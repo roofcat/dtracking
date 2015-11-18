@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+
+{% block stylesheets %}
+	<link rel="stylesheet" href="https://cdn.datatables.net/r/bs/jqc-1.11.3,dt-1.10.9/datatables.min.css"/>
+	<link rel="stylesheet" href="/static/css/jquery.datetimepicker.css">
+	<link rel="stylesheet" href="/static/css/dataTables.bootstrap.min.css">
+{% endblock %}
+
+{% block title %}Información detallada{% endblock %}
+
+{% block content %}
+<div style="display:none;" id="divCards"></div>
+<table class="table table-hover table-striped table-condensed table-responsive" id="tableCards" style="font-size:10px;">
+	<tr>
+		<th>Resumen de envío</th>
+		<th>Adjuntos</th>
+		<th>Folio</th>
+		<th>Correo</th>
+		<th>Fecha envío</th>
+		<th>Rut eeceptor</th>
+		<th>Nombre cliente</th>
+		<th>Rut emisor</th>
+		<th>Nombre emisor</th>
+		<th>Tipo envío</th>
+		<th>Tipo DTE</th>
+		<th>Resolución receptor</th>
+		<th>Resolución emisor</th>
+		<th>Monto</th>
+		<th>Fecha emisión</th>
+		<th>Fecha recepción</th>
+		<th>Estado documento</th>
+		<th>Tipo operación</th>
+		<th>Tipo receptor</th>
+	</tr>
+</table>
+
+<!-- BOTON MATERIAL EXPORT -->
+<div class="csv-download-btn">
+	<button class="btn btn-fab btn-raised btn-material-blue mdi-content-send" style="display:none;" 
+	id="btnGenerateReport" type="button" rel="popover" data-animation="true" data-trigger="hover" 
+	data-html="true" data-placement="left" data-container="body" data-toggle="popover" 
+	data-content="<p>Generar Excel y enviármelo como correo electrónico adjunto. 
+	<b>Nota:</b> máximo 20 mil celdas.</p>">
+		<div class="ripple-wrapper"></div>
+	</button>
+</div>
+
+<!-- BOTON MATERIAL MENU -->
+<div class="search-btn" align="right">
+	<button class="btn btn-fab btn-raised btn-material-red mdi-action-search" id="showMenu" 
+	type="button" rel="popover" data-animation="true" data-trigger="hover" 
+	data-html="true" data-placement="left" data-container="body" data-toggle="popover" 
+	data-content="<p>Click para abrir panel de filtro por fechas de período.</p>">
+		<div class="ripple-wrapper"></div>
+	</button>
+</div>
+
+<!-- MODAL MENU BUSCAR -->
+<div class="modal" id="menuModal" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" id="closeMenuModal" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Buscar por...</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-horizontal" style="padding-top:10px;width:100%;">
+                	<div class="row">
+						<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+							<ul class="nav nav-pills nav-stacked" role="tablist" id="tabNavs">
+								<li role="presentation" class="active">
+									<a href="#correo" aria-controls="correo" role="tab" data-toggle="tab">Correo</a>
+								</li>
+								<li role="presentation">
+									<a href="#folio" aria-controls="folio" role="tab" data-toggle="tab">Folio</a>
+								</li>
+								<li role="presentation">
+									<a href="#rutreceptor" aria-controls="rutreceptor" role="tab" data-toggle="tab">Rut receptor</a>
+								</li>
+								<li role="presentation">
+									<a href="#fallidos" aria-controls="fallidos" role="tab" data-toggle="tab">Fallidos</a>
+								</li>
+								<li role="presentation">
+									<a href="#monto" aria-controls="monto" role="tab" data-toggle="tab">Monto</a>
+								</li>
+				  			</ul>
+						</div>
+						<!-- DIVs DE OPCIONES -->
+						<div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
+							<div class="tab-content">
+							    <div role="tabpanel" class="tab-pane active" id="correo">
+
+							    	<div class="form-horizontal" style="padding:10px;">
+							    	<!-- FORM CORREOS -->
+										<div class="form-group form-group-material-indigo has-feedback">
+											<label class="control-label">Correo</label>
+											<input class="form-control" type="email" id="correoDestinatario">
+										</div>
+							    		<div class="form-group form-group-material-indigo has-feedback">
+											<label class="control-label">Desde</label>
+											<input class="form-control datePicker" type="text" id="date_from1">
+											<span class="mdi-action-today form-control-feedback" aria-hidden="true"></span>
+										</div>
+										<div class="form-group form-group-material-indigo has-feedback">
+											<label class="control-label">Hasta</label>
+											<input class="form-control datePicker" type="text" id="date_to1">
+											<span class="mdi-action-today form-control-feedback" aria-hidden="true"></span>
+										</div>
+							    	</div>
+							    </div>
+
+							    <div role="tabpanel" class="tab-pane" id="folio">
+							    <!-- FORM POR FOLIO -->
+							    	<div class="form-horizontal" style="padding:10px;">
+										<div class="form-group form-group-material-indigo has-feedback">
+											<label class="control-label">Nº de folio</label>
+											<input class="form-control" type="number" id="numeroFolio">
+										</div>
+							    	</div>
+							    </div>
+
+							    <div role="tabpanel" class="tab-pane" id="rutreceptor">
+							    <!-- FORM RUT RECEPTOR -->
+							    	<div class="form-horizontal" style="padding:10px;">
+										<div class="form-group form-group-material-indigo has-feedback">
+											<label class="control-label">Rut receptor</label>
+											<input class="form-control" type="text" id="rutReceptor">
+										</div>
+							    		<div class="form-group form-group-material-indigo has-feedback">
+											<label class="control-label">Desde</label>
+											<input class="form-control datePicker" type="text" id="date_from2">
+											<span class="mdi-action-today form-control-feedback" aria-hidden="true"></span>
+										</div>
+										<div class="form-group form-group-material-indigo has-feedback">
+											<label class="control-label">Hasta</label>
+											<input class="form-control datePicker" type="text" id="date_to2">
+											<span class="mdi-action-today form-control-feedback" aria-hidden="true"></span>
+										</div>
+							    	</div>
+							    </div>
+
+							    <div role="tabpanel" class="tab-pane" id="fallidos">
+							    <!-- FORM FALLIDOS -->
+							    	<div class="form-horizontal" style="padding:10px;">
+							    		<div class="form-group form-group-material-indigo has-feedback">
+											<label class="control-label">Desde</label>
+											<input class="form-control datePicker" type="text" id="date_from3">
+											<span class="mdi-action-today form-control-feedback" aria-hidden="true"></span>
+										</div>
+										<div class="form-group form-group-material-indigo has-feedback">
+											<label class="control-label">Hasta</label>
+											<input class="form-control datePicker" type="text" id="date_to3">
+											<span class="mdi-action-today form-control-feedback" aria-hidden="true"></span>
+										</div>
+							    	</div>
+							    </div>
+
+							    <div role="tabpanel" class="tab-pane" id="monto">
+							    <!-- FORM MONTO -->
+							    	<div class="form-horizontal" style="padding:10px;">
+							    		<div class="form-group form-group-material-indigo has-feedback">
+											<label class="control-label">Monto desde</label>
+											<input class="form-control" type="number" id="mount_from" min="0">
+										</div>
+										<div class="form-group form-group-material-indigo has-feedback">
+											<label class="control-label">Monto hasta</label>
+											<input class="form-control" type="number" id="mount_to" min="0">
+										</div>
+							    		<div class="form-group form-group-material-indigo has-feedback">
+											<label class="control-label">Desde</label>
+											<input class="form-control datePicker" type="text" id="date_from4">
+											<span class="mdi-action-today form-control-feedback" aria-hidden="true"></span>
+										</div>
+										<div class="form-group form-group-material-indigo has-feedback">
+											<label class="control-label">Hasta</label>
+											<input class="form-control datePicker" type="text" id="date_to4">
+											<span class="mdi-action-today form-control-feedback" aria-hidden="true"></span>
+										</div>
+							    	</div>
+							    </div>
+
+				  			</div>
+						</div>
+					</div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+            	<div class="form-group" align="right" style="margin-right:20px;">
+            		<button class="btn btn-flat btn-material-indigo" data-dismiss="modal">Cancelar</button>
+					<button class="btn btn-material-indigo" id="run_search">Buscar</button>
+				</div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- MODAL CARGANDO -->
+<div class="modal" id="loadingModal" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" id="closeLoadingModal" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Buscando...</h4>
+            </div>
+            <div class="modal-body">
+                <p>por favor espere unos segundos</p>
+            </div>
+            <div class="modal-footer"></div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL ERROR -->
+<div class="modal" id="errorModal" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" id="closeErrorModal" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title">Advertencia!</h4>
+            </div>
+            <div class="modal-body">
+                <p>No deben ir campos vacíos.</p>
+            </div>
+            <div class="modal-footer">
+            	<div class="form-group" align="right" style="margin-right:20px;">
+					<button class="btn btn-flat btn-material-indigo" data-dismiss="modal">Cerrar</button>
+				</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+	<script src="/static/js/jquery.datetimepicker.js"></script>
+	<script src="/static/js/jquery.dataTables.min.js"></script>
+	<script src="/static/js/dataTables.bootstrap.min.js"></script>
+	<script src="/static/js/customsearch/index.min.js"></script>
+{% endblock %}

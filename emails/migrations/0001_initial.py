@@ -1,0 +1,82 @@
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
+from django.db import migrations, models
+
+
+class Migration(migrations.Migration):
+
+    dependencies = [
+        ('empresas', '0001_initial'),
+    ]
+
+    operations = [
+        migrations.CreateModel(
+            name='Email',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('input_datetime', models.DateTimeField(auto_now_add=True)),
+                ('input_date', models.DateField(auto_now_add=True)),
+                ('rut_receptor', models.CharField(max_length=20)),
+                ('rut_emisor', models.CharField(max_length=20)),
+                ('tipo_envio', models.CharField(max_length=20)),
+                ('tipo_dte', models.CharField(max_length=20)),
+                ('numero_folio', models.IntegerField()),
+                ('resolucion_receptor', models.CharField(max_length=20)),
+                ('resolucion_emisor', models.CharField(max_length=20)),
+                ('monto', models.IntegerField(default=0)),
+                ('fecha_emision', models.DateTimeField(null=True)),
+                ('fecha_recepcion', models.DateTimeField(null=True)),
+                ('estado_documento', models.CharField(max_length=100)),
+                ('tipo_operacion', models.CharField(max_length=100)),
+                ('tipo_receptor', models.CharField(max_length=100)),
+                ('nombre_cliente', models.CharField(max_length=200)),
+                ('correo', models.EmailField(max_length=100)),
+                ('asunto', models.CharField(max_length=200)),
+                ('html', models.TextField()),
+                ('smtp_id', models.CharField(max_length=200)),
+                ('processed_date', models.DateTimeField(null=True)),
+                ('processed_event', models.CharField(max_length=240)),
+                ('processed_sg_event_id', models.CharField(max_length=240)),
+                ('processed_sg_message_id', models.CharField(max_length=240)),
+                ('delivered_date', models.DateTimeField(null=True)),
+                ('delivered_event', models.CharField(max_length=240)),
+                ('delivered_sg_event_id', models.CharField(max_length=240)),
+                ('delivered_sg_message_id', models.CharField(max_length=240)),
+                ('delivered_response', models.TextField()),
+                ('opened_first_date', models.DateTimeField(null=True)),
+                ('opened_last_date', models.DateTimeField(null=True)),
+                ('opened_event', models.CharField(max_length=240)),
+                ('opened_ip', models.CharField(max_length=100)),
+                ('opened_user_agent', models.CharField(max_length=240)),
+                ('opened_sg_event_id', models.CharField(max_length=240)),
+                ('opened_sg_message_id', models.CharField(max_length=240)),
+                ('opened_count', models.IntegerField()),
+                ('dropped_date', models.DateTimeField(null=True)),
+                ('dropped_sg_event_id', models.CharField(max_length=240)),
+                ('dropped_sg_message_id', models.CharField(max_length=240)),
+                ('dropped_reason', models.CharField(max_length=240)),
+                ('dropped_event', models.CharField(max_length=240)),
+                ('bounce_date', models.DateTimeField(null=True)),
+                ('bounce_event', models.CharField(max_length=240)),
+                ('bounce_sg_event_id', models.CharField(max_length=240)),
+                ('bounce_sg_message_id', models.CharField(max_length=240)),
+                ('bounce_reason', models.TextField()),
+                ('bounce_status', models.CharField(max_length=240)),
+                ('bounce_type', models.CharField(max_length=240)),
+                ('unsubscribe_date', models.DateTimeField(null=True)),
+                ('unsubscribe_uid', models.CharField(max_length=240)),
+                ('unsubscribe_purchase', models.CharField(max_length=240)),
+                ('unsubscribe_id', models.CharField(max_length=240)),
+                ('unsubscribe_event', models.CharField(max_length=240)),
+                ('click_ip', models.CharField(max_length=100)),
+                ('click_purchase', models.CharField(max_length=240)),
+                ('click_useragent', models.CharField(max_length=240)),
+                ('click_event', models.CharField(max_length=240)),
+                ('click_email', models.CharField(max_length=240)),
+                ('click_date', models.DateTimeField(null=True)),
+                ('click_url', models.CharField(max_length=240)),
+                ('empresa', models.ForeignKey(to='empresas.Empresa')),
+            ],
+        ),
+    ]
