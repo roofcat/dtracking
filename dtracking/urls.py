@@ -7,7 +7,7 @@ from django.contrib import admin
 
 urlpatterns = [
     url(r'^$', 'emails.views.dashboard'),
-	url(r'^customsearch/$', 'emails.views.customsearch'),
+    url(r'^customsearch/$', 'emails.views.customsearch'),
 
 	# sistema de autenticación de usuarios
 	url(r'^login/', 'autenticacion.views.log_in'),
