@@ -2,14 +2,12 @@
 # se deben instalar en la carpeta vendor
 # para instalar ejecutar pip install -U -t lib -r requirements.txt
 
+django-filter==0.11
 django==1.8.6
-djangorestframework
-google-api-python-client
-httplib2
-oauth2client
+djangorestframework==3.3.1
+markdown==2.6
 sendgrid
 simplejson
 six
 smtpapi
 tablib
-uritemplate

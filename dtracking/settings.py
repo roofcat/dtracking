@@ -39,7 +39,20 @@ INSTALLED_APPS = (
     'emails',
     'empresas',
     'autenticacion',
+    'rest_framework',
+    'rest_framework.authtoken',
 )
+
+REST_FRAMEWORK = {
+    'PAGE_SIZE': 50,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAdminUser',
+    ),
+}
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
