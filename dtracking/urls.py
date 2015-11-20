@@ -26,8 +26,10 @@ urlpatterns = [
 	url(r'^api-token/', obtain_auth_token),
 	
 	# rutas de las paginas html del tracking
-    url(r'^$', 'emails.views.dashboard'),
-    url(r'^customsearch/$', 'emails.views.customsearch'),
+    url(r'^$', 'dashboard.views.index'),
+    url(r'^customsearch/$', 'customsearch.views.index'),
+    # url que recibe webhooks de sendgrid
+    url(r'^webhook/$', 'webhooks.views.sendgrid_rest_webhook'),
 
     # rutas de autenticación de usuarios
     url(r'^login/', 'autenticacion.views.log_in'),

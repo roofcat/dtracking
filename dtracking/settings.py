@@ -24,7 +24,7 @@ SECRET_KEY = '%7)c#yro&000cb_f*-dhc19@p%in)dvcq%(88-7jq7f1%lha5f'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*',]
 
 
 # Application definition
@@ -41,8 +41,11 @@ INSTALLED_APPS = (
     'rest_framework.authtoken',
     # apps
     'autenticacion',
+    'customsearch',
+    'dashboard',
     'emails',
     'empresas',
+    'webhooks',
 )
 
 REST_FRAMEWORK = {

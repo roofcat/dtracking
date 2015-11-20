@@ -5,11 +5,6 @@ import json
 import logging
 
 
-from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
-from django.shortcuts import render
-
-
 from rest_framework import viewsets, permissions
 
 
@@ -26,12 +21,7 @@ class EmailViewSet(viewsets.ModelViewSet):
     def list(self, request, *args, **kwargs):
     	return super(EmailViewSet, self).list(request, *args, **kwargs)
 
-
-@login_required(login_url='/login/')
-def dashboard(request):
-    return render(request, 'dashboard/index.html')
-
-
-@login_required(login_url='/login/')
-def customsearch(request):
-    return render(request, 'customsearch/index.html')
+	def post(self, request, *args, **kwargs):
+		logging.error("paso el post ahora mandarlo en cola")
+		logging.error(request)
+		return request
