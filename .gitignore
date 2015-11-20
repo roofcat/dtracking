@@ -1,5 +1,6 @@
 .DS_Store
 *py[cod]
+*.py[cod]
 autenticacion/*py[cod]
 dtracking/*py[cod]
 emails/*py[cod]
