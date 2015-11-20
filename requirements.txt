@@ -6,8 +6,9 @@ django-filter==0.11
 django==1.8.6
 djangorestframework==3.3.1
 markdown==2.6
+pytz==2015.7
 sendgrid
 simplejson
-six
+six==1.10
 smtpapi
-tablib
+tablib==0.10

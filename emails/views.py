@@ -24,7 +24,6 @@ class EmailViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.AllowAny,)
 
     def list(self, request, *args, **kwargs):
-    	print request.user
     	return super(EmailViewSet, self).list(request, *args, **kwargs)
 
 
