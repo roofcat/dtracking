@@ -36,11 +36,13 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'emails',
-    'empresas',
-    'autenticacion',
+    # app de terceros
     'rest_framework',
     'rest_framework.authtoken',
+    # apps
+    'autenticacion',
+    'emails',
+    'empresas',
 )
 
 REST_FRAMEWORK = {
@@ -124,7 +126,6 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
-
 if os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine'):
     STATIC_ROOT = 'static'
 else:
