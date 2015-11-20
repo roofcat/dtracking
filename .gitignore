@@ -2,6 +2,8 @@
 *py[cod]
 *.py[cod]
 autenticacion/*py[cod]
+customsearch/*py[cod]
+dashboard/*py[cod]
 dtracking/*py[cod]
 emails/*py[cod]
 empresas/*py[cod]
