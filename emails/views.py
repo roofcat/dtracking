@@ -23,6 +23,8 @@ class SaludoView(APIView):
     def get(self, request, format=None):
         emails = Email.objects.all()
         response = self.serializer_class(emails, many=True)
+        logging.info("paso en el GET")
+        print "paso en el GET"
         return Response(response.data)
 
 saludo_view = SaludoView.as_view()
@@ -40,4 +42,4 @@ class EmailViewSet(ModelViewSet):
 	def post(self, request, *args, **kwargs):
 		logging.error("paso el post ahora mandarlo en cola")
 		logging.error(request)
-		return request
+		return request.id
