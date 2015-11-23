@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 
-from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
 
 
 from .models import Empresa
 
 
-class EmpresaSerializer(serializers.ModelSerializer):
+class EmpresaSerializer(ModelSerializer):
 
 	class Meta:
 		model = Empresa

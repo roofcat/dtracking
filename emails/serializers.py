@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 
-from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer
 
 
 from .models import Email
 
 
-class EmailSerializer(serializers.ModelSerializer):
+class EmailSerializer(ModelSerializer):
 
 	class Meta:
 		model = Email
