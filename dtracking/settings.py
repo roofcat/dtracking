@@ -135,4 +135,3 @@ else:
     # comentar el staticfiles_dir para ejecutar collecstatic
     STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 STATIC_URL = '/static/'
-

@@ -8,13 +8,12 @@ from pytz.gae import pytz
 
 
 from django.http import HttpResponse
-from django.utils.timezone import localtime
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 
 from emails.models import Email
-from dtracking.settings import TIME_ZONE
 
 
 def get_email(email_id):
@@ -35,10 +34,10 @@ def sendgrid_rest_webhook(request):
 		# import datetime, pytz
 		# print datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
 		# timestamp_to_date = lambda x: datetime.utcfromtimestamp(x).replace(tzinfo=pytz.utc)
-		logging.info(pytz.timezone(TIME_ZONE))
 		logging.info(pytz.utc)
-		timestamp_to_date = lambda x: datetime.fromtimestamp(x, tz=pytz.timezone(TIME_ZONE))
-
+		logging.info(timezone.get_default_timezone())
+		logging.info(timezone.get_current_timezone_name())
+		timestamp_to_date = lambda x: datetime.fromtimestamp(x, tz=timezone.get_default_timezone())
 		for body in request_body:
 			try:
 				evento_sendgrid = str(body['event']).decode('utf-8')
