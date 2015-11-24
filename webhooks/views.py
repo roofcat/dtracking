@@ -4,7 +4,7 @@
 from datetime import datetime
 import json
 import logging
-from pytz.gae import pytz
+import pytz
 
 
 from django.http import HttpResponse
