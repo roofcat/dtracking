@@ -32,7 +32,8 @@ class EmailClient(object):
         self.message.set_html(correo.html)
         # valores personalizados
         unique_args = {
-            'empresa': correo.empresa,
+        	'email_id': correo.id,
+            'empresa': correo.empresa.rut,
             'rut_receptor': correo.rut_receptor,
             'rut_emisor': correo.rut_emisor,
             'tipo_envio': correo.tipo_envio,
