@@ -16,9 +16,10 @@ from rest_framework.viewsets import ModelViewSet
 
 from .models import Email
 from .serializers import EmailSerializer
+from .sendgrid_client import EmailClient
 
 
-class SaludoView(APIView):
+class EmailDteInputView(APIView):
     serializer_class = EmailSerializer
     # authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (permissions.AllowAny,)
@@ -37,13 +38,14 @@ class SaludoView(APIView):
         if email.is_valid():
             email.save()
             logging.info(email.data)
-            logging.info(email.data['id'])
+            email_client = EmailClient()
+            email_client.enviar_correo_dte(email.data['id'])
             return Response(email.data)
         else:
             logging.error(email.errors)
             return Response(email.errors)
 
-saludo_view = SaludoView.as_view()
+email_dte_input_view = EmailDteInputView.as_view()
 
 
 class EmailViewSet(ModelViewSet):

@@ -25,8 +25,8 @@ urlpatterns = [
     url(r'^api-auth/$', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api-token/', obtain_auth_token),
     # rutas api rest heredadas de APIView
-    url(r'^api/input/$', 'emails.views.saludo_view'),
-    url(r'^api/input/(?P<id>[0-9]+)/$', 'emails.views.saludo_view'),
+    url(r'^api/input/$', 'emails.views.email_dte_input_view'),
+    url(r'^api/input/(?P<id>[0-9]+)/$', 'emails.views.email_dte_input_view'),
 
 	
 	# rutas de las paginas html del tracking
