@@ -31,23 +31,16 @@ def sendgrid_rest_webhook(request):
 	if request.method == 'POST':
 		request_body = json.loads(request.body.decode('utf-8'))
 		logging.info(request_body)
-		# import datetime, pytz
-		# print datetime.datetime.now(tz=pytz.timezone(TIME_ZONE))
-		# timestamp_to_date = lambda x: datetime.utcfromtimestamp(x).replace(tzinfo=pytz.utc)
-		logging.info(pytz.utc)
-		logging.info(timezone.get_default_timezone())
-		logging.info(timezone.get_current_timezone_name())
-		timestamp_to_date = lambda x: datetime.fromtimestamp(x, tz=timezone.get_default_timezone())
+		timestamp_to_date = lambda x: datetime.fromtimestamp(x, tz=pytz.timezone("America/Santiago"))
+
 		for body in request_body:
-			try:
-				evento_sendgrid = str(body['event']).decode('utf-8')
-				correo = str(body['email']).decode('utf-8')
-				numero_folio = str(body['numero_folio']).decode('utf-8')
-				tipo_dte = str(body['tipo_dte']).decode('utf-8')
-				email_id = str(body['email_id']).decode('utf-8')
-				logging.info(evento_sendgrid)
-			except Exception, e:
-				logging.info(e)
+			evento_sendgrid = str(body['event']).decode('utf-8')
+			correo = str(body['email']).decode('utf-8')
+			numero_folio = str(body['numero_folio']).decode('utf-8')
+			tipo_dte = str(body['tipo_dte']).decode('utf-8')
+			email_id = str(body['email_id']).decode('utf-8')
+			logging.info(evento_sendgrid)
+
 			if evento_sendgrid and correo and numero_folio and tipo_dte and email_id:
 				email_id = int(email_id, base=10)
 				logging.info("paso el if")
