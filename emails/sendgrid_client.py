@@ -48,8 +48,11 @@ class EmailClient(object):
             'tipo_operacion': correo.tipo_operacion,
             'tipo_receptor': correo.tipo_receptor,
         }
+        logging.info(correo)
         if correo.adjunto1:
-            self.message.add_attachment_stream(correo.name, correo)
+            logging.info(correo.adjunto1.name)
+            logging.info(correo.adjunto1.file)
+            #self.message.add_attachment_stream(correo.adjunto1.name, correo.adjunto1.file)
         self.message.set_unique_args(unique_args)
         # enviando el mail
         status, msg = self.sg.send(self.message)
