@@ -1,12 +1,12 @@
 Metadata-Version: 2.0
 Name: Markdown
-Version: 2.6
+Version: 2.6.5
 Summary: Python implementation of Markdown.
 Home-page: https://pythonhosted.org/Markdown/
 Author: Waylan Limberg
 Author-email: waylan.limberg [at] icloud.com
 License: BSD License
-Download-URL: http://pypi.python.org/packages/source/M/Markdown/Markdown-2.6.tar.gz
+Download-URL: http://pypi.python.org/packages/source/M/Markdown/Markdown-2.6.5.tar.gz
 Platform: UNKNOWN
 Classifier: Development Status :: 5 - Production/Stable
 Classifier: License :: OSI Approved :: BSD License

@@ -1,6 +1,6 @@
 Metadata-Version: 2.0
 Name: sendgrid
-Version: 1.5.17
+Version: 1.5.18
 Summary: SendGrid library for Python
 Home-page: https://github.com/sendgrid/sendgrid-python/
 Author: Yamil Asusta

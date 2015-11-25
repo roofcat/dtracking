@@ -15,12 +15,12 @@ from rest_framework.viewsets import ModelViewSet
 
 
 from .models import Email
-from .serializers import EmailSerializer
+from .serializers import EmailDteInputSerializer
 from .sendgrid_client import EmailClient
 
 
 class EmailDteInputView(APIView):
-    serializer_class = EmailSerializer
+    serializer_class = EmailDteInputSerializer
     # authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (permissions.AllowAny,)
 
@@ -51,7 +51,7 @@ email_dte_input_view = EmailDteInputView.as_view()
 class EmailViewSet(ModelViewSet):
     model = Email
     queryset = Email.objects.all()
-    serializer_class = EmailSerializer
+    serializer_class = EmailDteInputSerializer
     permission_classes = (permissions.AllowAny,)
 
     def list(self, request, *args, **kwargs):

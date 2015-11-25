@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 
 
+import calendar
+from datetime import datetime
+
+
 from django.db import models
 
 
@@ -67,7 +71,10 @@ class Email(models.Model):
     asunto = models.CharField(max_length=200)
     html = models.TextField()
     # adjuntos
-    # attachs = models.KeyProperty(kind='AttachModel', repeated=True)
+    adjunto1 = models.FileField(
+        upload_to='adjuntos/%Y/%m/%d/{0}'.format(
+            calendar.timegm(datetime.utcnow().utctimetuple())),
+        default='', null=True, blank=True)
     # campos de processed
     smtp_id = models.CharField(max_length=200, null=True, blank=True)
     processed_date = models.DateTimeField(null=True, blank=True)

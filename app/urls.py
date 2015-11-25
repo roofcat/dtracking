@@ -30,15 +30,14 @@ urlpatterns = [
 
 	
 	# rutas de las paginas html del tracking
-    url(r'^$', 'dashboard.views.index'),
-    url(r'^customsearch/$', 'customsearch.views.index'),
+    url(r'^$', 'dashboard.views.index', name='dashboard'),
+    url(r'^customsearch/$', 'customsearch.views.index', 'customsearch'),
     # url que recibe webhooks de sendgrid
-    url(r'^webhook/$', 'webhooks.views.sendgrid_rest_webhook'),
+    url(r'^webhook/$', 'webhooks.views.sendgrid_rest_webhook', name='webhook_rest'),
 
     # rutas de autenticación de usuarios
-    url(r'^login/', 'autenticacion.views.log_in'),
-    url(r'^logout/', 'autenticacion.views.log_out'),
-
-    # modulo Administrador Azurian
+    url(r'^login/', 'autenticacion.views.log_in', name='login'),
+    url(r'^logout/', 'autenticacion.views.log_out', name='logout'),
+   # modulo Administrador Azurian
     url(r'^admin/', include(admin.site.urls)),
 ]

@@ -83,7 +83,7 @@ smartypants.py license:
 
 from __future__ import unicode_literals
 from . import Extension
-from ..inlinepatterns import HtmlPattern
+from ..inlinepatterns import HtmlPattern, HTML_RE
 from ..odict import OrderedDict
 from ..treeprocessors import InlineProcessor
 
@@ -126,6 +126,9 @@ doubleQuoteStartRe = r'^"(?=%s\B)' % punctClass
 doubleQuoteSetsRe = r""""'(?=\w)"""
 singleQuoteSetsRe = r"""'"(?=\w)"""
 
+# Special case for decade abbreviations (the '80s):
+decadeAbbrRe = r"(?<!\w)'(?=\d{2}s)"
+
 # Get most opening double quotes:
 openingDoubleQuotesRegex = r'%s"(?=\w)' % openingQuotesBase
 
@@ -143,6 +146,8 @@ closingSingleQuotesRegex2 = r"(?<=%s)'(\s|s\b)" % closeClass
 # All remaining quotes should be opening ones
 remainingSingleQuotesRegex = "'"
 remainingDoubleQuotesRegex = '"'
+
+HTML_STRICT_RE = HTML_RE + r'(?!\>)'
 
 
 class SubstituteTextPattern(HtmlPattern):
@@ -227,6 +232,7 @@ class SmartyExtension(Extension):
             (doubleQuoteStartRe, (rdquo,)),
             (doubleQuoteSetsRe, (ldquo + lsquo,)),
             (singleQuoteSetsRe, (lsquo + ldquo,)),
+            (decadeAbbrRe, (rsquo,)),
             (openingSingleQuotesRegex, (2, lsquo)),
             (closingSingleQuotesRegex, (rsquo,)),
             (closingSingleQuotesRegex2, (rsquo, 2)),
@@ -247,6 +253,9 @@ class SmartyExtension(Extension):
             self.educateQuotes(md)
         if configs['smart_angled_quotes']:
             self.educateAngledQuotes(md)
+            # Override HTML_RE from inlinepatterns.py so that it does not
+            # process tags with duplicate closing quotes.
+            md.inlinePatterns["html"] = HtmlPattern(HTML_STRICT_RE, md)
         if configs['smart_dashes']:
             self.educateDashes(md)
         inlineProcessor = InlineProcessor(md)
