@@ -2,8 +2,7 @@
 
 google.load('visualization', '1.0', {'packages': ['corechart','line','table'], 'language': 'es'});
 
-var baseUrl = document.location.href;
-var urlPath = 'api/statistics/globalstats/';
+var urlPath = 'statistics/';
 var urlGeneralExport = 'export/general/';
 var urlSendedExport = 'export/sended/';
 var urlFailureExport = 'export/failure/';
@@ -65,9 +64,9 @@ function putDownloadLink () {
 	date_from = getDateAsTimestamp( date_from );
 	date_to = getDateAsTimestamp( date_to );
 	
-	linkGeneral = baseUrl + urlGeneralExport + date_from + '/' + date_to + '/' + options + '/';
-	linkSended = baseUrl + urlSendedExport + date_from + '/' + date_to + '/' + options + '/';
-	linkFailure = baseUrl + urlFailureExport + date_from + '/' + date_to + '/' + options + '/';
+	linkGeneral = urlGeneralExport + date_from + '/' + date_to + '/' + options + '/';
+	linkSended = urlSendedExport + date_from + '/' + date_to + '/' + options + '/';
+	linkFailure = urlFailureExport + date_from + '/' + date_to + '/' + options + '/';
 };
 
 $( 'button' ).on( 'click', function () {
@@ -132,8 +131,14 @@ $( '#run_search' ).on( 'click', function () {
 	$( '#loadingModal' ).modal( 'show', true );
 	$.ajax({
 		'type': 'GET',
-		'url': baseUrl + urlPath + date_from + '/' + date_to + '/' + options + '/',
+		//'url': urlPath + date_from + '/' + date_to + '/' + options + '/',
+		'url': urlPath,
 		'dataType': 'json',
+		'data': {
+			'date_from': date_from,
+			'date_to': date_to,
+			'options': options,
+		},
 		success: function ( data ) {
 			jsonData = data;
 			drawJsonData();
