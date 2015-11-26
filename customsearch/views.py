@@ -1,11 +1,20 @@
 # -*- coding: utf-8 -*-
 
 
-from django.contrib.auth.decorators import login_required
+from datetime import datetime
+import json
+
+
+from django.http import HttpResponse
 from django.shortcuts import render
+from django.views.generic import TemplateView
 
 
+from autenticacion.views import LoginRequiredMixin
 
-@login_required(login_url='/login/')
-def index(request):
-    return render(request, 'customsearch/index.html')
+
+class IndexView(LoginRequiredMixin, TemplateView):
+	template_name = 'customsearch/index.html'
+
+	def get(self, request, *args, **kwargs):
+		return render(request, self.template_name)
