@@ -25,31 +25,7 @@ class StatisticsView(LoginRequiredMixin, TemplateView):
         	date_to = int(date_to, base=10)
         	date_from = datetime.fromtimestamp(date_from)
         	date_to = datetime.fromtimestamp(date_to)
-        	count_total = Email.objects.filter(
-        		input_date__range=(date_from, date_to)).count()
-        	count_processed = Email.objects.filter(
-        		input_date__range=(date_from, date_to),
-        		processed_event='processed').count()
-        	count_delivered = Email.objects.filter(
-        		input_date__range=(date_from, date_to), 
-        		delivered_event='delivered').count()
-        	count_opened = Email.objects.filter(
-        		input_date__range=(date_from, date_to), 
-        		opened_event='open').count()
-        	count_dropped = Email.objects.filter(
-        		input_date__range=(date_from, date_to), 
-        		dropped_event='dropped').count()
-        	count_bounce = Email.objects.filter(
-        		input_date__range=(date_from, date_to), 
-        		bounce_event='bounce').count()
-        	statistic = {
-        		'total': count_total,
-        		'processed': count_processed,
-        		'delivered': count_delivered,
-        		'opened': count_opened,
-        		'dropped': count_dropped,
-        		'bounced': count_bounce,
-        	}
+        	statistic = Email.get_statistics_count_by_dates(date_from, date_to)
         	data = {
         		'date_from': str(date_from),
         		'date_to': str(date_to),
