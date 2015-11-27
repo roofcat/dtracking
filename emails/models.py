@@ -176,6 +176,7 @@ class Email(models.Model):
         return u"{0} - {1}".format(self.correo, self.numero_folio)
 
     # MÉTODOS DE CONSULTAS (para no repetir código)
+    @classmethod
     def get_statistics_count_by_dates(self, date_from, date_to):
         count_total = Email.objects.filter(
             input_date__range=(date_from, date_to)).count()
