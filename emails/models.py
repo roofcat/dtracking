@@ -3,9 +3,11 @@
 
 import calendar
 from datetime import datetime
+import json
 
 
 from django.db import models
+from django.core import serializers
 
 
 from empresas.models import Empresa
@@ -202,4 +204,26 @@ class Email(models.Model):
             'opened': count_opened,
             'dropped': count_dropped,
             'bounced': count_bounce,
+        }
+
+    @classmethod
+    def get_emails_by_dates(self, date_from, date_to, correo, **kwargs):
+        emails = Email.objects.filter(
+            input_date__range=(date_from, date_to),
+            correo=correo).order_by('-input_date')
+        query_total = emails.count()
+        emails = emails[kwargs['display_start']:kwargs['display_length']]
+        if emails:
+            query_length = emails.count()
+        else:
+            query_length = 0
+        emails = serializers.serialize('json', emails)
+        emails = json.loads(emails)
+        data = []
+        for e in emails:
+            data.append(e['fields'])
+        return {
+            'query_total': query_total,
+            'query_length': query_length,
+            'data': data,
         }

@@ -14,6 +14,9 @@ from autenticacion.views import LoginRequiredMixin
 from emails.models import Email
 
 
+timestamp_to_date = lambda x: datetime.fromtimestamp(x)
+
+
 class StatisticsView(LoginRequiredMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
@@ -24,8 +27,8 @@ class StatisticsView(LoginRequiredMixin, TemplateView):
 	        if date_from and date_to:
 	        	date_from = int(date_from, base=10)
 	        	date_to = int(date_to, base=10)
-	        	date_from = datetime.fromtimestamp(date_from)
-	        	date_to = datetime.fromtimestamp(date_to)
+	        	date_from = timestamp_to_date(date_from)
+	        	date_to = timestamp_to_date(date_to)
 	        	statistic = Email.get_statistics_count_by_dates(date_from, date_to)
 	        	data = {
 	        		'date_from': str(date_from),

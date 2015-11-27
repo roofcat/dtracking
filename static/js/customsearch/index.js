@@ -2,7 +2,7 @@
 
 var baseUrl = document.location.href;
 // urls busquedas
-var emailUrl = 'api/search/email/';
+var emailUrl = 'email/';
 var folioUrl = 'api/search/folio/';
 var rutUrl = 'api/search/rut/';
 var fallidosUrl = 'api/search/fallidos/';
@@ -59,7 +59,7 @@ $( '#run_search' ).on( 'click', function () {
 			date_to = getDateAsTimestamp( date_to );
 			correoDestinatario = encodeURIComponent( correoDestinatario );
 
-			var link = baseUrl + emailUrl + date_from + '/' + date_to + '/' + correoDestinatario + '/';
+			var link = emailUrl + date_from + '/' + date_to + '/' + correoDestinatario + '/';
 			$( '#closeLoadingModal' ).click();
 			drawJqueryTable( link );
 
