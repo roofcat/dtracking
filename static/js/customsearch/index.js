@@ -1,12 +1,12 @@
 'use strict';
 
-var baseUrl = document.location.href;
+//var baseUrl = document.location.href;
 // urls busquedas
 var emailUrl = 'email/';
-var folioUrl = 'api/search/folio/';
-var rutUrl = 'api/search/rut/';
-var fallidosUrl = 'api/search/fallidos/';
-var montosUrl = 'api/search/montos/';
+var folioUrl = 'folio/';
+var rutUrl = 'rut/';
+var fallidosUrl = 'fallidos/';
+var montosUrl = 'montos/';
 // urls export
 var emailExportUrl = 'export/email/';
 var folioExportUrl = 'export/folio/';
@@ -18,12 +18,6 @@ var tabPosition = '#correo';
 var exportLink = '';
 
 $( document ).ready( function () {
-
-	baseUrl = baseUrl.split('/');
-	delete baseUrl[4];
-	delete baseUrl[3];
-	baseUrl = baseUrl.join('/')
-	baseUrl = baseUrl.substring( 0, baseUrl.length - 1 );
 	
 	$( '.datePicker' ).datetimepicker ({
 		'dayOfWeekStart': 1,
@@ -63,17 +57,17 @@ $( '#run_search' ).on( 'click', function () {
 			$( '#closeLoadingModal' ).click();
 			drawJqueryTable( link );
 
-			exportLink = baseUrl + emailExportUrl + date_from + '/' + date_to + '/' + correoDestinatario + '/';
+			exportLink = emailExportUrl + date_from + '/' + date_to + '/' + correoDestinatario + '/';
 			break;
 
 		case '#folio':
 			var numeroFolio = $( '#numeroFolio' ).val();
 
-			var link = baseUrl + folioUrl + numeroFolio + '/';
+			var link = folioUrl + numeroFolio + '/';
 			$( '#closeLoadingModal' ).click();
 			drawJqueryTable( link );
 
-			exportLink = baseUrl + folioExportUrl + numeroFolio + '/';
+			exportLink = folioExportUrl + numeroFolio + '/';
 			break;
 
 		case '#rutreceptor':
@@ -89,11 +83,12 @@ $( '#run_search' ).on( 'click', function () {
 				return;
 			};
 
-			var link = baseUrl + rutUrl + date_from + '/' + date_to + '/' + rutReceptor + '/';
+			var link = rutUrl + date_from + '/' + date_to + '/' + rutReceptor + '/';
+			//var link = rutUrl + rutReceptor + '/';
 			$( '#closeLoadingModal' ).click();
 			drawJqueryTable( link );
 
-			exportLink = baseUrl + rutExportUrl + date_from + '/' + date_to + '/' + rutReceptor + '/';
+			exportLink = rutExportUrl + date_from + '/' + date_to + '/' + rutReceptor + '/';
 			break;
 
 		case '#fallidos':
@@ -103,11 +98,11 @@ $( '#run_search' ).on( 'click', function () {
 			date_from = getDateAsTimestamp( date_from );
 			date_to = getDateAsTimestamp( date_to );
 
-			var link = baseUrl + fallidosUrl + date_from + '/' + date_to + '/';
+			var link = fallidosUrl + date_from + '/' + date_to + '/';
 			$( '#closeLoadingModal' ).click();
 			drawJqueryTable( link );
 
-			exportLink = baseUrl + fallidosExportUrl + date_from + '/' + date_to + '/';
+			exportLink = fallidosExportUrl + date_from + '/' + date_to + '/';
 			break;
 
 		case '#monto':
@@ -121,11 +116,11 @@ $( '#run_search' ).on( 'click', function () {
 			mount_from = parseInt( mount_from, 10 );
 			mount_to = parseInt( mount_to, 10 );
 
-			var link = baseUrl + montosUrl + date_from + '/' + date_to + '/' + mount_from + '/' + mount_to + '/';
+			var link = montosUrl + date_from + '/' + date_to + '/' + mount_from + '/' + mount_to + '/';
 			$( '#closeLoadingModal' ).click();
 			drawJqueryTable( link );
 
-			exportLink = baseUrl + montosExportUrl + date_from + '/' + date_to + '/' + mount_from + '/' + mount_to + '/';
+			exportLink = montosExportUrl + date_from + '/' + date_to + '/' + mount_from + '/' + mount_to + '/';
 			break;
 	};
 	$( '#btnGenerateReport' ).show();
@@ -420,7 +415,7 @@ function drawJqueryTable ( urlSource ) {
 					var html = '<div style="font-size:11px;">';
 					for ( var i in data ) {
 						var attach = data[i];
-						html += '<a href="' + baseUrl + attachUrl + attach + '/" title="Ver archivo adjunto" target="_blank"><span class="mdi-editor-attach-file"></span></a>';
+						html += '<a href="' + attachUrl + attach + '/" title="Ver archivo adjunto" target="_blank"><span class="mdi-editor-attach-file"></span></a>';
 					};
 					html += '</div>';
 					return html;
