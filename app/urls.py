@@ -9,8 +9,10 @@ from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
 
 
-from emails.views import EmailViewSet
+from autenticacion.views import log_in, log_out, home_to_dashboard
+from emails.views import EmailViewSet, email_dte_input_view
 from empresas.views import EmpresaViewSet
+from webhooks.views import sendgrid_rest_webhook
 
 
 # sección de registro de apis rest con django-rest-framework
@@ -22,24 +24,23 @@ router = routers.DefaultRouter()
 urlpatterns = [
     # rutas de api rest
     url(r'^api/', include(router.urls)),
-    url(r'^api-auth/$', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api-token/', obtain_auth_token),
     
     # rutas api rest heredadas de APIView
-    url(r'^api/input/$', 'emails.views.email_dte_input_view'),
-    url(r'^api/input/(?P<id>[0-9]+)/$', 'emails.views.email_dte_input_view'),
+    url(r'^api/input/', email_dte_input_view),
 
 	# rutas de las paginas html del tracking
     url(r'^dashboard/', include('dashboard.urls', namespace='dashboard')),
     url(r'^customsearch/', include('customsearch.urls', namespace='customsearch')),
 
     # url que recibe webhooks de sendgrid
-    url(r'^webhook/$', 'webhooks.views.sendgrid_rest_webhook', name='webhook_rest'),
+    url(r'^webhook/', sendgrid_rest_webhook, name='webhook_rest'),
 
     # rutas de autenticación de usuarios
-    url(r'^$', 'autenticacion.views.home_to_dashboard'),
-    url(r'^login/', 'autenticacion.views.log_in', name='login'),
-    url(r'^logout/', 'autenticacion.views.log_out', name='logout'),
+    url(r'^$', home_to_dashboard),
+    url(r'^login/', log_in, name='login'),
+    url(r'^logout/', log_out, name='logout'),
     
     # modulo Administrador Azurian
     url(r'^admin/', include(admin.site.urls)),
