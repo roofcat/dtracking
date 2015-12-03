@@ -139,6 +139,8 @@ if os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine'):
     STATIC_ROOT = 'static'
 else:
     # comentar el staticfiles_dir para ejecutar collecstatic
+    # y descomentar el static_root
+    #STATIC_ROOT = 'static'
     STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
 STATIC_URL = '/static/'
 
