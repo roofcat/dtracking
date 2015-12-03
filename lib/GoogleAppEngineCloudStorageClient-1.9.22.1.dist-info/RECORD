@@ -1,7 +1,7 @@
 GoogleAppEngineCloudStorageClient-1.9.22.1.dist-info/DESCRIPTION.rst,sha256=OCTuuN6LcWulhHS3d5rfjdsQtW22n7HENFRh6jC6ego,10
-GoogleAppEngineCloudStorageClient-1.9.22.1.dist-info/METADATA,sha256=ynCH9GKIMeomXj4ehBvRjTXlKPPUBp61WSEkzG15mwg,678
+GoogleAppEngineCloudStorageClient-1.9.22.1.dist-info/METADATA,sha256=NGuF3B1gcpugJnPxxZqovF7lCxViasi_ZADr6O7_AGc,664
 GoogleAppEngineCloudStorageClient-1.9.22.1.dist-info/RECORD,,
-GoogleAppEngineCloudStorageClient-1.9.22.1.dist-info/WHEEL,sha256=3BTqKpHqwt_rzaCQaFEIeFXHTrSWBSQKkqmeYbLAVWs,97
+GoogleAppEngineCloudStorageClient-1.9.22.1.dist-info/WHEEL,sha256=JTb7YztR8fkPg6aSjc571Q4eiVHCwmUDlX8PhuuqIIE,92
 GoogleAppEngineCloudStorageClient-1.9.22.1.dist-info/metadata.json,sha256=TxZf47npscJ9aK-W8E758QS7fD9dCrMXjDupnxktZO4,859
 GoogleAppEngineCloudStorageClient-1.9.22.1.dist-info/top_level.txt,sha256=_v7scHekFLFMVDclCtnqY3uWN1hZa79_qcUjCw8kOaQ,13
 GoogleAppEngineCloudStorageClient-1.9.22.1.dist-info/zip-safe,sha256=AbpHGcgLb-kRsJGnwFEktk7uzpZOCcBY74-YBdrKVGs,1
@@ -17,7 +17,7 @@ cloudstorage/errors.pyc,,
 cloudstorage/storage_api.pyc,,
 cloudstorage/__init__.pyc,,
 cloudstorage/test_utils.pyc,,
-cloudstorage/rest_api.pyc,,
 cloudstorage/common.pyc,,
+cloudstorage/rest_api.pyc,,
 cloudstorage/api_utils.pyc,,
 cloudstorage/cloudstorage_api.pyc,,

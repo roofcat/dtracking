@@ -12,9 +12,9 @@ sendgrid/resources/asm_suppressions.py,sha256=MDpKcnVkAmS3VEuhJroYlTSa_TaN3lVQ_v
 sendgrid/resources/stats.py,sha256=8J-5Ee78ySEYnJ5-eeXFIL7zOIh2BUXh3E1wjKynVzY,1321
 sendgrid/resources/suppressions.py,sha256=nYjmK-1z4YLbTN0ZIXhjp2gkYqPDqJee6Uuct0tQbnY,749
 sendgrid-1.5.18.dist-info/DESCRIPTION.rst,sha256=82cWgKNaIJ2A28HLN3QYaxD0eJA2bsBiLI6QrJPNe_M,14308
-sendgrid-1.5.18.dist-info/METADATA,sha256=KUH1mTmf93mGIj6WkC4b62K5Mo51fya4jA0NIVAfFTE,15495
+sendgrid-1.5.18.dist-info/METADATA,sha256=6xOtru4enEKYdQVmUBFUdzpkebnHzMnvXpOtma6Jhi4,14873
 sendgrid-1.5.18.dist-info/RECORD,,
-sendgrid-1.5.18.dist-info/WHEEL,sha256=3BTqKpHqwt_rzaCQaFEIeFXHTrSWBSQKkqmeYbLAVWs,97
+sendgrid-1.5.18.dist-info/WHEEL,sha256=JTb7YztR8fkPg6aSjc571Q4eiVHCwmUDlX8PhuuqIIE,92
 sendgrid-1.5.18.dist-info/metadata.json,sha256=iXjb30a2isCS15_QE3eJHYrQGdL4sCDCeQ56deLfPak,750
 sendgrid-1.5.18.dist-info/top_level.txt,sha256=9sMGrEBXEdYTa0vBRhqF9T-1n8_j4UMlOdOVplQF96A,9
 sendgrid/resources/__init__.pyc,,
@@ -22,11 +22,11 @@ sendgrid/resources/asm_suppressions.pyc,,
 sendgrid/version.pyc,,
 sendgrid/client.pyc,,
 sendgrid/exceptions.pyc,,
-sendgrid/__init__.pyc,,
+sendgrid/message.pyc,,
 sendgrid/resources/stats.pyc,,
 sendgrid/resources/suppressions.pyc,,
 sendgrid/resources/asm_global_suppressions.pyc,,
-sendgrid/message.pyc,,
+sendgrid/__init__.pyc,,
 sendgrid/sendgrid.pyc,,
 sendgrid/resources/asm_groups.pyc,,
 sendgrid/resources/api_keys.pyc,,
