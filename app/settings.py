@@ -38,7 +38,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     # app de terceros
     'appengine_toolkit',
-    'django-debug-toolbar',
+    #'debug_toolbar',
     'rest_framework',
     'rest_framework.authtoken',
     # apps
