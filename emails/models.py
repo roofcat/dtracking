@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
 
+from datetime import datetime, time, date
 import calendar
-from datetime import datetime
 import json
 
 
 from django.db import models
+from django.db.models import Count
 from django.core import serializers
+from django.core.serializers.json import DjangoJSONEncoder
 
 
 from empresas.models import Empresa
@@ -207,6 +209,23 @@ class Email(models.Model):
         }
 
     @classmethod
+    def get_statistics_range_by_dates(self, date_from, date_to):
+        try:
+            emails = Email.objects.filter(input_date__range=(
+                date_from, date_to)).values('input_date').annotate(
+                total=Count('input_date'), processed=Count('processed_event'),
+                delivered=Count('delivered_event'), opened=Count('opened_event'),
+                dropped=Count('dropped_event'), bounced=Count('bounce_event')
+                ).order_by('input_date')
+            data = []
+            for email in emails:
+                email = json.dumps(email, cls=DjangoJSONEncoder)
+                data.append(json.loads(email))
+            return data
+        except Exception, e:
+            print e
+
+    @classmethod
     def get_emails_by_dates(self, date_from, date_to, correo, **kwargs):
         emails = Email.objects.filter(
             input_date__range=(date_from, date_to),
@@ -281,7 +300,7 @@ class Email(models.Model):
         if date_from and date_to:
             emails = Email.objects.filter(
                 input_date__range=(date_from, date_to),
-                bounce_event='bounce', 
+                bounce_event='bounce',
                 dropped_event='dropped'
             ).order_by('-input_date')
             query_total = emails.count()

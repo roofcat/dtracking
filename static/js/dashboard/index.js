@@ -131,7 +131,6 @@ $( '#run_search' ).on( 'click', function () {
 	$( '#loadingModal' ).modal( 'show', true );
 	$.ajax({
 		'type': 'GET',
-		//'url': urlPath + date_from + '/' + date_to + '/' + options + '/',
 		'url': urlPath,
 		'dataType': 'json',
 		'data': {
@@ -234,8 +233,21 @@ function getPercentage3( val1, val2, val3 ) {
 	};
 };
 
-function drawLineGraph ( datas ) {
-	var data = new google.visualization.arrayToDataTable( datas );
+function drawLineGraph ( results ) {
+
+	var arrayDataTable = new Array();
+	arrayDataTable.push(
+		[ "Fecha", "Solicitudes", "Procesados", "Enviados", "Leídos", "Rechazados", "Rebotados" ]
+	);
+
+	for ( var i = 0; i < results.length; i++ ) {
+		var row = results[i];
+		arrayDataTable.push(
+			[ row.input_date, row.total, row.processed, row.delivered, row.opened, row.dropped, row.bounced ]
+		);
+	};
+
+	var data = new google.visualization.arrayToDataTable( arrayDataTable );
 	var options = {
 		'width': '87%',
 		'height': '90%',
