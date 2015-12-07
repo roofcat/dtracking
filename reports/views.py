@@ -278,8 +278,10 @@ def queue_export(request):
 		# Creación del documento
 		excel_report = create_tablib(file_name, data)
 		# Crear objeto
-		report = Report.objects.create(
-		name=file_name, report=excel_report.xlsx)
+		report = Report.objects.create()
+		report.name = file_name
+		report.report.filename = file_name
+		report.report = excel_report.xlsx
 		report.save()
 		print "se guardo el reporte"
 		# preparación de parametros
