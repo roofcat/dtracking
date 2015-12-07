@@ -2,16 +2,24 @@
 
 google.load('visualization', '1.0', {'packages': ['corechart','line','table'], 'language': 'es'});
 
+var baseUrl = document.location.href;
 var urlPath = 'statistics/';
-var urlGeneralExport = 'export/general/';
-var urlSendedExport = 'export/sended/';
-var urlFailureExport = 'export/failure/';
+var urlGeneralExport = 'reports/general/';
+var urlSendedExport = 'reports/sended/';
+var urlFailureExport = 'reports/failure/';
 var jsonData;
 var linkGeneral = '';
 var linkSended = '';
 var linkFailure = '';
 
 $( document ).ready( function () {
+	baseUrl = baseUrl.split('/');
+	delete baseUrl[4];
+	delete baseUrl[3];
+	baseUrl = baseUrl.join('/')
+	baseUrl = baseUrl.substring( 0, baseUrl.length - 1 );
+	console.log( baseUrl );
+
 	// Seteo de fecha actual
 	setDefaultDates();
 	putDownloadLink();
@@ -64,9 +72,9 @@ function putDownloadLink () {
 	date_from = getDateAsTimestamp( date_from );
 	date_to = getDateAsTimestamp( date_to );
 	
-	linkGeneral = urlGeneralExport + date_from + '/' + date_to + '/' + options + '/';
-	linkSended = urlSendedExport + date_from + '/' + date_to + '/' + options + '/';
-	linkFailure = urlFailureExport + date_from + '/' + date_to + '/' + options + '/';
+	linkGeneral = baseUrl + urlGeneralExport + date_from + '/' + date_to + '/' + options + '/';
+	linkSended = baseUrl + urlSendedExport + date_from + '/' + date_to + '/' + options + '/';
+	linkFailure = baseUrl + urlFailureExport + date_from + '/' + date_to + '/' + options + '/';
 };
 
 $( 'button' ).on( 'click', function () {

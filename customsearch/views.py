@@ -29,7 +29,7 @@ class EmailSearchTemplateView(LoginRequiredMixin, TemplateView):
                 date_to = int(date_to, base=10)
                 date_from = timestamp_to_date(date_from)
                 date_to = timestamp_to_date(date_to)
-                emails = Email.get_emails_by_dates(
+                emails = Email.get_emails_by_correo(
                     date_from, date_to, correo,
                     display_start=display_start,
                     display_length=display_length)

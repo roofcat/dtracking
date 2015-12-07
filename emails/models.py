@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-from datetime import datetime, time, date
+from datetime import datetime
 import calendar
 import json
 
@@ -216,7 +216,7 @@ class Email(models.Model):
                 total=Count('input_date'), processed=Count('processed_event'),
                 delivered=Count('delivered_event'), opened=Count('opened_event'),
                 dropped=Count('dropped_event'), bounced=Count('bounce_event')
-                ).order_by('input_date')
+            ).order_by('input_date')
             data = []
             for email in emails:
                 email = json.dumps(email, cls=DjangoJSONEncoder)
@@ -226,7 +226,7 @@ class Email(models.Model):
             print e
 
     @classmethod
-    def get_emails_by_dates(self, date_from, date_to, correo, **kwargs):
+    def get_emails_by_correo(self, date_from, date_to, correo, **kwargs):
         emails = Email.objects.filter(
             input_date__range=(date_from, date_to),
             correo=correo
@@ -247,6 +247,40 @@ class Email(models.Model):
             'query_length': query_length,
             'data': data,
         }
+
+    @classmethod
+    def get_emails_by_correo_async(self, date_from, date_to, correo, **kwargs):
+        emails = Email.objects.filter(
+            input_date__range=(date_from, date_to),
+            correo=correo).order_by('-input_date')
+        if emails:
+            return emails
+        else:
+            return None
+
+    @classmethod
+    def get_emails_by_dates_async(self, date_from, date_to, options, **kwargs):
+        if date_from and date_to:
+            emails = Email.objects.filter(
+                input_date__range=(date_from, date_to))
+            if emails:
+                return emails
+            else:
+                return None
+
+    @classmethod
+    def get_sended_emails_by_dates_async(self, date_from, date_to, tipo_receptor='all'):
+        if tipo_receptor == 'all':
+            emails = Email.objects.filter(
+                input_date__range=(date_from, date_to)).order_by('-input_date')
+        else:
+            emails = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                tipo_receptor=tipo_receptor).order_by('-input_date')
+        if emails:
+            return emails
+        else:
+            return None
 
     @classmethod
     def get_emails_by_folio(self, folio, **kwargs):
@@ -272,8 +306,13 @@ class Email(models.Model):
             }
 
     @classmethod
+    def get_emails_by_folio_async(self, folio, **kwargs):
+        if folio:
+            emails = Email.objects
+
+    @classmethod
     def get_emails_by_rut_receptor(self, date_from, date_to, rut, **kwargs):
-        if rut:
+        if date_from and date_to and rut:
             emails = Email.objects.filter(
                 input_date__range=(date_from, date_to),
                 rut_receptor=rut
@@ -294,6 +333,17 @@ class Email(models.Model):
                 'query_length': query_length,
                 'data': data,
             }
+
+    @classmethod
+    def get_emails_by_rut_receptor_async(self, date_from, date_to, rut, **kwargs):
+        if date_from and date_to and rut:
+            emails = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                rut_receptor=rut).order_by('-input_date')
+            if emails:
+                return emails
+            else:
+                return None
 
     @classmethod
     def get_failure_emails_by_dates(self, date_from, date_to, **kwargs):
@@ -321,6 +371,18 @@ class Email(models.Model):
             }
 
     @classmethod
+    def get_failure_emails_by_dates_async(self, date_from, date_to, **kwargs):
+        if date_from and date_to:
+            emails = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                bounce_event='bounce',
+                dropped_event='dropped').order_by('-input_date')
+            if emails:
+                return emails
+            else:
+                return None
+
+    @classmethod
     def get_emails_by_mount_and_dates(self, date_from, date_to, mount_from, mount_to, **kwargs):
         emails = Email.objects.filter(
             input_date__range=(date_from, date_to),
@@ -342,3 +404,13 @@ class Email(models.Model):
             'query_length': query_length,
             'data': data,
         }
+
+    @classmethod
+    def get_emails_by_mount_and_dates_async(self, date_from, date_to, mount_from, mount_to, **kwargs):
+        emails = Email.objects.filter(
+            input_date__range=(date_from, date_to),
+            monto__range=(mount_from, mount_to)).order_by('-input_date')
+        if emails:
+            return emails
+        else:
+            return None

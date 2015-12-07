@@ -36,6 +36,8 @@ INSTALLED_APPS = (
     'dashboard',
     'emails',
     'empresas',
+    'reports',
+    'sendgrid_manager',
     'webhooks',
 )
 

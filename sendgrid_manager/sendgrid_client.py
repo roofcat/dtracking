@@ -7,8 +7,11 @@ import logging
 from sendgrid import SendGridClient, Mail
 
 
-from .models import Email
-from configuraciones.models import SendgridConf
+from django.contrib.auth.models import User
+
+
+from configuraciones.models import SendgridConf, TemplateReporte
+from emails.models import Email
 
 
 email_config = SendgridConf.objects.all()[:1].get()
@@ -23,8 +26,8 @@ class EmailClient(object):
         self.message.set_from_name(email_config.nombre_email_dte)
 
     def enviar_correo_dte(self, id):
-    	# cargar el objecto de id
-    	correo = Email.objects.get(pk=id)
+        # cargar el objecto de id
+        correo = Email.objects.get(pk=id)
         # valores de envío
         self.message.add_to(correo.correo)
         self.message.add_to_name(correo.nombre_cliente)
@@ -32,7 +35,7 @@ class EmailClient(object):
         self.message.set_html(correo.html)
         # valores personalizados
         unique_args = {
-        	'email_id': correo.id,
+            'email_id': correo.id,
             'empresa': correo.empresa.rut,
             'rut_receptor': correo.rut_receptor,
             'rut_emisor': correo.rut_emisor,
@@ -54,6 +57,24 @@ class EmailClient(object):
                 correo.adjunto1.name, correo.adjunto1.file.read())
         self.message.set_unique_args(unique_args)
         # enviando el mail
+        status, msg = self.sg.send(self.message)
+        # imprimiendo respuesta
+        logging.info(status)
+        logging.info(msg)
+
+    def send_report_to_user(self, user_email, report):
+        template_config = TemplateReporte.objects.all()[:1].get()
+        user = User.objects.get(email=user_email)
+        html = str(template_config.template_html).format(user.first_name)
+        # valores de envío
+        self.message.add_to(user_email)
+        self.message.add_to_name(user.first_name)
+        self.message.set_subject(template_config.asunto_reporte)
+        self.message.set_html(html)
+        if report.report:
+            self.message.add_attachment_stream(
+                report.name, report.report.file.read())
+        # enviando el correo
         status, msg = self.sg.send(self.message)
         # imprimiendo respuesta
         logging.info(status)

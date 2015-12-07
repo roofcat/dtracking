@@ -16,7 +16,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from .models import Email
 from .serializers import EmailDteInputSerializer
-from .sendgrid_client import EmailClient
+from sendgrid_manager.sendgrid_client import EmailClient
 
 
 class EmailDteInputView(APIView):
