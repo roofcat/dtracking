@@ -33,6 +33,7 @@ urlpatterns = [
 	# rutas de las paginas html del tracking
     url(r'^dashboard/', include('dashboard.urls', namespace='dashboard')),
     url(r'^customsearch/', include('customsearch.urls', namespace='customsearch')),
+    url(r'^reportes/', include('reportes.urls', namespace='reportes')),
 
     # url que recibe webhooks de sendgrid
     url(r'^webhook/', sendgrid_rest_webhook, name='webhook_rest'),
