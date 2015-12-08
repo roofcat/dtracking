@@ -35,7 +35,7 @@ urlpatterns = [
     url(r'^customsearch/', include('customsearch.urls', namespace='customsearch')),
 
     # rutas para reportes
-    url(r'^reports/', include('reports.urls', namespace='reportes')),
+    url(r'^reports/', include('reports.urls', namespace='reports')),
 
     # url que recibe webhooks de sendgrid
     url(r'^webhook/', sendgrid_rest_webhook, name='webhook_rest'),
