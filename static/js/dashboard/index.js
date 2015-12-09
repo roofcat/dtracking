@@ -18,7 +18,6 @@ $( document ).ready( function () {
 	delete baseUrl[3];
 	baseUrl = baseUrl.join('/')
 	baseUrl = baseUrl.substring( 0, baseUrl.length - 1 );
-	console.log( baseUrl );
 
 	// Seteo de fecha actual
 	setDefaultDates();
