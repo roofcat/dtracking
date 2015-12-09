@@ -62,18 +62,25 @@ class EmailClient(object):
         logging.info(status)
         logging.info(msg)
 
-    def send_report_to_user(self, user_email, report):
+    def send_report_to_user_with_attach(self, user_email, report):
+        # parametros de correo reporte
+        self.message.set_from(email_config.asunto_email_reporte)
+        self.message.set_from_name(email_config.nombre_email_reporte)
+        # buscar usuario
         template_config = TemplateReporte.objects.all()[:1].get()
+        # preparar template del correo reporte
         user = User.objects.get(email=user_email)
-        html = str(template_config.template_html).format(user.first_name)
+        html = str(template_config.template_html).format(
+            user_name=user.first_name)
         # valores de envío
         self.message.add_to(user_email)
         self.message.add_to_name(user.first_name)
         self.message.set_subject(template_config.asunto_reporte)
         self.message.set_html(html)
-        if report.report:
+        # adjuntar excel si esta
+        if report['report']:
             self.message.add_attachment_stream(
-                report.name, report.report.file.read())
+                report['name'], report['report'])
         # enviando el correo
         status, msg = self.sg.send(self.message)
         # imprimiendo respuesta

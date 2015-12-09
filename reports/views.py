@@ -14,11 +14,10 @@ from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 
 
-from .models import Report
+from .forms import ReportForm
 from .tablib_export import create_tablib
 from autenticacion.views import LoginRequiredMixin
 from emails.models import Email
-from .models import Report
 from sendgrid_manager.sendgrid_client import EmailClient
 
 
@@ -205,87 +204,104 @@ def queue_export(request):
 			date_from = timestamp_to_date(date_from)
 			date_to = timestamp_to_date(date_to)
 			# Consulta
-			data = Email.get_emails_by_dates_async(date_from, date_to, options)
+			data = Email.get_emails_by_dates_async(
+				date_from, date_to, options)
 		elif export_type == 'export_sended_email':
-			options = request.GET['options']
-			user_email = request.GET['user_email']
-			file_name = request.GET['file_name']
-			date_from = request.GET['date_from']
-			date_to = request.GET['date_to']
+			options = request.POST.get('options')
+			user_email = request.POST.get('user_email')
+			file_name = request.POST.get('file_name')
+			date_from = request.POST.get('date_from')
+			date_to = request.POST.get('date_to')
 			date_from = int(date_from, base=10)
 			date_to = int(date_to, base=10)
 			date_from = timestamp_to_date(date_from)
 			date_to = timestamp_to_date(date_to)
 			# Consulta
-			data = EmailModel.get_sended_emails_by_dates_async(date_from, date_to, options)
+			data = Email.get_sended_emails_by_dates_async(
+				date_from, date_to, options)
 		elif export_type == 'export_failure_email':
-			options = request.GET['options']
-			user_email = request.GET['user_email']
-			file_name = request.GET['file_name']
-			date_from = request.GET['date_from']
-			date_to = request.GET['date_to']
+			options = request.POST.get('options')
+			user_email = request.POST.get('user_email')
+			file_name = request.POST.get('file_name')
+			date_from = request.POST.get('date_from')
+			date_to = request.POST.get('date_to')
 			date_from = int(date_from, base=10)
 			date_to = int(date_to, base=10)
 			date_from = timestamp_to_date(date_from)
 			date_to = timestamp_to_date(date_to)
 			# Consulta
-			data = EmailModel.get_failure_emails_by_dates_async(date_from, date_to, options)
+			data = Email.get_failure_emails_by_dates_async(
+				date_from, date_to, options)
 		elif export_type == 'export_search_by_email':
-			correo = request.GET['email']
-			user_email = request.GET['user_email']
-			file_name = request.GET['file_name']
-			date_from = request.GET['date_from']
-			date_to = request.GET['date_to']
+			correo = request.POST.get('email')
+			user_email = request.POST.get('user_email')
+			file_name = request.POST.get('file_name')
+			date_from = request.POST.get('date_from')
+			date_to = request.POST.get('date_to')
 			date_from = int(date_from, base=10)
 			date_to = int(date_to, base=10)
 			date_from = timestamp_to_date(date_from)
 			date_to = timestamp_to_date(date_to)
 			# Consulta
-			data = EmailModel.get_emails_by_correo_async(date_from, date_to, correo)
+			data = Email.get_emails_by_correo_async(
+				date_from, date_to, correo)
 		elif export_type == 'export_search_by_folio':
-			folio = request.GET['folio']
-			user_email = request.GET['user_email']
-			file_name = request.GET['file_name']
+			folio = request.POST.get('folio')
+			user_email = request.POST.get('user_email')
+			file_name = request.POST.get('file_name')
 			# Consulta
-			data = EmailModel.get_emails_by_folio_async(folio)
+			data = Email.get_emails_by_folio_async(folio)
 		elif export_type == 'export_search_by_rut':
-			rut = request.GET['rut']
-			user_email = request.GET['user_email']
-			file_name = request.GET['file_name']
-			date_from = request.GET['date_from']
-			date_to = request.GET['date_to']
+			rut = request.POST.get('rut')
+			user_email = request.POST.get('user_email')
+			file_name = request.POST.get('file_name')
+			date_from = request.POST.get('date_from')
+			date_to = request.POST.get('date_to')
 			date_from = int(date_from, base=10)
 			date_to = int(date_to, base=10)
 			date_from = timestamp_to_date(date_from)
 			date_to = timestamp_to_date(date_to)
 			# Consulta
-			data = EmailModel.get_emails_by_rut_receptor_async(date_from, date_to, rut)
+			data = Email.get_emails_by_rut_receptor_async(
+				date_from, date_to, rut)
 		elif export_type == 'export_search_by_mount':
-			mount_from = request.GET['mount_from']
-			mount_to = request.GET['mount_to']
+			mount_from = request.POST.get('mount_from')
+			mount_to = request.POST.get('mount_to')
 			mount_from = int(mount_from, base=10)
 			mount_to = int(mount_to, base=10)
-			user_email = request.GET['user_email']
-			file_name = request.GET['file_name']
-			date_from = request.GET['date_from']
-			date_to = request.GET['date_to']
+			user_email = request.POST.get('user_email')
+			file_name = request.POST.get('file_name')
+			date_from = request.POST.get('date_from')
+			date_to = request.POST.get('date_to')
 			date_from = int(date_from, base=10)
 			date_to = int(date_to, base=10)
 			date_from = timestamp_to_date(date_from)
 			date_to = timestamp_to_date(date_to)
 			# Consulta
-			data = EmailModel.get_emails_by_mount_and_dates_async(date_from, date_to, mount_from, mount_to)
+			data = Email.get_emails_by_mount_and_dates_async(
+				date_from, date_to, mount_from, mount_to)
 		# Creación del documento
-		excel_report = create_tablib(file_name, data)
+		excel_report = create_tablib(data)
+		print type(excel_report)
+		print type(excel_report.xlsx)
+		#print excel_report.xlsx
+		print "excel_report"
+		#excel_file = open(excel_report.xlsx, 'rb').read()
+		#print excel_file
 		# Crear objeto
-		report = Report.objects.create()
+		data = {
+			'name': file_name,
+			'report': excel_report.xlsx,
+		}
+		report = ReportForm(data)
+		print "imprimir ReportForm"
 		report.name = file_name
-		report.report.filename = file_name
 		report.report = excel_report.xlsx
-		report.save()
+		print report.is_valid()
+		print report.errors
 		print "se guardo el reporte"
 		# preparación de parametros
 		mail = EmailClient()
-		mail.send_mail_to_user_attach(user_email, report)
+		mail.send_report_to_user_with_attach(user_email, data)
 		data = {"status": "ok"}
 		return HttpResponse(json.dumps(data), content_type="application/json")
