@@ -282,12 +282,7 @@ def queue_export(request):
 				date_from, date_to, mount_from, mount_to)
 		# Creación del documento
 		excel_report = create_tablib(data)
-		print type(excel_report)
-		print type(excel_report.xlsx)
-		#print excel_report.xlsx
-		print "excel_report"
-		#excel_file = open(excel_report.xlsx, 'rb').read()
-		#print excel_file
+		#new_excel = open(excel_report.xlsx, "rb")
 		# Crear objeto
 		data = {
 			'name': file_name,

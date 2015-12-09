@@ -269,14 +269,14 @@ class Email(models.Model):
                 return None
 
     @classmethod
-    def get_sended_emails_by_dates_async(self, date_from, date_to, tipo_receptor='all'):
-        if tipo_receptor == 'all':
+    def get_sended_emails_by_dates_async(self, date_from, date_to, options='all'):
+        if options == 'all':
             emails = Email.objects.filter(
                 input_date__range=(date_from, date_to)).order_by('-input_date')
         else:
             emails = Email.objects.filter(
                 input_date__range=(date_from, date_to),
-                tipo_receptor=tipo_receptor).order_by('-input_date')
+                tipo_receptor=options).order_by('-input_date')
         if emails:
             return emails
         else:
@@ -371,7 +371,7 @@ class Email(models.Model):
             }
 
     @classmethod
-    def get_failure_emails_by_dates_async(self, date_from, date_to, **kwargs):
+    def get_failure_emails_by_dates_async(self, date_from, date_to, options, **kwargs):
         if date_from and date_to:
             emails = Email.objects.filter(
                 input_date__range=(date_from, date_to),
