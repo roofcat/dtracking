@@ -7,7 +7,7 @@ import json
 
 
 from django.db import models
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 
@@ -232,7 +232,10 @@ class Email(models.Model):
             correo=correo
         ).order_by('-input_date')
         query_total = emails.count()
-        emails = emails[kwargs['display_start']:kwargs['display_length']]
+        if kwargs['display_start'] is 0:
+            emails = emails[kwargs['display_start']:kwargs['display_length']]
+        else:
+            emails = emails[kwargs['display_start']:kwargs['display_length']+kwargs['display_start']]
         if emails:
             query_length = emails.count()
         else:
@@ -289,7 +292,10 @@ class Email(models.Model):
                 numero_folio=folio
             ).order_by('-input_date')
             query_total = emails.count()
-            emails = emails[kwargs['display_start']:kwargs['display_length']]
+            if kwargs['display_start'] is 0:
+                emails = emails[kwargs['display_start']:kwargs['display_length']]
+            else:
+                emails = emails[kwargs['display_start']:kwargs['display_length']+kwargs['display_start']]
             if emails:
                 query_length = emails.count()
             else:
@@ -318,7 +324,10 @@ class Email(models.Model):
                 rut_receptor=rut
             ).order_by('-input_date')
             query_total = emails.count()
-            emails = emails[kwargs['display_start']:kwargs['display_length']]
+            if kwargs['display_start'] is 0:
+                emails = emails[kwargs['display_start']:kwargs['display_length']]
+            else:
+                emails = emails[kwargs['display_start']:kwargs['display_length']+kwargs['display_start']]
             if emails:
                 query_length = emails.count()
             else:
@@ -347,36 +356,37 @@ class Email(models.Model):
 
     @classmethod
     def get_failure_emails_by_dates(self, date_from, date_to, **kwargs):
-        if date_from and date_to:
-            emails = Email.objects.filter(
-                input_date__range=(date_from, date_to),
-                bounce_event='bounce',
-                dropped_event='dropped'
-            ).order_by('-input_date')
-            query_total = emails.count()
+        emails = Email.objects.filter(
+            Q(input_date__range=(date_from, date_to)),
+            Q(bounce_event='bounce') | Q(dropped_event='dropped')
+        ).order_by('-input_date')
+        query_total = emails.count()
+        if kwargs['display_start'] is 0:
             emails = emails[kwargs['display_start']:kwargs['display_length']]
-            if emails:
-                query_length = emails.count()
-            else:
-                query_length = 0
-            emails = serializers.serialize('json', emails)
-            emails = json.loads(emails)
-            data = []
-            for e in emails:
-                data.append(e['fields'])
-            return {
-                'query_total': query_total,
-                'query_length': query_length,
-                'data': data,
-            }
+        else:
+            emails = emails[kwargs['display_start']:kwargs['display_length']+kwargs['display_start']]
+        if emails:
+            query_length = emails.count()
+        else:
+            query_length = 0
+        emails = serializers.serialize('json', emails)
+        emails = json.loads(emails)
+        data = []
+        for e in emails:
+            data.append(e['fields'])
+        return {
+            'query_total': query_total,
+            'query_length': query_length,
+            'data': data,
+        }
 
     @classmethod
     def get_failure_emails_by_dates_async(self, date_from, date_to, options, **kwargs):
         if date_from and date_to:
             emails = Email.objects.filter(
-                input_date__range=(date_from, date_to),
-                bounce_event='bounce',
-                dropped_event='dropped').order_by('-input_date')
+                Q(input_date__range=(date_from, date_to)),
+                Q(bounce_event='bounce') | Q(dropped_event='dropped')
+            ).order_by('-input_date')
             if emails:
                 return emails
             else:
@@ -384,12 +394,16 @@ class Email(models.Model):
 
     @classmethod
     def get_emails_by_mount_and_dates(self, date_from, date_to, mount_from, mount_to, **kwargs):
+        print kwargs
         emails = Email.objects.filter(
             input_date__range=(date_from, date_to),
             monto__range=(mount_from, mount_to),
         ).order_by('-input_date')
         query_total = emails.count()
-        emails = emails[kwargs['display_start']:kwargs['display_length']]
+        if kwargs['display_start'] is 0:
+            emails = emails[kwargs['display_start']:kwargs['display_length']]
+        else:
+            emails = emails[kwargs['display_start']:kwargs['display_length']+kwargs['display_start']]
         if emails:
             query_length = emails.count()
         else:

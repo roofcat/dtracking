@@ -25,6 +25,8 @@ class EmailSearchTemplateView(LoginRequiredMixin, TemplateView):
                 echo = request.GET['sEcho']
                 display_start = request.GET['iDisplayStart']
                 display_length = request.GET['iDisplayLength']
+                display_start = int(display_start, base=10)
+                display_length = int(display_length, base=10)
                 date_from = int(date_from, base=10)
                 date_to = int(date_to, base=10)
                 date_from = timestamp_to_date(date_from)
@@ -54,6 +56,8 @@ class FolioSearchTemplateView(LoginRequiredMixin, TemplateView):
                 echo = request.GET['sEcho']
                 display_start = request.GET['iDisplayStart']
                 display_length = request.GET['iDisplayLength']
+                display_start = int(display_start, base=10)
+                display_length = int(display_length, base=10)
                 emails = Email.get_emails_by_folio(folio,
                                                    display_start=display_start,
                                                    display_length=display_length)
@@ -77,6 +81,8 @@ class RutSearchTemplateView(LoginRequiredMixin, TemplateView):
                 echo = request.GET['sEcho']
                 display_start = request.GET['iDisplayStart']
                 display_length = request.GET['iDisplayLength']
+                display_start = int(display_start, base=10)
+                display_length = int(display_length, base=10)
                 date_from = int(date_from, base=10)
                 date_to = int(date_to, base=10)
                 date_from = timestamp_to_date(date_from)
@@ -105,6 +111,8 @@ class FallidosSearchTemplateView(LoginRequiredMixin, TemplateView):
                 echo = request.GET['sEcho']
                 display_start = request.GET['iDisplayStart']
                 display_length = request.GET['iDisplayLength']
+                display_start = int(display_start, base=10)
+                display_length = int(display_length, base=10)
                 date_from = int(date_from, base=10)
                 date_to = int(date_to, base=10)
                 date_from = timestamp_to_date(date_from)
@@ -132,6 +140,8 @@ class MontoSearchTemplateView(LoginRequiredMixin, TemplateView):
             echo = request.GET['sEcho']
             display_start = request.GET['iDisplayStart']
             display_length = request.GET['iDisplayLength']
+            display_start = int(display_start, base=10)
+            display_length = int(display_length, base=10)
             date_from = int(date_from, base=10)
             date_to = int(date_to, base=10)
             date_from = timestamp_to_date(date_from)
