@@ -28,8 +28,11 @@ urlpatterns = [
     url(r'^api-token/', obtain_auth_token),
     
     # rutas api rest heredadas de APIView
+    # en esta ruta entran las peticiones de correo desde un DTE
     url(r'^api/input/', EmailDteInputView.as_view()),
-    url(r'^api/input/inputqueue/', queue_send_email),
+    # luego el tracking lo pasa a esta cola para 
+    # luego enviar el correo por sendgrid
+    url(r'^emails/inputqueue/', queue_send_email),
 
 	# rutas de las paginas html del tracking
     url(r'^dashboard/', include('dashboard.urls', namespace='dashboard')),

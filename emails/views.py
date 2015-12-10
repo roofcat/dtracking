@@ -46,7 +46,8 @@ class EmailDteInputView(APIView):
                 "email_id": email.data['id'],
             }
             q = taskqueue.Queue("InputQueue")
-            t = taskqueue.Task(url="/api/input/inputqueue/", params=context)
+            t = taskqueue.Task(url="/emails/inputqueue/", params=context)
+            q.add(t)
             return Response({'status': 200})
         else:
             logging.error(email.errors)
