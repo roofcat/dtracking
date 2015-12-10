@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 
 
+from google.appengine.api import taskqueue
 import json
 import logging
 
 
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
 
 from rest_framework import authentication, permissions
@@ -38,14 +42,31 @@ class EmailDteInputView(APIView):
         if email.is_valid():
             email.save()
             logging.info(email.data)
-            email_client = EmailClient()
-            email_client.enviar_correo_dte(email.data['id'])
-            return Response(email.data)
+            context = {
+                "email_id": email.data['id'],
+            }
+            q = taskqueue.Queue("InputQueue")
+            t = taskqueue.Task(url="/api/input/inputqueue/", params=context)
+            return Response({'status': 200})
         else:
             logging.error(email.errors)
             return Response(email.errors)
 
-email_dte_input_view = EmailDteInputView.as_view()
+
+@csrf_exempt
+@require_POST
+def queue_send_email(request):
+    if request.method == 'POST':
+        logging.info("entrando a la cola")
+        logging.info(request.body)
+        try:
+            email_id = request.POST.get('email_id')
+            email_id = int(email_id, base=10)
+            email_client = EmailClient()
+            email_client.enviar_correo_dte(email_id)
+            return HttpResponse()
+        except Exception, e:
+            logging.error(e)
 
 
 class EmailViewSet(ModelViewSet):

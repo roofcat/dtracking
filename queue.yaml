@@ -5,5 +5,3 @@ queue:
   rate: 60/s
 - name: ReportQueue
   rate: 60/s
-- name: WebhookQueue
-  rate: 60/s

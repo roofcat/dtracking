@@ -10,7 +10,7 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 
 from autenticacion.views import log_in, log_out, home_to_dashboard
-from emails.views import EmailViewSet, email_dte_input_view
+from emails.views import EmailDteInputView, queue_send_email
 from empresas.views import EmpresaViewSet
 from webhooks.views import sendgrid_rest_webhook
 
@@ -28,7 +28,8 @@ urlpatterns = [
     url(r'^api-token/', obtain_auth_token),
     
     # rutas api rest heredadas de APIView
-    url(r'^api/input/', email_dte_input_view),
+    url(r'^api/input/', EmailDteInputView.as_view()),
+    url(r'^api/input/inputqueue/', queue_send_email),
 
 	# rutas de las paginas html del tracking
     url(r'^dashboard/', include('dashboard.urls', namespace='dashboard')),

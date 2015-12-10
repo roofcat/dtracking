@@ -2,10 +2,8 @@
 
 
 from datetime import datetime
-import json
-
-
 from google.appengine.api import taskqueue
+import json
 
 
 from django.http import HttpResponse
