@@ -166,6 +166,5 @@ DEFAULT_FILE_STORAGE = 'appengine_toolkit.storage.GoogleCloudStorage'
 #STATICFILE_STORAGE = 'appengine_toolkit.storage.GoogleCloudStorage'
 
 # definir la url para obtener los archivos adjuntos
-#MEDIA_ROOT = "storage.googleapis.com/"
 MEDIA_URL = "storage.googleapis.com/"
 MEDIA_ROOT = "storage.googleapis.com/"

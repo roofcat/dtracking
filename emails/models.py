@@ -4,6 +4,7 @@
 from datetime import datetime
 import calendar
 import json
+import logging
 
 
 from django.db import models
@@ -81,7 +82,7 @@ class Email(models.Model):
         default='', null=True, blank=True)
     # campos de processed
     smtp_id = models.CharField(max_length=200, null=True, blank=True)
-    processed_date = models.DateTimeField(null=True, blank=True)
+    processed_date = models.BigIntegerField(null=True, blank=True)
     processed_event = models.CharField(max_length=240,
                                        null=True,
                                        blank=True,
@@ -93,7 +94,7 @@ class Email(models.Model):
                                                null=True,
                                                blank=True)
     # campos delivered
-    delivered_date = models.DateTimeField(null=True, blank=True)
+    delivered_date = models.BigIntegerField(null=True, blank=True)
     delivered_event = models.CharField(max_length=240,
                                        null=True,
                                        blank=True,
@@ -106,8 +107,8 @@ class Email(models.Model):
                                                blank=True)
     delivered_response = models.TextField(null=True, blank=True)
     # campos open
-    opened_first_date = models.DateTimeField(null=True, blank=True)
-    opened_last_date = models.DateTimeField(null=True, blank=True)
+    opened_first_date = models.BigIntegerField(null=True, blank=True)
+    opened_last_date = models.BigIntegerField(null=True, blank=True)
     opened_event = models.CharField(max_length=240,
                                     null=True,
                                     blank=True,
@@ -126,7 +127,7 @@ class Email(models.Model):
                                        blank=True,
                                        default=0)
     # campos dropped
-    dropped_date = models.DateTimeField(null=True, blank=True)
+    dropped_date = models.BigIntegerField(null=True, blank=True)
     dropped_sg_event_id = models.CharField(max_length=240,
                                            null=True,
                                            blank=True)
@@ -139,7 +140,7 @@ class Email(models.Model):
                                      blank=True,
                                      db_index=True)
     # campos bounce
-    bounce_date = models.DateTimeField(null=True, blank=True)
+    bounce_date = models.BigIntegerField(null=True, blank=True)
     bounce_event = models.CharField(max_length=240,
                                     null=True,
                                     blank=True,
@@ -154,7 +155,7 @@ class Email(models.Model):
     bounce_status = models.CharField(max_length=240, null=True, blank=True)
     bounce_type = models.CharField(max_length=240, null=True, blank=True)
     # campos unscribes
-    unsubscribe_date = models.DateTimeField(null=True, blank=True)
+    unsubscribe_date = models.BigIntegerField(null=True, blank=True)
     unsubscribe_uid = models.CharField(max_length=240, null=True, blank=True)
     unsubscribe_purchase = models.CharField(max_length=240,
                                             null=True,
@@ -173,11 +174,22 @@ class Email(models.Model):
                                    blank=True,
                                    db_index=True)
     click_email = models.CharField(max_length=240, null=True, blank=True)
-    click_date = models.DateTimeField(null=True, blank=True)
+    click_date = models.BigIntegerField(null=True, blank=True)
     click_url = models.CharField(max_length=240, null=True, blank=True)
 
     def __unicode__(self):
         return u"{0} - {1}".format(self.correo, self.numero_folio)
+
+    # funcion utilizada desde el webhook
+    @classmethod
+    def get_email(self, email_id):
+        try:
+            email = Email.objects.get(pk=email_id)
+            logging.info("objeto existe")
+        except Email.DoesNotExist:
+            logging.error("Email.DoesNotExist")
+            email = None
+        return email
 
     # MÉTODOS DE CONSULTAS (para no repetir código)
     @classmethod
@@ -314,7 +326,12 @@ class Email(models.Model):
     @classmethod
     def get_emails_by_folio_async(self, folio, **kwargs):
         if folio:
-            emails = Email.objects
+            emails = Email.objects.filter(
+                numero_folio=folio).order_by('-input_date')
+            if emails:
+                return emails
+            else:
+                return None
 
     @classmethod
     def get_emails_by_rut_receptor(self, date_from, date_to, rut, **kwargs):

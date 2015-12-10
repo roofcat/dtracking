@@ -99,13 +99,13 @@ class FailureReportTemplateView(LoginRequiredMixin, TemplateView):
 
 class ByEmailReportTemplateView(LoginRequiredMixin, TemplateView):
 
-    def get(self, request, date_from, date_to, email, *args, **kwargs):
+    def get(self, request, date_from, date_to, correo, *args, **kwargs):
         try:
             if date_from and date_to:
                 context = {
                     'date_from': int(date_from, base=10),
                     'date_to': int(date_to, base=10),
-                    'email': str(email).lower(),
+                    'email': str(correo).lower(),
                     'user_email': request.user.email,
                     'file_name': 'reporte_por_email.xlsx',
                     'export_type': 'export_search_by_email',
@@ -141,9 +141,9 @@ class ByFolioReportTemplateView(LoginRequiredMixin, TemplateView):
 
 class ByRutReportTemplateView(LoginRequiredMixin, TemplateView):
 
-    def get(self, request, date_from, date_to, *args, **kwargs):
+    def get(self, request, date_from, date_to, rut, *args, **kwargs):
         try:
-            if date_from and date_to:
+            if date_from and date_to and rut:
                 context = {
                     'date_from': int(date_from, base=10),
                     'date_to': int(date_to, base=10),

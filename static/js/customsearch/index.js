@@ -1,23 +1,35 @@
 'use strict';
 
-//var baseUrl = document.location.href;
+var baseUrl = document.location.href;
 // urls busquedas
 var emailUrl = 'email/';
 var folioUrl = 'folio/';
 var rutUrl = 'rut/';
 var fallidosUrl = 'fallidos/';
 var montosUrl = 'montos/';
-// urls export
-var emailExportUrl = 'export/email/';
-var folioExportUrl = 'export/folio/';
-var rutExportUrl = 'export/rut/';
-var fallidosExportUrl = 'export/fallidos/';
-var montosExportUrl = 'export/montos/';
-var attachUrl = 'storage/attach/';
+
+// urls exportar reportes
+var emailExportUrl = 'reports/email/';
+var folioExportUrl = 'reports/folio/';
+var rutExportUrl = 'reports/rut/';
+var fallidosExportUrl = 'reports/failure/';
+var montosExportUrl = 'reports/mount/';
+
+// url link storage
+var attachUrl = 'https://storage.googleapis.com';
+
+// variable para controlar tab del modal de consultas
 var tabPosition = '#correo';
+
+// link dinamico para las rutas de exportar
 var exportLink = '';
 
 $( document ).ready( function () {
+	baseUrl = baseUrl.split('/');
+	delete baseUrl[4];
+	delete baseUrl[3];
+	baseUrl = baseUrl.join('/')
+	baseUrl = baseUrl.substring( 0, baseUrl.length - 1 );
 	
 	$( '.datePicker' ).datetimepicker ({
 		'dayOfWeekStart': 1,
@@ -57,7 +69,7 @@ $( '#run_search' ).on( 'click', function () {
 			$( '#closeLoadingModal' ).click();
 			drawJqueryTable( link );
 
-			exportLink = emailExportUrl + date_from + '/' + date_to + '/' + correoDestinatario + '/';
+			exportLink = baseUrl + emailExportUrl + date_from + '/' + date_to + '/' + correoDestinatario + '/';
 			break;
 
 		case '#folio':
@@ -67,7 +79,7 @@ $( '#run_search' ).on( 'click', function () {
 			$( '#closeLoadingModal' ).click();
 			drawJqueryTable( link );
 
-			exportLink = folioExportUrl + numeroFolio + '/';
+			exportLink = baseUrl + folioExportUrl + numeroFolio + '/';
 			break;
 
 		case '#rutreceptor':
@@ -88,7 +100,7 @@ $( '#run_search' ).on( 'click', function () {
 			$( '#closeLoadingModal' ).click();
 			drawJqueryTable( link );
 
-			exportLink = rutExportUrl + date_from + '/' + date_to + '/' + rutReceptor + '/';
+			exportLink = baseUrl + rutExportUrl + date_from + '/' + date_to + '/' + rutReceptor + '/';
 			break;
 
 		case '#fallidos':
@@ -102,7 +114,7 @@ $( '#run_search' ).on( 'click', function () {
 			$( '#closeLoadingModal' ).click();
 			drawJqueryTable( link );
 
-			exportLink = fallidosExportUrl + date_from + '/' + date_to + '/';
+			exportLink = baseUrl + fallidosExportUrl + date_from + '/' + date_to + '/all/';
 			break;
 
 		case '#monto':
@@ -120,7 +132,7 @@ $( '#run_search' ).on( 'click', function () {
 			$( '#closeLoadingModal' ).click();
 			drawJqueryTable( link );
 
-			exportLink = montosExportUrl + date_from + '/' + date_to + '/' + mount_from + '/' + mount_to + '/';
+			exportLink = baseUrl + montosExportUrl + date_from + '/' + date_to + '/' + mount_from + '/' + mount_to + '/';
 			break;
 	};
 	$( '#btnGenerateReport' ).show();
@@ -345,6 +357,10 @@ $( 'div' ).on( 'mouseout', '#divPopOver', function () {
 	$( this ).popover( 'hide' );
 });
 
+function timestamp_to_date ( date ) {
+	return moment.unix( date ).format( 'DD-MM-YYYY h:mm:ss a' );
+};
+
 function drawJqueryTable ( urlSource ) {
 	var table = $( '#tableCards' ).dataTable({
 		"ajaxSource": urlSource,
@@ -369,35 +385,38 @@ function drawJqueryTable ( urlSource ) {
 					if ( row['processed_event'] ) {
 						rowBody += "<span class=\"label label-default\"> </span>&nbsp;";
 						popBody += "<p><span class=\"label label-default\"> </span>&nbsp;";
-						popBody += " Procesado el " + row['processed_date'] + "</p>";
+						popBody += " Procesado el " + timestamp_to_date( row['processed_date'] ) + "</p>";
 					};
 					if ( row['delivered_event'] ) {
 						rowBody += "<span class=\"label label-primary\"> </span>&nbsp;";
 						popBody += "<p><span class=\"label label-primary\"> </span>&nbsp;";
-						popBody += " Enviado el " + row['delivered_date'] + "</p>";
+						popBody += " Enviado el " + timestamp_to_date( row['delivered_date'] ) + "</p>";
 					};
 					if ( row['opened_event'] ) {
 						rowBody += "<span class=\"label label-success\"> </span>&nbsp;";
 						popBody += "<p><span class=\"label label-success\"> </span>&nbsp;";
-						popBody += " Leído el " + row['opened_first_date'] + "<br>";
+						popBody += " Leído la primera vez el  ";
+						popBody += timestamp_to_date( row['opened_first_date'] ) + "<br>";
+						popBody += " Leído por última vez el ";
+						popBody += timestamp_to_date( row['opened_last_date'] ) + "<br>";
 						popBody += " IP " + row['opened_ip'] + " " + row['opened_count'] + " veces.</p>";
 					};
 					if ( row['dropped_event'] ) {
 						rowBody += "<span class=\"label label-warning\"> </span>&nbsp;";
 						popBody += "<p><span class=\"label label-warning\"> </span>&nbsp;";
-						popBody += " Rechazado el " + row['dropped_date'] + "<br> ";
+						popBody += " Rechazado el " + timestamp_to_date( row['dropped_date'] ) + "<br> ";
 						popBody += " Motivo: " + row['dropped_reason'] + "</p>";
 					};
 					if ( row['bounce_event'] ) {
 						rowBody += "<span class=\"label label-danger\"> </span>&nbsp;";
 						popBody += "<p><span class=\"label label-danger\"> </span>&nbsp;";
-						popBody += " Rebotado el " + row['bounce_date'] + "<br> ";
+						popBody += " Rebotado el " + timestamp_to_date( row['bounce_date'] ) + "<br> ";
 						popBody += " Motivo: " + row['bounce_reason'] + "</p>";
 					};
 					if ( row['unsubscribe_event'] ) {
 						rowBody += "<span class=\"label label-info\"> </span>&nbsp;";
 						popBody += "<p><span class=\"label label-info\"> </span>&nbsp;";
-						popBody += " Desuscrito el " + row['dropped_date'] + "</p>";
+						popBody += " Desuscrito el " + timestamp_to_date( row['dropped_date'] ) + "</p>";
 					};
 					popBody += '</article>';
 
@@ -409,14 +428,11 @@ function drawJqueryTable ( urlSource ) {
 				},
 			},
 			{
-				'data': 'attachs',
+				'data': 'adjunto1',
 				'title': 'Adjuntos',
 				'render': function ( data, type, row, meta ) {
 					var html = '<div style="font-size:11px;">';
-					for ( var i in data ) {
-						var attach = data[i];
-						html += '<a href="' + attachUrl + attach + '/" title="Ver archivo adjunto" target="_blank"><span class="mdi-editor-attach-file"></span></a>';
-					};
+					html += '<a href="' + attachUrl + data + '" title="Ver archivo adjunto" target="_blank"><span class="mdi-editor-attach-file"></span></a>';
 					html += '</div>';
 					return html;
 				},
@@ -430,10 +446,10 @@ function drawJqueryTable ( urlSource ) {
 				'title': 'Correo',
 			},
 			{
-				'data': 'input_datetime',
+				'data': 'input_date',
 				'title': 'Fecha envío',
 				'render': function ( data, type, row, meta ) {
-					return ( !data ) ? "" : moment( data ).format( 'DD-MM-YYYY H:mm:ss' );
+					return ( !data ) ? "" : moment( data ).format( 'DD-MM-YYYY' );
 				},
 			},
 			{

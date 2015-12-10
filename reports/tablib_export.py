@@ -1,14 +1,18 @@
 # -*- coding: utf-8 -*-
 
 
-import datetime
+from datetime import datetime
 import logging
+import pytz
 import tablib
 
 
 """ Esta función genera excel en tiempo real de ejecución 
     ya que recibe como parametro un arreglo de objetos
 """
+
+
+timestamp_to_date = lambda x: datetime.fromtimestamp(x, tz=pytz.timezone("America/Santiago"))
 
 
 def create_tablib(data):
@@ -96,16 +100,16 @@ def create_tablib(data):
                 asunto = unicode(row.asunto)
             else:
                 asunto = ''
-            if row.processed_date:
-                processed_date = row.processed_date
+            if row.processed_date is not None:
+                processed_date = timestamp_to_date(row.processed_date)
             else:
                 processed_date = ''
             if row.processed_event:
                 processed_event = unicode(row.processed_event).encode('utf-8')
             else:
                 processed_event = ''
-            if row.delivered_date:
-                delivered_date = row.delivered_date
+            if row.delivered_date is not None:
+                delivered_date = timestamp_to_date(row.delivered_date)
             else:
                 delivered_date = ''
             if row.delivered_event:
@@ -116,12 +120,12 @@ def create_tablib(data):
                 delivered_response = unicode(row.delivered_response).encode('utf-8')
             else:
                 delivered_response = ''
-            if row.opened_first_date:
-                opened_first_date = row.opened_first_date
+            if row.opened_first_date is not None:
+                opened_first_date = timestamp_to_date(row.opened_first_date)
             else:
                 opened_first_date = ''
-            if row.opened_last_date:
-                opened_last_date = row.opened_last_date
+            if row.opened_last_date is not None:
+                opened_last_date = timestamp_to_date(row.opened_last_date)
             else:
                 opened_last_date = ''
             if row.opened_event:
@@ -140,8 +144,8 @@ def create_tablib(data):
                 opened_count = row.opened_count
             else:
                 opened_count = ''
-            if row.dropped_date:
-                dropped_date = row.dropped_date
+            if row.dropped_date is not None:
+                dropped_date = timestamp_to_date(row.dropped_date)
             else:
                 dropped_date = ''
             if row.dropped_reason:
@@ -152,8 +156,8 @@ def create_tablib(data):
                 dropped_event = unicode(row.dropped_event).encode('utf-8')
             else:
                 dropped_event = ''
-            if row.bounce_date:
-                bounce_date = row.bounce_date
+            if row.bounce_date is not None:
+                bounce_date = timestamp_to_date(row.bounce_date)
             else:
                 bounce_date = ''
             if row.bounce_event:
@@ -172,8 +176,8 @@ def create_tablib(data):
                 bounce_type = unicode(row.bounce_type).encode('utf-8')
             else:
                 bounce_type = ''
-            if row.unsubscribe_date:
-                unsubscribe_date = row.unsubscribe_date
+            if row.unsubscribe_date is not None:
+                unsubscribe_date = timestamp_to_date(row.unsubscribe_date)
             else:
                 unsubscribe_date = ''
             if row.unsubscribe_purchase:
@@ -208,8 +212,8 @@ def create_tablib(data):
                 click_email = unicode(row.click_email).encode('utf-8')
             else:
                 click_email = ''
-            if row.click_date:
-                click_date = row.click_date
+            if row.click_date is not None:
+                click_date = timestamp_to_date(row.click_date)
             else:
                 click_date = ''
             if row.click_url:
