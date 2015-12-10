@@ -14,16 +14,16 @@ from configuraciones.models import SendgridConf, TemplateReporte
 from emails.models import Email
 
 
-email_config = SendgridConf.objects.all()[:1].get()
-
-
 class EmailClient(object):
 
     def __init__(self):
-        self.sg = SendGridClient(email_config.api_key)
+        # llamar las configuraciones en la DB
+        self.email_config = SendgridConf.objects.all()[:1].get()
+        # crear los atributos de la instancia de SendGrid
+        self.sg = SendGridClient(self.email_config.api_key)
         self.message = Mail()
-        self.message.set_from(email_config.asunto_email_dte)
-        self.message.set_from_name(email_config.nombre_email_dte)
+        self.message.set_from(self.email_config.asunto_email_dte)
+        self.message.set_from_name(self.email_config.nombre_email_dte)
 
     def enviar_correo_dte(self, id):
         # cargar el objecto de id
@@ -64,8 +64,8 @@ class EmailClient(object):
 
     def send_report_to_user_with_attach(self, user_email, report):
         # parametros de correo reporte
-        self.message.set_from(email_config.asunto_email_reporte)
-        self.message.set_from_name(email_config.nombre_email_reporte)
+        self.message.set_from(self.email_config.asunto_email_reporte)
+        self.message.set_from_name(self.email_config.nombre_email_reporte)
         # buscar usuario
         template_config = TemplateReporte.objects.all()[:1].get()
         # preparar template del correo reporte
