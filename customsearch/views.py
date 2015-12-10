@@ -5,8 +5,9 @@ from datetime import datetime
 import json
 
 
+from django.forms.models import model_to_dict
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.views.generic import TemplateView
 
 
@@ -15,6 +16,18 @@ from emails.models import Email
 
 
 timestamp_to_date = lambda x: datetime.fromtimestamp(x)
+
+
+class EmailDetailTemplateView(LoginRequiredMixin, TemplateView):
+    
+    def get(self, request, email_id, *args, **kwargs):
+        try:
+            email = get_object_or_404(Email, pk=email_id)
+            email = model_to_dict(email)
+            email['adjunto1'] = email['adjunto1'].name
+            return HttpResponse(json.dumps(email), content_type='application/json')
+        except Exception, e:
+            print e
 
 
 class EmailSearchTemplateView(LoginRequiredMixin, TemplateView):
