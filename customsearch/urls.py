@@ -26,5 +26,5 @@ urlpatterns = [
 	url(r'^montos/(?P<date_from>\d+)/(?P<date_to>\d+)/(?P<mount_from>\d+)/(?P<mount_to>\d+)/$', 
 		MontoSearchTemplateView.as_view()),
 	# consultas para el modal de detalle (cuando clickean un row de la tabla html)
-	url(r'^email-detail/(?P<email_id>\d+)/', EmailDetailTemplateView.as_view()),
+	url(r'^email-detail/', EmailDetailTemplateView.as_view()),
 ]

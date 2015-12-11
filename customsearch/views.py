@@ -20,12 +20,14 @@ timestamp_to_date = lambda x: datetime.fromtimestamp(x)
 
 class EmailDetailTemplateView(LoginRequiredMixin, TemplateView):
     
-    def get(self, request, email_id, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         try:
-            email = get_object_or_404(Email, pk=email_id)
-            email = model_to_dict(email)
-            email['adjunto1'] = email['adjunto1'].name
-            return HttpResponse(json.dumps(email), content_type='application/json')
+            smtp_id = request.GET['smtp_id']
+            if smtp_id:
+                email = get_object_or_404(Email, smtp_id=smtp_id)
+                email = model_to_dict(email)
+                email['adjunto1'] = email['adjunto1'].name
+                return HttpResponse(json.dumps(email), content_type='application/json')
         except Exception, e:
             print e
 
