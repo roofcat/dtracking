@@ -15,6 +15,9 @@ var rutExportUrl = 'reports/rut/';
 var fallidosExportUrl = 'reports/failure/';
 var montosExportUrl = 'reports/mount/';
 
+// urls para modal detalle de email
+var emailDetailUrl = 'email-detail/';
+
 // url link storage
 var attachUrl = 'https://storage.googleapis.com';
 
@@ -428,6 +431,15 @@ function drawJqueryTable ( urlSource ) {
 				},
 			},
 			{
+				'data': 'smtp_id',
+				'title': 'Detalle',
+				'render': function ( data, type, row, meta ) {
+					var html = '';
+					html += '<span class="glyphicon glyphicon-eye-open" id="spanDetail" data-smtp="' + data + '"></span>';
+					return html;
+				},
+			},
+			{
 				'data': 'adjunto1',
 				'title': 'Adjuntos',
 				'render': function ( data, type, row, meta ) {
@@ -535,4 +547,117 @@ function drawJqueryTable ( urlSource ) {
 	});
 	table.removeClass('display');
 	table.addClass('table table-hover table-striped table-condensed table-responsive');
+};
+
+/*
+* Funciones para detalle de email y mostrarlos en el modal
+*/
+$( "#tableCards" ).on( "click", "td", function () {
+	var span = $( this ).find( "#spanDetail" );
+	var smtp_id = span.data( "smtp" )
+	console.log( smtp_id );
+	getEmailDetailAjax( smtp_id );
+});
+
+function getEmailDetailAjax ( smtp_id ) {
+	$.ajax({
+		url: emailDetailUrl,
+		type: 'GET',
+		dataType: 'json',
+		data: {
+			'smtp_id': smtp_id,
+		},
+		success: function ( data ) {
+			console.log( data );
+			drawEmailDetailModal( data );
+		},
+		error: function ( jqXHR, textStatus, errorThrown ) {
+			console.log( errorThrown );
+		},
+	});
+};
+
+function drawEmailDetailModal ( data ) {
+	/*
+	id: 13337
+	*/
+	var title = $( '#emailDetailTitle' );
+	var body = $( '#emailDetailBody' );
+	title.empty();
+	body.empty();
+	
+	var htmlTitle = 'Detalle de ' + data.correo + " Folio Nº " + data.numero_folio;
+	
+	var htmlBody = '<div><br>';
+	htmlBody += '<label>Empresa</label> ' + data.empresa + ' ';
+	htmlBody += '<label>Rut emisor</label> ' + data.rut_emisor + ' ';
+	htmlBody += '<label>Rut receptor</label> ' + data.rut_receptor + ' ';
+	htmlBody += '<label>Tipo envío</label> ' + data.tipo_envio + '<br>';
+	htmlBody += '<label>Folio</label> ' + data.numero_folio + ' <label>Tipo doc. trib.</label> ' + data.tipo_dte + '<br>';
+	htmlBody += '<label>Resolución receptor</label> ';
+	if ( data.resolucion_receptor ) { data.resolucion_receptor } else { '---' };
+	htmlBody += '<label>Resolución emisor</label> ';
+	if ( data.resolucion_emisor ) { data.resolucion_emisor } else { '---' };
+	htmlBody += '<br>';
+	htmlBody += '<label>Monto</label> ' + data.monto + '<br>';
+	htmlBody += '<label>Fecha emisión</label> ';
+	if ( data.fecha_emision ) { moment( data.fecha_emision ).format( 'DD-MM-YYYY H:mm:ss' ) } else { '---' };
+	htmlBody += '<br>';
+	htmlBody += '<label>Fecha recepción</label> ';
+	if ( data.fecha_recepcion ) { moment( data.fecha_recepcion ).format( 'DD-MM-YYYY H:mm:ss' ) } else { '---' };
+	htmlBody += '<br>';
+	htmlBody += '<label>Estado del documento</label> ';
+	if ( data.estado_documento ) { data.estado_documento } else { '---' };
+	htmlBody += '<br>';
+	htmlBody += '<label>Tipo operación</label>';
+	if ( data.tipo_operacion ) { data.tipo_operacion } else { '---' };
+	htmlBody += '<br>';
+	htmlBody += '<label>Tipo receptor</label>';
+	if ( data.tipo_receptor ) { data.tipo_receptor } else { '---' };
+	htmlBody += '<br>';
+	if ( data.adjunto1 ) {
+		htmlBody += '<label>Adjunto</label> ';
+		htmlBody += '<a href="' + attachUrl + data.adjunto1 + '" target="_blank">Ver documento adjunto</a><br>';
+	};
+	htmlBody += '<label>Nombre cliente</label> ' + data.nombre_cliente + '<br>';
+
+	htmlBody += '<label>Tracking del correo:</label><br>';
+	if ( data.processed_event ) {
+		htmlBody += '<label class="label label-default">Procesado</label> ';
+		htmlBody += 'el ' + timestamp_to_date( data.processed_date ) + '<br>'; 
+	};
+
+	if ( data.delivered_event ) {
+		htmlBody += '<label class="label label-primary">Enviado</label> ';
+		htmlBody += ' el ' + timestamp_to_date( data.delivered_date ) + '<br>';
+	};
+
+	if ( data.opened_event ) {
+		htmlBody += '<label class="label label-success">Leído</label> ';
+		htmlBody += 'primera vez el ' + timestamp_to_date( data.opened_first_date ) + ' ';
+		htmlBody += 'y fue leído por ultima vez el ' + timestamp_to_date( data.opened_last_date ) + ' ';
+		htmlBody += 'y ha sido leído ' + data.opened_count + ' vez/veces.<br>';
+		htmlBody += 'IP lectura ' + data.opened_ip + ' Navegador web utilizado ' + data.opened_user_agent + '<br>';
+	};
+
+	if ( data.bounce_event ) {
+		htmlBody +='Rebotado el ' + timestamp_to_date( data.bounce_date ) + '<br>';
+		htmlBody +='Tipo rebote ' + data.bounce_type + ' status ' + data.bounce_status + '<br>';
+		htmlBody +='Razón del rebote ' + data.bounce_reason + '<br>';
+	};
+	
+
+	if ( data.dropped_event ) {
+		htmlBody += '<label class="label label-danger">Rechazado</label> ';
+		htmlBody += 'el ' + timestamp_to_date( data.dropped_date ) + ' ';
+		htmlBody += '<b>Motivo</b> ' + data.dropped_reason + '<br>';
+	};
+
+	
+	htmlBody += '';
+	htmlBody += '</div>';
+
+	title.append( htmlTitle );
+	body.append( htmlBody );
+	$( '#emailDetailModal' ).modal( 'show', true );
 };
