@@ -13,6 +13,7 @@
 <table class="table table-hover table-striped table-condensed table-responsive" id="tableCards" style="font-size:10px;">
 	<tr>
 		<th>Resumen de envío</th>
+		<th>Detalle</th>
 		<th>Adjuntos</th>
 		<th>Folio</th>
 		<th>Correo</th>
@@ -196,6 +197,24 @@
     </div>
 </div>
 
+<!-- MODAL DETALLE EMAIL -->
+<div class="modal" id="emailDetailModal" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" id="closeEmailDetailModal" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title" id="emailDetailTitle">Detalle de...</h4>
+            </div>
+            <div class="modal-body">
+                <p id="emailDetailBody" style="font-size:12px;"></p>
+            </div>
+            <div class="modal-footer">
+            	<button class="btn btn-flat btn-material-indigo" data-dismiss="modal">Cerrar</button>            	
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- MODAL CARGANDO -->
 <div class="modal" id="loadingModal" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog">
@@ -237,5 +256,5 @@
 	<script src="/static/js/jquery.datetimepicker.js"></script>
 	<script src="/static/js/jquery.dataTables.min.js"></script>
 	<script src="/static/js/dataTables.bootstrap.min.js"></script>
-	<script src="/static/js/customsearch/index.min.js"></script>
+	<script src="/static/js/customsearch/index.js"></script>
 {% endblock %}
