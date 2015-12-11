@@ -11,6 +11,7 @@ from django.db import models
 from django.db.models import Count, Q
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
+from django.forms import model_to_dict
 
 
 from empresas.models import Empresa
