@@ -243,6 +243,26 @@
         </div>
     </div>
 </div>
+
+<!-- MODAL NOTIFICACIONES -->
+<div class="modal" id="notificationModal" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" id="closeNotificationModal" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title" id="notificationTitle"></h4>
+            </div>
+            <div class="modal-body">
+                <p id="notificationBody"></p>
+            </div>
+            <div class="modal-footer">
+            	<div class="form-group" align="right" style="margin-right:20px;">
+					<button class="btn btn-flat btn-material-indigo" data-dismiss="modal">Cerrar</button>
+				</div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block javascript %}

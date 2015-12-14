@@ -99,7 +99,6 @@ $( '#run_search' ).on( 'click', function () {
 			};
 
 			var link = rutUrl + date_from + '/' + date_to + '/' + rutReceptor + '/';
-			//var link = rutUrl + rutReceptor + '/';
 			$( '#closeLoadingModal' ).click();
 			drawJqueryTable( link );
 
@@ -525,7 +524,7 @@ function drawJqueryTable ( urlSource ) {
 $( "#tableCards" ).on( "click", "td", function () {
 	var span = $( this ).find( "#spanDetail" );
 	var smtp_id = span.data( "smtp" )
-	console.log( smtp_id );
+	$( '#loadingModal' ).modal( 'show', true );
 	getEmailDetailAjax( smtp_id );
 });
 
@@ -548,9 +547,6 @@ function getEmailDetailAjax ( smtp_id ) {
 };
 
 function drawEmailDetailModal ( data ) {
-	/*
-	id: 13337
-	*/
 	var title = $( '#emailDetailTitle' );
 	var body = $( '#emailDetailBody' );
 	title.empty();
@@ -630,4 +626,5 @@ function drawEmailDetailModal ( data ) {
 	title.append( htmlTitle );
 	body.append( htmlBody );
 	$( '#emailDetailModal' ).modal( 'show', true );
+	$( '#closeLoadingModal' ).click();
 };
