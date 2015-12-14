@@ -434,9 +434,13 @@ function drawJqueryTable ( urlSource ) {
 				'data': 'smtp_id',
 				'title': 'Detalle',
 				'render': function ( data, type, row, meta ) {
-					var html = '';
-					html += '<span class="glyphicon glyphicon-eye-open" id="spanDetail" data-smtp="' + data + '"></span>';
-					return html;
+					if ( typeof( data ) === 'string' && data != null ) {
+						var html = '';
+						html += '<span style="font-size:16px;color:#2196f3;align:center;cursor:pointer;" title="Click para ver más detalle." class="glyphicon glyphicon-info-sign" id="spanDetail" data-smtp="' + data + '"></span>';
+						return html;
+					} else {
+						return "";
+					};
 				},
 			},
 			{
@@ -489,45 +493,11 @@ function drawJqueryTable ( urlSource ) {
 				'title': 'Tipo DTE',
 			},
 			{ 
-				'data': 'resolucion_receptor',
-				'title': 'Resolucion receptor',
-			},
-			{ 
-				'data': 'resolucion_emisor',
-				'title': 'Resolucion emisor',
-			},
-			{ 
 				'data': 'monto',
 				'title': 'Monto',
 				'render': function ( data, type, row, meta ) {
 					return ( !data ) ? "$0.-" : "$" + data + ".-";
 				},
-			},
-			{ 
-				'data': 'fecha_emision',
-				'title': 'Fecha emisión',
-				'render': function ( data, type, row, meta ) {
-					return ( !data ) ? "" : moment( data ).format( 'DD-MM-YYYY H:mm:ss' );
-				},
-			},
-			{ 
-				'data': 'fecha_recepcion',
-				'title': 'Fecha recepción',
-				'render': function ( data, type, row, meta ) {
-					return ( !data ) ? "" : moment( data ).format( 'DD-MM-YYYY H:mm:ss' );
-				},
-			},
-			{ 
-				'data': 'estado_documento',
-				'title': 'Estado documento',
-			},
-			{ 
-				'data': 'tipo_operacion',
-				'title': 'Tipo operación',
-			},
-			{ 
-				'data': 'tipo_receptor',
-				'title': 'Tipo receptor',
 			},
 		],
 		"language": {
