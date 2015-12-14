@@ -1,0 +1,7 @@
+cron:
+- description: Enviar correos que no se enviaron por algún error
+  url: /emails/send-delayed/
+  schedule: every 60 mins
+- description: Enviar correos que tienen marcado procesado pero no enviados
+  url: /emails/send-delayed-processed/
+  schedule: every 60 mins

@@ -239,6 +239,31 @@ class Email(models.Model):
             print e
 
     @classmethod
+    def get_delayed_emails(self):
+        emails = Email.objects.filter(
+            Q(processed_event__isnull=True) & Q(dropped_event__isnull=True)
+        ).order_by('id')
+        if emails:
+            logging.info("se encontraron la siguente cantidad de emails pendientes")
+            logging.info(emails.count())
+            return emails
+        else:
+            return None
+
+    @classmethod
+    def get_delayed_emails_only_processed(self):
+        emails = Email.objects.filter(
+            Q(processed_event__isnull=False) &  Q(delivered_event__isnull=True) &
+            Q(opened_event__isnull=True ) & Q(dropped_event__isnull=True) & 
+            Q(bounce_event__isnull=True)).order_by('input_date')
+        if emails:
+            logging.info("se encontraron la siguente cantidad de emails pendientes")
+            logging.info(emails.count())
+            return emails
+        else:
+            return None
+
+    @classmethod
     def get_emails_by_correo(self, date_from, date_to, correo, **kwargs):
         emails = Email.objects.filter(
             input_date__range=(date_from, date_to),

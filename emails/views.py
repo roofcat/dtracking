@@ -9,7 +9,7 @@ import logging
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 
 
 from rest_framework import authentication, permissions
@@ -68,6 +68,41 @@ def queue_send_email(request):
             return HttpResponse()
         except Exception, e:
             logging.error(e)
+
+
+@csrf_exempt
+@require_GET
+def cron_send_delayed_email(request):
+    if request.method == 'GET':
+        logging.info("entrando a la cola de reenvio de correos")
+        logging.info(request.body)
+        emails = Email.get_delayed_emails()
+        if emails is not None:
+            for email in emails:
+                context = {
+                    "email_id": email.id
+                }
+                q = taskqueue.Queue("InputQueue")
+                t = taskqueue.Task(url="/emails/inputqueue/", params=context)
+                q.add(t)
+        return HttpResponse()
+
+@csrf_exempt
+@require_GET
+def cron_send_delayed_processed_email(request):
+    if request.method == 'GET':
+        logging.info("entrando a la cola de reenvio de correos")
+        logging.info(request.body)
+        emails = Email.get_delayed_emails_only_processed()
+        if emails is not None:
+            for email in emails:
+                context = {
+                    "email_id": email.id
+                }
+                q = taskqueue.Queue("InputQueue")
+                t = taskqueue.Task(url="/emails/inputqueue/", params=context)
+                q.add(t)
+        return HttpResponse()
 
 
 class EmailViewSet(ModelViewSet):

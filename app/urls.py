@@ -10,7 +10,8 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 
 from autenticacion.views import log_in, log_out, home_to_dashboard
-from emails.views import EmailDteInputView, queue_send_email
+from emails.views import EmailDteInputView
+from emails.views import queue_send_email, cron_send_delayed_email, cron_send_delayed_processed_email
 from empresas.views import EmpresaViewSet
 from webhooks.views import sendgrid_rest_webhook
 
@@ -33,6 +34,9 @@ urlpatterns = [
     # luego el tracking lo pasa a esta cola para 
     # luego enviar el correo por sendgrid
     url(r'^emails/inputqueue/', queue_send_email),
+    # tarea cron que envia correos con pendiente
+    url(r'^emails/send-delayed/', cron_send_delayed_email),
+    url(r'^emails/send-delayed-processed/', cron_send_delayed_processed_email),
 
 	# rutas de las paginas html del tracking
     url(r'^dashboard/', include('dashboard.urls', namespace='dashboard')),
