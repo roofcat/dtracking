@@ -537,7 +537,7 @@ function getEmailDetailAjax ( smtp_id ) {
 			'smtp_id': smtp_id,
 		},
 		success: function ( data ) {
-			console.log( data );
+			//console.log( data );
 			drawEmailDetailModal( data );
 		},
 		error: function ( jqXHR, textStatus, errorThrown ) {
