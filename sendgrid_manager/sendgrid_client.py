@@ -40,7 +40,7 @@ class EmailClient(object):
             'rut_receptor': correo.rut_receptor,
             'rut_emisor': correo.rut_emisor,
             'tipo_envio': correo.tipo_envio,
-            'tipo_dte': correo.tipo_dte,
+            'tipo_dte': correo.tipo_dte.id_documento,
             'numero_folio': correo.numero_folio,
             'resolucion_receptor': correo.resolucion_receptor,
             'resolucion_emisor': correo.resolucion_emisor,

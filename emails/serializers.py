@@ -5,14 +5,15 @@ from rest_framework.serializers import ModelSerializer, FileField
 
 
 from .models import Email
-from empresas.serializers import EmpresaSerializer
 
 
 class EmailDteInputSerializer(ModelSerializer):
     # agregando el serializador de empresa
     # anida la relación en el json de listado
-    # del modelo emails
+    # del modelo emails, pero en los parametros 
+    # rest hay que enviarlos 
     # empresa = EmpresaSerializer()
+    # tipo_dte = TipoDocumentoSerializer()
     adjunto1 = FileField(use_url=False, max_length=None,
                          allow_null=True, allow_empty_file=True)
 

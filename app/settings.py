@@ -38,6 +38,7 @@ INSTALLED_APPS = (
     'empresas',
     'reports',
     'sendgrid_manager',
+    'tipodocumentos',
     'webhooks',
 )
 

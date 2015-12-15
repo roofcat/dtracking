@@ -523,9 +523,11 @@ function drawJqueryTable ( urlSource ) {
 */
 $( "#tableCards" ).on( "click", "td", function () {
 	var span = $( this ).find( "#spanDetail" );
-	var smtp_id = span.data( "smtp" )
-	$( '#loadingModal' ).modal( 'show', true );
-	getEmailDetailAjax( smtp_id );
+	var smtp_id = span.data( "smtp" );
+	if ( smtp_id ) {
+		$( '#loadingModal' ).modal( 'show', true );
+		getEmailDetailAjax( smtp_id );
+	};
 });
 
 function getEmailDetailAjax ( smtp_id ) {

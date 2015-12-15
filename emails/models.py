@@ -15,6 +15,7 @@ from django.forms import model_to_dict
 
 
 from empresas.models import Empresa
+from tipodocumentos.models import TipoDocumento
 
 
 TIPOS_RECEPTORES = (
@@ -50,7 +51,7 @@ class Email(models.Model):
     tipo_envio = models.CharField(max_length=20,
                                   choices=TIPOS_ENVIOS,
                                   db_index=True)
-    tipo_dte = models.CharField(max_length=20, db_index=True)
+    tipo_dte = models.ForeignKey(TipoDocumento)
     numero_folio = models.IntegerField(db_index=True)
     resolucion_receptor = models.CharField(max_length=20,
                                            null=True,

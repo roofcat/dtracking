@@ -19,6 +19,8 @@ reports/*py[cod]
 reports/migrations/*py[cod]
 sendgrid_manager/*py[cod]
 sendgrid_manager/migrations/*py[cod]
+tipodocumentos/*py[cod]
+tipodocumentos/migrations/*py[cod]
 webhook/*py[cod]
 webhook/migrations/*py[cod]
 .idea

@@ -14,10 +14,11 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Empresa',
+            name='TipoDocumento',
             fields=[
-                ('rut', models.CharField(max_length=20, primary_key=True, serialize=False, unique=True)),
-                ('empresa', models.CharField(max_length=200)),
+                ('id_documento', models.IntegerField(primary_key=True, serialize=False, unique=True)),
+                ('nombre_documento', models.CharField(max_length=200)),
+                ('es_electronico', models.BooleanField()),
             ],
         ),
     ]
