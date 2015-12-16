@@ -54,7 +54,8 @@ class EmailClient(object):
         logging.info(correo)
         if correo.adjunto1:
             self.message.add_attachment_stream(
-                correo.adjunto1.name, correo.adjunto1.file.read())
+                get_file_name(correo.adjunto1.name), 
+                correo.adjunto1.file.read())
         self.message.set_unique_args(unique_args)
         # enviando el mail
         status, msg = self.sg.send(self.message)
@@ -86,3 +87,9 @@ class EmailClient(object):
         # imprimiendo respuesta
         logging.info(status)
         logging.info(msg)
+
+def get_file_name(name):
+    if name is not None:
+        name = name.split("/")
+        length = len(name) - 1
+        return name[length]
