@@ -2,7 +2,6 @@
 
 
 from datetime import datetime
-from google.appengine.api import taskqueue
 import json
 
 
@@ -13,14 +12,12 @@ from django.views.generic import TemplateView
 
 
 from .forms import ReportForm
-from .tablib_export import create_tablib
 from autenticacion.views import LoginRequiredMixin
 from emails.models import Email
-from sendgrid_manager.sendgrid_client import EmailClient
-
-
-# Función lambda para convertir una fecha unix a datetime
-timestamp_to_date = lambda x: datetime.fromtimestamp(x)
+from utils.sendgrid_client import EmailClient
+from utils.tablib_export import create_tablib
+from utils.generics import timestamp_to_date
+from utils.queues import report_queue
 
 
 """ Serie de clases controladoras que reciben parametros
@@ -42,9 +39,7 @@ class GeneralReportTemplateView(LoginRequiredMixin, TemplateView):
                     'file_name': 'reporte_general.xlsx',
                     'export_type': 'export_general_email',
                 }
-                q = taskqueue.Queue("ReportQueue")
-                t = taskqueue.Task(url="/reports/exportqueue/", params=context)
-                q.add(t)
+                report_queue(context)
                 data = {"status": "ok"}
                 return HttpResponse(json.dumps(data), content_type="application/json")
         except Exception, e:
@@ -64,9 +59,7 @@ class SendedReportTemplateView(LoginRequiredMixin, TemplateView):
                     'file_name': 'reporte_enviados.xlsx',
                     'export_type': 'export_sended_email',
                 }
-            q = taskqueue.Queue("ReportQueue")
-            t = taskqueue.Task(url="/reports/exportqueue/", params=context)
-            q.add(t)
+            report_queue(context)
             data = {"status": "ok"}
             return HttpResponse(json.dumps(data), content_type="application/json")
         except Exception, e:
@@ -86,9 +79,7 @@ class FailureReportTemplateView(LoginRequiredMixin, TemplateView):
                     'file_name': 'reporte_fallidos.xlsx',
                     'export_type': 'export_failure_email',
                 }
-            q = taskqueue.Queue("ReportQueue")
-            t = taskqueue.Task(url="/reports/exportqueue/", params=context)
-            q.add(t)
+            report_queue(context)
             data = {"status": "ok"}
             return HttpResponse(json.dumps(data), content_type="application/json")
         except Exception, e:
@@ -108,9 +99,7 @@ class ByEmailReportTemplateView(LoginRequiredMixin, TemplateView):
                     'file_name': 'reporte_por_email.xlsx',
                     'export_type': 'export_search_by_email',
                 }
-            q = taskqueue.Queue("ReportQueue")
-            t = taskqueue.Task(url="/reports/exportqueue/", params=context)
-            q.add(t)
+            report_queue(context)
             data = {"status": "ok"}
             return HttpResponse(json.dumps(data), content_type="application/json")
         except Exception, e:
@@ -128,9 +117,7 @@ class ByFolioReportTemplateView(LoginRequiredMixin, TemplateView):
                     'file_name': 'reporte_por_folio.xlsx',
                     'export_type': 'export_search_by_folio',
                 }
-                q = taskqueue.Queue("ReportQueue")
-                t = taskqueue.Task(url="/reports/exportqueue/", params=context)
-                q.add(t)
+                report_queue(context)
                 data = {"status": "ok"}
                 return HttpResponse(json.dumps(data), content_type="application/json")
         except Exception, e:
@@ -150,9 +137,7 @@ class ByRutReportTemplateView(LoginRequiredMixin, TemplateView):
                     'file_name': 'reporte_por_rut.xlsx',
                     'export_type': 'export_search_by_rut',
                 }
-            q = taskqueue.Queue("ReportQueue")
-            t = taskqueue.Task(url="/reports/exportqueue/", params=context)
-            q.add(t)
+            report_queue(context)
             data = {"status": "ok"}
             return HttpResponse(json.dumps(data), content_type="application/json")
         except Exception, e:
@@ -173,9 +158,7 @@ class ByMountReportTemplateView(LoginRequiredMixin, TemplateView):
                     'file_name': 'reporte_por_monto.xlsx',
                     'export_type': 'export_search_by_mount',
                 }
-            q = taskqueue.Queue("ReportQueue")
-            t = taskqueue.Task(url="/reports/exportqueue/", params=context)
-            q.add(t)
+            report_queue(context)
             data = {"status": "ok"}
             return HttpResponse(json.dumps(data), content_type="application/json")
         except Exception, e:

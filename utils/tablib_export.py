@@ -7,12 +7,12 @@ import pytz
 import tablib
 
 
+from .generics import timestamp_to_date
+
+
 """ Esta función genera excel en tiempo real de ejecución 
     ya que recibe como parametro un arreglo de objetos
 """
-
-
-timestamp_to_date = lambda x: datetime.fromtimestamp(x, tz=pytz.timezone("America/Santiago"))
 
 
 def create_tablib(data):

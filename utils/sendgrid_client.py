@@ -2,8 +2,6 @@
 
 
 import logging
-
-
 from sendgrid import SendGridClient, Mail
 
 
@@ -12,6 +10,7 @@ from django.contrib.auth.models import User
 
 from configuraciones.models import SendgridConf, TemplateReporte
 from emails.models import Email
+from utils.generics import get_file_name_from_storage
 
 
 class EmailClient(object):
@@ -54,7 +53,7 @@ class EmailClient(object):
         logging.info(correo)
         if correo.adjunto1:
             self.message.add_attachment_stream(
-                get_file_name(correo.adjunto1.name), 
+                get_file_name_from_storage(correo.adjunto1.name), 
                 correo.adjunto1.file.read())
         self.message.set_unique_args(unique_args)
         # enviando el mail
@@ -87,9 +86,3 @@ class EmailClient(object):
         # imprimiendo respuesta
         logging.info(status)
         logging.info(msg)
-
-def get_file_name(name):
-    if name is not None:
-        name = name.split("/")
-        length = len(name) - 1
-        return name[length]

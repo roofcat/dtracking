@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 
-from google.appengine.api import taskqueue
 import json
 import logging
 
@@ -20,7 +19,8 @@ from rest_framework.viewsets import ModelViewSet
 
 from .models import Email
 from .serializers import EmailDteInputSerializer
-from sendgrid_manager.sendgrid_client import EmailClient
+from utils.queues import input_queue
+from utils.sendgrid_client import EmailClient
 
 
 class EmailDteInputView(APIView):
@@ -42,12 +42,7 @@ class EmailDteInputView(APIView):
         if email.is_valid():
             email.save()
             logging.info(email.data)
-            context = {
-                "email_id": email.data['id'],
-            }
-            q = taskqueue.Queue("InputQueue")
-            t = taskqueue.Task(url="/emails/inputqueue/", params=context)
-            q.add(t)
+            input_queue(email.data['id'])
             return Response({'status': 200})
         else:
             logging.error(email.errors)
@@ -79,12 +74,7 @@ def cron_send_delayed_email(request):
         emails = Email.get_delayed_emails()
         if emails is not None:
             for email in emails:
-                context = {
-                    "email_id": email.id
-                }
-                q = taskqueue.Queue("InputQueue")
-                t = taskqueue.Task(url="/emails/inputqueue/", params=context)
-                q.add(t)
+                input_queue(email.id)
         return HttpResponse()
 
 @csrf_exempt
@@ -96,12 +86,7 @@ def cron_send_delayed_processed_email(request):
         emails = Email.get_delayed_emails_only_processed()
         if emails is not None:
             for email in emails:
-                context = {
-                    "email_id": email.id
-                }
-                q = taskqueue.Queue("InputQueue")
-                t = taskqueue.Task(url="/emails/inputqueue/", params=context)
-                q.add(t)
+                input_queue(email.id)
         return HttpResponse()
 
 

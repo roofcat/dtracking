@@ -1,4 +1,5 @@
 .DS_Store
+.idea
 *py[cod]
 *.py[cod]
 app/*py[cod]
@@ -21,6 +22,6 @@ sendgrid_manager/*py[cod]
 sendgrid_manager/migrations/*py[cod]
 tipodocumentos/*py[cod]
 tipodocumentos/migrations/*py[cod]
+utils/*py[cod]
 webhook/*py[cod]
 webhook/migrations/*py[cod]
-.idea
