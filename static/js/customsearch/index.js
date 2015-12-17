@@ -28,7 +28,7 @@ var tabPosition = '#correo';
 var exportLink = '';
 
 // expresión regular de correo
-var expr = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+var expr = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,4})+$/;
 
 $( document ).ready( function () {
 	baseUrl = baseUrl.split('/');
