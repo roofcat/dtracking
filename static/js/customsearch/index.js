@@ -178,7 +178,7 @@ function formValidate () {
 			var date_from = $( '#date_from1' ).val();
 			var date_to = $( '#date_to1' ).val();
 			var correoDestinatario = $( '#correoDestinatario' ).val();
-			if ( date_from && date_to && correoDestinatario & expr.test( correoDestinatario ) ) {
+			if ( date_from && date_to && correoDestinatario && expr.test( correoDestinatario ) ) {
 				return true;
 			} else {
 				return false;
