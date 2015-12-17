@@ -13,7 +13,7 @@ from autenticacion.views import log_in, log_out, home_to_dashboard
 from emails.views import EmailDteInputView
 from emails.views import queue_send_email, cron_send_delayed_email, cron_send_delayed_processed_email
 from empresas.views import EmpresaViewSet
-from webhooks.views import sendgrid_rest_webhook
+from webhooks.views import sendgrid_rest_webhook, sendgrid_api_webhook
 
 
 # sección de registro de apis rest con django-rest-framework
@@ -47,6 +47,7 @@ urlpatterns = [
 
     # url que recibe webhooks de sendgrid
     url(r'^webhook/', sendgrid_rest_webhook, name='webhook_rest'),
+    url(r'^webhook-api/', sendgrid_api_webhook, name='webhook_rest'),
 
     # rutas de autenticación de usuarios
     url(r'^$', home_to_dashboard),

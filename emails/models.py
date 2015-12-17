@@ -75,8 +75,8 @@ class Email(models.Model):
     # campos correo
     nombre_cliente = models.CharField(max_length=200)
     correo = models.EmailField(max_length=100, db_index=True)
-    asunto = models.CharField(max_length=200)
-    html = models.TextField()
+    asunto = models.CharField(max_length=200, blank=True, null=True)
+    html = models.TextField(blank=True, null=True)
     # adjuntos
     adjunto1 = models.FileField(
         upload_to='adjuntos/%Y/%m/%d/{0}'.format(
@@ -182,12 +182,46 @@ class Email(models.Model):
     def __unicode__(self):
         return u"{0} - {1}".format(self.correo, self.numero_folio)
 
-    # funcion utilizada desde el webhook
+    # funcion utilizada desde el webhook rest
     @classmethod
     def get_email(self, email_id):
         try:
             email = Email.objects.get(pk=email_id)
-            logging.info("objeto existe")
+            logging.info("Email Existe")
+        except Email.DoesNotExist:
+            logging.error("Email.DoesNotExist")
+            email = None
+        return email
+
+    # funcion DRY para webhook api
+    @classmethod
+    def set_default_fields(body):
+        email = Email.objects.create()
+        email.empresa = str(body['empresa']).decode('utf-8')
+        email.rut_receptor = str(body['rut_receptor']).decode('utf-8')
+        email.rut_emisor = str(body['rut_emisor']).decode('utf-8')
+        email.tipo_envio = str(body['tipo_envio']).decode('utf-8')
+        email.tipo_dte = str(body['tipo_dte']).decode('utf-8')
+        email.numero_folio = str(body['numero_folio']).decode('utf-8')
+        email.resolucion_receptor = str(body['resolucion_receptor']).decode('utf-8')
+        email.resolucion_emisor = str(body['resolucion_emisor']).decode('utf-8')
+        email.monto = str(body['monto']).decode('utf-8')
+        email.fecha_emision = str(body['fecha_emision']).decode('utf-8')
+        email.fecha_recepcion = str(body['fecha_recepcion']).decode('utf-8')
+        email.estado_documento = str(body['estado_documento']).decode('utf-8')
+        email.tipo_operacion = str(body['tipo_operacion']).decode('utf-8')
+        email.tipo_receptor = str(body['tipo_receptor']).decode('utf-8')
+        email.nombre_cliente = str(body['nombre_cliente']).decode('utf-8')
+        email.correo = str(body['correo']).decode('utf-8')
+        return email
+
+    # funcion utilizada desde el webhook api
+    @classmethod
+    def get_email(self, correo, numero_folio, tipo_dte):
+        try:
+            email = Email.objects.get(
+                correo=correo, numero_folio=numero_folio, tipo_dte=tipo_dte)
+            logging.info("Email Existe")
         except Email.DoesNotExist:
             logging.error("Email.DoesNotExist")
             email = None
