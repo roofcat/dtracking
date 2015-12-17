@@ -27,6 +27,9 @@ var tabPosition = '#correo';
 // link dinamico para las rutas de exportar
 var exportLink = '';
 
+// expresión regular de correo
+var expr = /^([a-zA-Z0-9_\.\-])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+
 $( document ).ready( function () {
 	baseUrl = baseUrl.split('/');
 	delete baseUrl[4];
@@ -175,7 +178,7 @@ function formValidate () {
 			var date_from = $( '#date_from1' ).val();
 			var date_to = $( '#date_to1' ).val();
 			var correoDestinatario = $( '#correoDestinatario' ).val();
-			if ( date_from && date_to && correoDestinatario ) {
+			if ( date_from && date_to && correoDestinatario & expr.test( correoDestinatario ) ) {
 				return true;
 			} else {
 				return false;

@@ -184,7 +184,7 @@ class Email(models.Model):
 
     # funcion utilizada desde el webhook rest
     @classmethod
-    def get_email(self, email_id):
+    def get_email_by_id(self, email_id):
         try:
             email = Email.objects.get(pk=email_id)
             logging.info("Email Existe")

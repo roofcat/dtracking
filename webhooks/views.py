@@ -32,7 +32,7 @@ def sendgrid_rest_webhook(request):
                     logging.info("es un webhook para el tracking")
 
                     if evento_sendgrid == 'processed':
-                        email = Email.get_email(email_id)
+                        email = Email.get_email_by_id(email_id)
 
                         if email is not None:
                             logging.info(email)
@@ -46,7 +46,7 @@ def sendgrid_rest_webhook(request):
                                 body['sg_message_id']).decode('utf-8')
                             email.save()
                     elif evento_sendgrid == 'delivered':
-                        email = Email.get_email(email_id)
+                        email = Email.get_email_by_id(email_id)
 
                         if email is not None:
                             logging.info(email)
@@ -62,7 +62,7 @@ def sendgrid_rest_webhook(request):
                                 body['response']).decode('utf-8')
                             email.save()
                     elif evento_sendgrid == 'open':
-                        email = Email.get_email(email_id)
+                        email = Email.get_email_by_id(email_id)
 
                         if email is not None:
                             logging.info(email)
@@ -80,7 +80,7 @@ def sendgrid_rest_webhook(request):
                             email.opened_count += 1
                             email.save()
                     elif evento_sendgrid == 'dropped':
-                        email = Email.get_email(email_id)
+                        email = Email.get_email_by_id(email_id)
 
                         if email is not None:
                             logging.info(email)
@@ -96,7 +96,7 @@ def sendgrid_rest_webhook(request):
                             email.dropped_event = evento_sendgrid
                             email.save()
                     elif evento_sendgrid == 'bounce':
-                        email = Email.get_email(email_id)
+                        email = Email.get_email_by_id(email_id)
 
                         if email is not None:
                             logging.info(email)
@@ -116,7 +116,7 @@ def sendgrid_rest_webhook(request):
                                 body['type']).decode('utf-8')
                             email.save()
                     elif evento_sendgrid == 'unsubscribe':
-                        email = Email.get_email(email_id)
+                        email = Email.get_email_by_id(email_id)
 
                         if email is not None:
                             logging.info(email)
@@ -130,7 +130,7 @@ def sendgrid_rest_webhook(request):
                             email.unsubscribe_event = evento_sendgrid
                             email.save()
                     elif evento_sendgrid == 'click':
-                        email = Email.get_email(email_id)
+                        email = Email.get_email_by_id(email_id)
 
                         if email is not None:
                             logging.info(email)
