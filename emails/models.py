@@ -52,14 +52,14 @@ class Email(models.Model):
                                   choices=TIPOS_ENVIOS,
                                   db_index=True)
     tipo_dte = models.ForeignKey(TipoDocumento)
-    numero_folio = models.IntegerField(db_index=True)
+    numero_folio = models.BigIntegerField(db_index=True)
     resolucion_receptor = models.CharField(max_length=20,
                                            null=True,
                                            blank=True)
     resolucion_emisor = models.CharField(max_length=20, null=True, blank=True)
-    monto = models.IntegerField(default=0, db_index=True)
-    fecha_emision = models.DateTimeField(null=True, blank=True)
-    fecha_recepcion = models.DateTimeField(null=True, blank=True)
+    monto = models.BigIntegerField(default=0, db_index=True)
+    fecha_emision = models.BigIntegerField(null=True, blank=True)
+    fecha_recepcion = models.BigIntegerField(null=True, blank=True)
     estado_documento = models.CharField(max_length=100,
                                         choices=TIPOS_ESTADOS_DOCUMENTOS,
                                         null=True,
