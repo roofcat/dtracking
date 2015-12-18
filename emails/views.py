@@ -42,7 +42,9 @@ class EmailDteInputView(APIView):
         if email.is_valid():
             email.save()
             logging.info(email.data)
-            input_queue(email.data['id'])
+            #input_queue(email.data['id'])
+            email_client = EmailClient()
+            email_client.enviar_correo_dte(email.data['id'])
             return Response({'status': 200})
         else:
             logging.error(email.errors)
