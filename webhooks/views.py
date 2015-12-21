@@ -167,14 +167,17 @@ def sendgrid_api_webhook(request):
                 correo = str(body['email']).decode('utf-8')
                 numero_folio = str(body['numero_folio']).decode('utf-8')
                 tipo_dte = str(body['tipo_dte']).decode('utf-8')
+                rut_emisor = str(body['rut_emisor']).decode('utf-8')
+                resolucion_emisor = str(body['resolucion_emisor']).decode('utf-8')
                 logging.info(evento_sendgrid)
 
-                if evento_sendgrid and correo and numero_folio and tipo_dte is not None:
-                    email_id = int(email_id, base=10)
+                if evento_sendgrid and correo and numero_folio and tipo_dte and rut_emisor and resolucion_emisor:
+                    correo = str(correo).lower
+                    numero_folio = int(numero_folio, base=10)
                     logging.info("es un webhook para el tracking")
 
                     if evento_sendgrid == 'processed':
-                        email = Email.get_email(correo, numero_folio, tipo_dte)
+                        email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
 
                         if email is not None:
                             logging.info(email)
@@ -195,7 +198,7 @@ def sendgrid_api_webhook(request):
 							email.processed_sg_message_id = str(body['sg_message_id']).decode('utf-8')
 							email.save()
                     elif evento_sendgrid == 'delivered':
-                        email = Email.get_email(correo, numero_folio, tipo_dte)
+                        email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
 
                         if email is not None:
                             logging.info(email)
@@ -217,7 +220,7 @@ def sendgrid_api_webhook(request):
 							email.delivered_response = str(body['response']).decode('utf-8')
 							email.save()
                     elif evento_sendgrid == 'open':
-                        email = Email.get_email(correo, numero_folio, tipo_dte)
+                        email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
 
                         if email is not None:
                             logging.info(email)
@@ -245,7 +248,7 @@ def sendgrid_api_webhook(request):
 							email.opened_count += 1
 							email.save()
                     elif evento_sendgrid == 'dropped':
-                        email = Email.get_email(correo, numero_folio, tipo_dte)
+                        email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
 
                         if email is not None:
                             logging.info(email)
@@ -267,7 +270,7 @@ def sendgrid_api_webhook(request):
 							email.dropped_event = evento_sendgrid
 							email.save()
                     elif evento_sendgrid == 'bounce':
-                        email = Email.get_email(correo, numero_folio, tipo_dte)
+                        email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
 
                         if email is not None:
                             logging.info(email)
@@ -293,7 +296,7 @@ def sendgrid_api_webhook(request):
 							email.bounce_type = str(body['type']).decode('utf-8')
 							email.save()
                     elif evento_sendgrid == 'unsubscribe':
-                        email = Email.get_email(correo, numero_folio, tipo_dte)
+                        email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
 
                         if email is not None:
                             logging.info(email)
@@ -313,7 +316,7 @@ def sendgrid_api_webhook(request):
 							email.unsubscribe_event = evento_sendgrid
 							email.save()
                     elif evento_sendgrid == 'click':
-                        email = Email.get_email(correo, numero_folio, tipo_dte)
+                        email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
 
                         if email is not None:
                             logging.info(email)

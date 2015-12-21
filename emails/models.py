@@ -219,10 +219,15 @@ class Email(models.Model):
 
     # funcion utilizada desde el webhook api
     @classmethod
-    def get_email(self, correo, numero_folio, tipo_dte):
+    def get_email(self, correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor):
         try:
-            email = Email.objects.get(
-                correo=correo, numero_folio=numero_folio, tipo_dte=tipo_dte)
+            email = Email.objects.filter(
+                correo=correo, 
+                numero_folio=numero_folio, 
+                tipo_dte=tipo_dte,
+                rut_emisor=rut_emisor,
+                resolucion_emisor=resolucion_emisor,
+            ).order_by('-input_date')[:1]
             logging.info("Email Existe")
         except Email.DoesNotExist:
             logging.error("Email.DoesNotExist")
@@ -330,7 +335,7 @@ class Email(models.Model):
     def get_emails_by_correo_async(self, date_from, date_to, correo, **kwargs):
         emails = Email.objects.filter(
             input_date__range=(date_from, date_to),
-            correo=correo).order_by('-input_date')
+            correo=correo).order_by('-input_date')[:20000]
         if emails:
             return emails
         else:
@@ -340,7 +345,7 @@ class Email(models.Model):
     def get_emails_by_dates_async(self, date_from, date_to, options, **kwargs):
         if date_from and date_to:
             emails = Email.objects.filter(
-                input_date__range=(date_from, date_to))
+                input_date__range=(date_from, date_to))[:20000]
             if emails:
                 return emails
             else:
@@ -354,7 +359,7 @@ class Email(models.Model):
         else:
             emails = Email.objects.filter(
                 input_date__range=(date_from, date_to),
-                tipo_receptor=options).order_by('-input_date')
+                tipo_receptor=options).order_by('-input_date')[:20000]
         if emails:
             return emails
         else:
@@ -390,7 +395,7 @@ class Email(models.Model):
     def get_emails_by_folio_async(self, folio, **kwargs):
         if folio:
             emails = Email.objects.filter(
-                numero_folio=folio).order_by('-input_date')
+                numero_folio=folio).order_by('-input_date')[:20000]
             if emails:
                 return emails
             else:
@@ -428,7 +433,7 @@ class Email(models.Model):
         if date_from and date_to and rut:
             emails = Email.objects.filter(
                 input_date__range=(date_from, date_to),
-                rut_receptor=rut).order_by('-input_date')
+                rut_receptor=rut).order_by('-input_date')[:20000]
             if emails:
                 return emails
             else:
@@ -466,7 +471,7 @@ class Email(models.Model):
             emails = Email.objects.filter(
                 Q(input_date__range=(date_from, date_to)),
                 Q(bounce_event='bounce') | Q(dropped_event='dropped')
-            ).order_by('-input_date')
+            ).order_by('-input_date')[:20000]
             if emails:
                 return emails
             else:
@@ -503,7 +508,7 @@ class Email(models.Model):
     def get_emails_by_mount_and_dates_async(self, date_from, date_to, mount_from, mount_to, **kwargs):
         emails = Email.objects.filter(
             input_date__range=(date_from, date_to),
-            monto__range=(mount_from, mount_to)).order_by('-input_date')
+            monto__range=(mount_from, mount_to)).order_by('-input_date')[:20000]
         if emails:
             return emails
         else:
