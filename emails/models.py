@@ -23,8 +23,9 @@ TIPOS_RECEPTORES = (
     ('cliente', 'cliente'),
 )
 TIPOS_ENVIOS = (
-    ('notificacion', 'notificacion'),
     ('aceptacion', 'aceptacion'),
+    ('envío dte', 'envío dte'),
+    ('notificacion', 'notificacion'),
     ('rechazo', 'rechazo'),
     ('rems', 'rems'),
 )
@@ -72,9 +73,10 @@ class Email(models.Model):
                                      choices=TIPOS_RECEPTORES,
                                      null=True,
                                      blank=True)
+    id_envio = models.IntegerField()
     # campos correo
     nombre_cliente = models.CharField(max_length=200)
-    correo = models.EmailField(max_length=100, db_index=True)
+    correo = models.EmailField(max_length=250, db_index=True)
     asunto = models.CharField(max_length=200, blank=True, null=True)
     html = models.TextField(blank=True, null=True)
     # adjuntos
