@@ -19,10 +19,11 @@ class EmailDteInputSerializer(ModelSerializer):
 
     class Meta:
         model = Email
-        fields = ('id', 'input_date', 'empresa', 'rut_receptor',
-                  'rut_emisor', 'tipo_envio', 'tipo_dte', 'numero_folio',
-                  'resolucion_receptor', 'resolucion_emisor', 'monto',
-                  'fecha_emision', 'fecha_recepcion', 'estado_documento',
-                  'tipo_operacion', 'tipo_receptor', 'nombre_cliente',
-                  'correo', 'asunto', 'html', 'adjunto1',
-                  )
+        fields = (
+            'id', 'input_date', 'empresa', 'rut_receptor',
+            'rut_emisor', 'tipo_envio', 'tipo_dte', 'numero_folio',
+            'resolucion_receptor', 'resolucion_emisor', 'monto',
+            'fecha_emision', 'fecha_recepcion', 'estado_documento',
+            'tipo_operacion', 'tipo_receptor', 'id_envio',
+            'nombre_cliente', 'correo', 'asunto', 'html', 'adjunto1',
+        )
