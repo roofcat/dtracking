@@ -577,27 +577,57 @@ function drawEmailDetailModal ( data ) {
 	htmlBody += '<label>Rut emisor</label> ' + data.rut_emisor + ' ';
 	htmlBody += '<label>Rut receptor</label> ' + data.rut_receptor + ' ';
 	htmlBody += '<label>Tipo envío</label> ' + data.tipo_envio + '<br>';
-	htmlBody += '<label>Folio</label> ' + data.numero_folio + ' <label>Tipo doc. trib.</label> ' + data.tipo_dte + '<br>';
-	htmlBody += '<label>Resolución receptor</label> ';
-	if ( data.resolucion_receptor ) { data.resolucion_receptor } else { '---' };
+	htmlBody += '<label>Folio</label> ' + data.numero_folio + ' ';
+	htmlBody += '<label>Tipo doc. trib.</label> ' + data.tipo_dte + '<br>';
+	htmlBody += '<label>Resolución receptor</label>';
+	if ( data.resolucion_receptor ) {
+		htmlBody += ' aaa' + data.resolucion_receptor + ' ';
+	} else { 
+		htmlBody += '---';
+	};
 	htmlBody += '<label>Resolución emisor</label> ';
-	if ( data.resolucion_emisor ) { data.resolucion_emisor } else { '---' };
+	if ( data.resolucion_emisor ) {
+		htmlBody += ' ' + data.resolucion_emisor + ' ';
+	} else { 
+		htmlBody += '---';
+	};
 	htmlBody += '<br>';
 	htmlBody += '<label>Monto</label> ' + data.monto + '<br>';
 	htmlBody += '<label>Fecha emisión</label> ';
-	if ( data.fecha_emision ) { moment( data.fecha_emision ).format( 'DD-MM-YYYY H:mm:ss' ) } else { '---' };
+
+	if ( data.fecha_emision ) {
+		htmlBody += ' ' + timestamp_to_date( data.fecha_emision ) + ' ';
+	} else { 
+		htmlBody += '---';
+	};
 	htmlBody += '<br>';
 	htmlBody += '<label>Fecha recepción</label> ';
-	if ( data.fecha_recepcion ) { moment( data.fecha_recepcion ).format( 'DD-MM-YYYY H:mm:ss' ) } else { '---' };
+	if ( data.fecha_recepcion ) {
+		htmlBody += ' ' + timestamp_to_date( data.fecha_recepcion ) + ' ';
+	} else { 
+		htmlBody += '---';
+	};
 	htmlBody += '<br>';
 	htmlBody += '<label>Estado del documento</label> ';
-	if ( data.estado_documento ) { data.estado_documento } else { '---' };
+	if ( data.estado_documento ) {
+		htmlBody += ' ' + data.estado_documento + ' ';
+	} else {
+		htmlBody += '---';
+	};
 	htmlBody += '<br>';
 	htmlBody += '<label>Tipo operación</label>';
-	if ( data.tipo_operacion ) { data.tipo_operacion } else { '---' };
+	if ( data.tipo_operacion ) {
+		htmlBody += ' ' + data.tipo_operacion + ' ';
+	} else {
+		htmlBody += '---';
+	};
 	htmlBody += '<br>';
 	htmlBody += '<label>Tipo receptor</label>';
-	if ( data.tipo_receptor ) { data.tipo_receptor } else { '---' };
+	if ( data.tipo_receptor ) {
+		htmlBody += ' ' + data.tipo_receptor + ' ';
+	} else {
+		htmlBody += '---';
+	};
 	htmlBody += '<br>';
 	if ( data.adjunto1 ) {
 		htmlBody += '<label>Adjunto</label> ';
@@ -637,12 +667,12 @@ function drawEmailDetailModal ( data ) {
 		htmlBody += '<b>Motivo</b> ' + data.dropped_reason + '<br>';
 	};
 
-	
 	htmlBody += '';
 	htmlBody += '</div>';
 
 	title.append( htmlTitle );
 	body.append( htmlBody );
+
 	$( '#emailDetailModal' ).modal( 'show', true );
 	$( '#closeLoadingModal' ).click();
 };
