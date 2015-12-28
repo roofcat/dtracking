@@ -79,6 +79,12 @@ function putDownloadLink () {
 $( 'button' ).on( 'click', function () {
 	var btn = $( this );
 	var btnId = $( this ).attr( 'id' );
+
+	var title = "Reporte Tracking";
+	var body = "Se ha iniciado el proceso de generar un reporte Excel ";
+	body += "cuando este proceso finalice recibirás un email con el archivo adjunto, ";
+	body += "por favor espere unos minutos...";
+
 	if ( btnId ) {
 		switch ( btnId ) {
 			case 'btnGeneralExport':
@@ -86,24 +92,35 @@ $( 'button' ).on( 'click', function () {
 				btn.html( 'Generando...' );
 				btn.attr( 'disabled', true );
 				sendUrlToReportQueue ( linkGeneral, btn );
+				notificationModal ( title, body );
 				break;
 			case 'btnSendedExport':
 				btn.empty();
 				btn.html( 'Generando...' );
 				btn.attr( 'disabled', true );
 				sendUrlToReportQueue ( linkSended, btn );
+				notificationModal ( title, body );
 				break;
 			case 'btnFailedExport':
 				btn.empty();
 				btn.html( 'Generando...' );
 				btn.attr( 'disabled', true );
 				sendUrlToReportQueue ( linkFailure, btn );
+				notificationModal ( title, body );
 				break;
 		};
 	} else {
 		return;
 	};
 });
+
+function notificationModal ( t, b ) {
+	var title = $( '#notificationTitle' );
+	var body = $( '#notificationBody' );
+	title.empty().append( t );
+	body.empty().append( b );
+	$( '#notificationModal' ).modal( 'show', true );
+};
 
 function sendUrlToReportQueue ( link, btn ) {
 	$.ajax({
