@@ -149,7 +149,20 @@ $( '#btnGenerateReport' ).on( 'click', function () {
 	btn.addClass( 'mdi-action-cached' );
 	btn.attr( 'disabled', true );
 	sendUrlToReportQueue ( exportLink, btn );
+	var title = "Reporte Tracking";
+	var body = "Se ha iniciado el proceso de generar un reporte Excel ";
+	body += "cuando este proceso finalice recibirás un email con el archivo adjunto, ";
+	body += "por favor espere unos minutos...";
+	notificationModal ( title, body );
 });
+
+function notificationModal ( t, b ) {
+	var title = $( '#notificationTitle' );
+	var body = $( '#notificationBody' );
+	title.empty().append( t );
+	body.empty().append( b );
+	$( '#notificationModal' ).modal( 'show', true );
+};
 
 function sendUrlToReportQueue ( link, btn ) {
 	$.ajax({
