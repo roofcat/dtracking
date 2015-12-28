@@ -19,13 +19,13 @@ from tipodocumentos.models import TipoDocumento
 
 
 TIPOS_RECEPTORES = (
-    ('electrónico', 'electrónico'),
+    ('electronico', 'electronico'),
     ('manual', 'manual'),
     ('ambos', 'ambos'),
 )
 TIPOS_ENVIOS = (
     ('aceptacion', 'aceptacion'),
-    ('envío dte', 'envío dte'),
+    ('envio dte', 'envio dte'),
     ('notificacion', 'notificacion'),
     ('rechazo', 'rechazo'),
     ('rems', 'rems'),
