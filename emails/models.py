@@ -234,24 +234,49 @@ class Email(models.Model):
 
     # MÉTODOS DE CONSULTAS (para no repetir código)
     @classmethod
-    def get_statistics_count_by_dates(self, date_from, date_to):
-        count_total = Email.objects.filter(
-            input_date__range=(date_from, date_to)).count()
-        count_processed = Email.objects.filter(
-            input_date__range=(date_from, date_to),
-            processed_event='processed').count()
-        count_delivered = Email.objects.filter(
-            input_date__range=(date_from, date_to),
-            delivered_event='delivered').count()
-        count_opened = Email.objects.filter(
-            input_date__range=(date_from, date_to),
-            opened_event='open').count()
-        count_dropped = Email.objects.filter(
-            input_date__range=(date_from, date_to),
-            dropped_event='dropped').count()
-        count_bounce = Email.objects.filter(
-            input_date__range=(date_from, date_to),
-            bounce_event='bounce').count()
+    def get_statistics_count_by_dates(self, date_from, date_to, options='all'):
+        if options == 'all':
+            count_total = Email.objects.filter(
+                input_date__range=(date_from, date_to)).count()
+            count_processed = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                processed_event='processed').count()
+            count_delivered = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                delivered_event='delivered').count()
+            count_opened = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                opened_event='open').count()
+            count_dropped = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                dropped_event='dropped').count()
+            count_bounce = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                bounce_event='bounce').count()
+        else:
+            count_total = Email.objects.filter(
+                input_date__range=(date_from, date_to), 
+                tipo_receptor=options).count()
+            count_processed = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                processed_event='processed',
+                tipo_receptor=options).count()
+            count_delivered = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                delivered_event='delivered',
+                tipo_receptor=options).count()
+            count_opened = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                opened_event='open',
+                tipo_receptor=options).count()
+            count_dropped = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                dropped_event='dropped',
+                tipo_receptor=options).count()
+            count_bounce = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                bounce_event='bounce',
+                tipo_receptor=options).count()
         return {
             'total': count_total,
             'processed': count_processed,
@@ -262,14 +287,22 @@ class Email(models.Model):
         }
 
     @classmethod
-    def get_statistics_range_by_dates(self, date_from, date_to):
+    def get_statistics_range_by_dates(self, date_from, date_to, options='all'):
         try:
-            emails = Email.objects.filter(input_date__range=(
-                date_from, date_to)).values('input_date').annotate(
-                total=Count('input_date'), processed=Count('processed_event'),
-                delivered=Count('delivered_event'), opened=Count('opened_event'),
-                dropped=Count('dropped_event'), bounced=Count('bounce_event')
-            ).order_by('input_date')
+            if options == 'all':
+                emails = Email.objects.filter(input_date__range=(
+                    date_from, date_to)).values('input_date').annotate(
+                    total=Count('input_date'), processed=Count('processed_event'),
+                    delivered=Count('delivered_event'), opened=Count('opened_event'),
+                    dropped=Count('dropped_event'), bounced=Count('bounce_event')
+                ).order_by('input_date')
+            else:
+                emails = Email.objects.filter(input_date__range=(
+                    date_from, date_to), tipo_receptor=options).values('input_date').annotate(
+                    total=Count('input_date'), processed=Count('processed_event'),
+                    delivered=Count('delivered_event'), opened=Count('opened_event'),
+                    dropped=Count('dropped_event'), bounced=Count('bounce_event')
+                ).order_by('input_date')
             data = []
             for email in emails:
                 email = json.dumps(email, cls=DjangoJSONEncoder)

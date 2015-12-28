@@ -30,9 +30,8 @@ class StatisticsView(LoginRequiredMixin, TemplateView):
                 date_to = int(date_to, base=10)
                 date_from = timestamp_to_date(date_from)
                 date_to = timestamp_to_date(date_to)
-                statistic = Email.get_statistics_count_by_dates(date_from, date_to)
-                results = Email.get_statistics_range_by_dates(
-                    date_from, date_to)
+                statistic = Email.get_statistics_count_by_dates(date_from, date_to, options)
+                results = Email.get_statistics_range_by_dates(date_from, date_to, options)
                 data = {
                     'date_from': str(date_from),
                     'date_to': str(date_to),
