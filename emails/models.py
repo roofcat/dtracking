@@ -54,10 +54,8 @@ class Email(models.Model):
                                   db_index=True)
     tipo_dte = models.ForeignKey(TipoDocumento)
     numero_folio = models.BigIntegerField(db_index=True)
-    resolucion_receptor = models.CharField(max_length=20,
-                                           null=True,
-                                           blank=True)
-    resolucion_emisor = models.CharField(max_length=20, null=True, blank=True)
+    resolucion_receptor = models.IntegerField(null=True, blank=True)
+    resolucion_emisor = models.IntegerField(null=True, blank=True)
     monto = models.BigIntegerField(default=0, db_index=True)
     fecha_emision = models.BigIntegerField(null=True, blank=True)
     fecha_recepcion = models.BigIntegerField(null=True, blank=True)
@@ -73,7 +71,7 @@ class Email(models.Model):
                                      choices=TIPOS_RECEPTORES,
                                      null=True,
                                      blank=True)
-    id_envio = models.IntegerField()
+    id_envio = models.IntegerField(blank=True, null=True)
     # campos correo
     nombre_cliente = models.CharField(max_length=200)
     correo = models.EmailField(max_length=250, db_index=True)
