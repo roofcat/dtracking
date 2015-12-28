@@ -19,8 +19,9 @@ from tipodocumentos.models import TipoDocumento
 
 
 TIPOS_RECEPTORES = (
-    ('dte', 'dte'),
-    ('cliente', 'cliente'),
+    ('electrónico', 'electrónico'),
+    ('manual', 'manual'),
+    ('ambos', 'ambos'),
 )
 TIPOS_ENVIOS = (
     ('aceptacion', 'aceptacion'),
@@ -43,7 +44,6 @@ TIPOS_OPERACIONES = (
 
 class Email(models.Model):
     # campos basicos
-    # input_datetime = models.DateTimeField(auto_now_add=True, db_index=True)
     input_date = models.DateField(auto_now_add=True, db_index=True)
     # campos dte
     empresa = models.ForeignKey(Empresa)
