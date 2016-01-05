@@ -136,6 +136,18 @@
 						<span class="mdi-action-today form-control-feedback" aria-hidden="true"></span>
 					</div>
 					<div class="form-group form-group-material-indigo">
+						<label class="control-label">Empresa</label>
+						<select name="empresas" id="empresas" class="form-control">
+							{% if es_admin %}
+								<option value="all">Todas</option>
+							{% else %}
+								{% for empresa in empresas %}
+									<option value="{{ empresa.rut }}">{{ empresa.empresa }}</option>
+								{% endfor %}
+							{% endif %}
+						</select>
+					</div>
+					<div class="form-group form-group-material-indigo">
 						<label class="control-label">Opciones</label>
 						<select name="options" id="options" class="form-control">
 							<option value="all">Todo</option>

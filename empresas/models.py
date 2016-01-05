@@ -9,4 +9,4 @@ class Empresa(models.Model):
 	empresa = models.CharField(max_length=200)
 
 	def __unicode__(self):
-		return self.empresa
+		return u'{0}'.format(self.empresa)

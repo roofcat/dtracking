@@ -148,6 +148,7 @@ $( '#run_search' ).on( 'click', function () {
 
 	var date_from = $( '#date_from' ).val();
 	var date_to = $( '#date_to' ).val();
+	var empresas = $( '#empresas' ).val();
 	var options = $( '#options' ).val();
 	date_from = getDateAsTimestamp( date_from );
 	date_to = getDateAsTimestamp( date_to );
@@ -160,6 +161,7 @@ $( '#run_search' ).on( 'click', function () {
 		'data': {
 			'date_from': date_from,
 			'date_to': date_to,
+			'empresas': empresas,
 			'options': options,
 		},
 		success: function ( data ) {
