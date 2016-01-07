@@ -383,6 +383,71 @@ class Email(models.Model):
         return data
 
     @classmethod
+    def get_emails_by_dynamic_query(self, date_from, date_to, empresa, correo, 
+                                    folio, rut, mount_from, mount_to, fallidos,
+                                    display_start, display_length):
+        if folio is not None:
+            if empresa is None:
+                print "query de folio sin empresa"
+                emails = Email.objects.filter(
+                    numero_folio=folio).order_by('-input_date')
+            else:
+                print "query de folio con empresa"
+                emails = Email.objects.filter(
+                    empresa=empresa, numero_folio=folio
+                ).order_by('-input_date')
+        elif fallidos is True:
+            print "query de fallidos"
+            emails = Email.objects.filter(
+                Q(input_date__range=(date_from, date_to)),
+                Q(bounce_event='bounce') | Q(dropped_event='dropped')
+            ).order_by('-input_date')
+        else:
+            params = {}
+            print "query dinamica"
+            if date_from and date_to:
+                params['input_date__range'] = (date_from, date_to)
+            if empresa is not None:
+                print "con empresa"
+                params['empresa'] = empresa
+            if correo is not None:
+                print "con correo"
+                params['correo'] = correo
+            if rut is not None:
+                print "con rut receptor"
+                params['rut_receptor'] = rut
+            if mount_from is not None and mount_to is not None:
+                print "con montos"
+                params['monto__range'] = (mount_from, mount_to)
+            emails = Email.objects.filter(**params).order_by('-input_date')
+        # imprimir consulta
+        print "query"
+        print emails.query
+        # despues de consultar paginar y preparar retorno de emails
+        query_total = emails.count()
+        print query_total
+        if display_start is 0:
+            emails = emails[display_start:display_length]
+        else:
+            emails = emails[display_start:display_length + display_start]
+        if emails:
+            query_length = emails.count()
+        else:
+            query_length = 0
+        emails = serializers.serialize('json', emails)
+        emails = json.loads(emails)
+        data = []
+        for e in emails:
+            data.append(e['fields'])
+        return {
+            'query_total': query_total,
+            'query_length': query_length,
+            'data': data,
+        }
+        display_start
+        display_length
+
+    @classmethod
     def get_delayed_emails(self):
         emails = Email.objects.filter(
             Q(processed_event__isnull=True) & Q(dropped_event__isnull=True)

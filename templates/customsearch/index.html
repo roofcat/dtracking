@@ -55,128 +55,95 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" id="closeMenuModal" data-dismiss="modal" aria-hidden="true"></button>
-                <h4 class="modal-title">Buscar por...</h4>
+                <h4 class="modal-title">Búsqueda personalizada</h4>
             </div>
             <div class="modal-body">
-                <div class="form-horizontal" style="padding-top:10px;width:100%;">
-                	<div class="row">
-						<div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
-							<ul class="nav nav-pills nav-stacked" role="tablist" id="tabNavs">
-								<li role="presentation" class="active">
-									<a href="#correo" aria-controls="correo" role="tab" data-toggle="tab">Correo</a>
-								</li>
-								<li role="presentation">
-									<a href="#folio" aria-controls="folio" role="tab" data-toggle="tab">Folio</a>
-								</li>
-								<li role="presentation">
-									<a href="#rutreceptor" aria-controls="rutreceptor" role="tab" data-toggle="tab">Rut receptor</a>
-								</li>
-								<li role="presentation">
-									<a href="#fallidos" aria-controls="fallidos" role="tab" data-toggle="tab">Fallidos</a>
-								</li>
-								<li role="presentation">
-									<a href="#monto" aria-controls="monto" role="tab" data-toggle="tab">Monto</a>
-								</li>
-				  			</ul>
-						</div>
-						<!-- DIVs DE OPCIONES -->
-						<div class="col-xs-9 col-sm-9 col-md-9 col-lg-9">
-							<div class="tab-content">
-							    <div role="tabpanel" class="tab-pane active" id="correo">
-
-							    	<div class="form-horizontal" style="padding:10px;">
-							    	<!-- FORM CORREOS -->
-										<div class="form-group form-group-material-indigo has-feedback">
-											<label class="control-label">Correo</label>
-											<input class="form-control" type="email" id="correoDestinatario">
-										</div>
-							    		<div class="form-group form-group-material-indigo has-feedback">
-											<label class="control-label">Desde</label>
-											<input class="form-control datePicker" type="text" id="date_from1">
-											<span class="mdi-action-today form-control-feedback" aria-hidden="true"></span>
-										</div>
-										<div class="form-group form-group-material-indigo has-feedback">
-											<label class="control-label">Hasta</label>
-											<input class="form-control datePicker" type="text" id="date_to1">
-											<span class="mdi-action-today form-control-feedback" aria-hidden="true"></span>
-										</div>
-							    	</div>
-							    </div>
-
-							    <div role="tabpanel" class="tab-pane" id="folio">
-							    <!-- FORM POR FOLIO -->
-							    	<div class="form-horizontal" style="padding:10px;">
-										<div class="form-group form-group-material-indigo has-feedback">
-											<label class="control-label">Nº de folio</label>
-											<input class="form-control" type="number" id="numeroFolio">
-										</div>
-							    	</div>
-							    </div>
-
-							    <div role="tabpanel" class="tab-pane" id="rutreceptor">
-							    <!-- FORM RUT RECEPTOR -->
-							    	<div class="form-horizontal" style="padding:10px;">
-										<div class="form-group form-group-material-indigo has-feedback">
-											<label class="control-label">Rut receptor</label>
-											<input class="form-control" type="text" id="rutReceptor">
-										</div>
-							    		<div class="form-group form-group-material-indigo has-feedback">
-											<label class="control-label">Desde</label>
-											<input class="form-control datePicker" type="text" id="date_from2">
-											<span class="mdi-action-today form-control-feedback" aria-hidden="true"></span>
-										</div>
-										<div class="form-group form-group-material-indigo has-feedback">
-											<label class="control-label">Hasta</label>
-											<input class="form-control datePicker" type="text" id="date_to2">
-											<span class="mdi-action-today form-control-feedback" aria-hidden="true"></span>
-										</div>
-							    	</div>
-							    </div>
-
-							    <div role="tabpanel" class="tab-pane" id="fallidos">
-							    <!-- FORM FALLIDOS -->
-							    	<div class="form-horizontal" style="padding:10px;">
-							    		<div class="form-group form-group-material-indigo has-feedback">
-											<label class="control-label">Desde</label>
-											<input class="form-control datePicker" type="text" id="date_from3">
-											<span class="mdi-action-today form-control-feedback" aria-hidden="true"></span>
-										</div>
-										<div class="form-group form-group-material-indigo has-feedback">
-											<label class="control-label">Hasta</label>
-											<input class="form-control datePicker" type="text" id="date_to3">
-											<span class="mdi-action-today form-control-feedback" aria-hidden="true"></span>
-										</div>
-							    	</div>
-							    </div>
-
-							    <div role="tabpanel" class="tab-pane" id="monto">
-							    <!-- FORM MONTO -->
-							    	<div class="form-horizontal" style="padding:10px;">
-							    		<div class="form-group form-group-material-indigo has-feedback">
-											<label class="control-label">Monto desde</label>
-											<input class="form-control" type="number" id="mount_from" min="0">
-										</div>
-										<div class="form-group form-group-material-indigo has-feedback">
-											<label class="control-label">Monto hasta</label>
-											<input class="form-control" type="number" id="mount_to" min="0">
-										</div>
-							    		<div class="form-group form-group-material-indigo has-feedback">
-											<label class="control-label">Desde</label>
-											<input class="form-control datePicker" type="text" id="date_from4">
-											<span class="mdi-action-today form-control-feedback" aria-hidden="true"></span>
-										</div>
-										<div class="form-group form-group-material-indigo has-feedback">
-											<label class="control-label">Hasta</label>
-											<input class="form-control datePicker" type="text" id="date_to4">
-											<span class="mdi-action-today form-control-feedback" aria-hidden="true"></span>
-										</div>
-							    	</div>
-							    </div>
-
-				  			</div>
-						</div>
-					</div>
-                </div>
+            	<br>
+            	<div class="row">
+            		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+		            	<div class="form-horizontal">
+		                	<div class="form-group form-group-material-indigo has-feedback">
+								<label class="control-label">Desde</label>
+								<input class="form-control datePicker" type="text" id="date_from">
+								<span class="mdi-action-today form-control-feedback" aria-hidden="true"></span>
+							</div>
+		            	</div>
+            		</div>
+            		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+		            	<div class="form-horizontal">
+							<div class="form-group form-group-material-indigo has-feedback">
+								<label class="control-label">Hasta</label>
+								<input class="form-control datePicker" type="text" id="date_to">
+								<span class="mdi-action-today form-control-feedback" aria-hidden="true"></span>
+							</div>
+		            	</div>
+            		</div>
+            		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+            			<div class="form-horizontal">
+            				<div class="form-group form-group-material-indigo has-feedback">
+								<label class="control-label">Empresa</label>
+								<select name="empresas" id="empresas" class="form-control">
+									{% if es_admin %}
+										<option value="all">Todas</option>
+									{% else %}
+										{% for empresa in empresas %}
+											<option value="{{ empresa.rut }}">{{ empresa.empresa }}</option>
+										{% endfor %}
+									{% endif %}
+								</select>
+							</div>
+            			</div>
+            		</div>
+            		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+		                <div class="form-horizontal">
+		                	<div class="form-group form-group-material-indigo has-feedback">
+								<label class="control-label">Nº de folio</label>
+								<input class="form-control" type="number" id="numeroFolio">
+							</div>
+		                </div>
+            		</div>
+            		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+	            		<div class="form-horizontal">
+		                	<div class="form-group form-group-material-indigo has-feedback">
+								<label class="control-label">Correo</label>
+								<input class="form-control" type="email" id="correoDestinatario">
+							</div>
+		                </div>
+            		</div>
+            		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+            			<div class="form-horizontal">
+							<div class="form-group form-group-material-indigo has-feedback">
+								<label class="control-label">Rut receptor</label>
+								<input class="form-control" type="text" id="rutReceptor">
+							</div>
+		                </div>
+            		</div>
+            		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+            			<div class="form-horizontal">
+		                	<div class="form-group form-group-material-indigo has-feedback">
+								<label class="control-label">Monto desde</label>
+								<input class="form-control" type="number" id="mount_from" min="0">
+							</div>
+		                </div>
+            		</div>
+            		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+            			<div class="form-horizontal">
+							<div class="form-group form-group-material-indigo has-feedback">
+								<label class="control-label">Monto hasta</label>
+								<input class="form-control" type="number" id="mount_to" min="0">
+							</div>
+		                </div>
+            		</div>
+            		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+            			<div class="form-group form-group-material-indigo has-feedback">
+            				<div class="checkbox checkbox-material-indigo">
+		            			<label>
+		            				<input type="checkbox" id="checkFallidos"> Sólo fallidos
+		        				</label>
+            				</div>
+            			</div>
+            		</div>
+            	</div>
             </div>
 
             <div class="modal-footer">
@@ -269,5 +236,5 @@
 	<script src="/static/js/jquery.datetimepicker.js"></script>
 	<script src="/static/js/jquery.dataTables.min.js"></script>
 	<script src="/static/js/dataTables.bootstrap.min.js"></script>
-	<script src="/static/js/customsearch/index.min.js"></script>
+	<script src="/static/js/customsearch/index.js"></script>
 {% endblock %}

@@ -26,6 +26,57 @@ from utils.queues import report_queue
 """
 
 
+class DynamicReportTemplateView(LoginRequiredMixin, TemplateView):
+
+	def get(self, request, date_from, date_to, empresa, correo, folio, 
+			rut, mount_from, mount_to, fallidos, *args, **kwargs):
+		parameters = {}
+		# preparación de parámetros
+		date_from = int(date_from, base=10)
+		date_to = int(date_to, base=10)
+		date_from = timestamp_to_date(date_from)
+		date_to = timestamp_to_date(date_to)
+		parameters['date_from'] = date_from
+		parameters['date_to'] = date_to
+		if empresa == 'all':
+		    empresa = None
+		parameters['empresa'] = empresa
+		if correo == '-':
+		    correo = None
+		parameters['correo'] = correo
+		if folio == '-':
+		    folio = None
+		parameters['folio'] = folio
+		if rut == '-':
+		    rut = None
+		parameters['rut'] = rut
+		if mount_from == '-':
+		    mount_from = None
+		else:
+		    mount_from = int(mount_from, base=10)
+		parameters['mount_from'] = mount_from
+		if mount_to == '-':
+		    mount_to = None
+		else:
+		    mount_to = int(mount_to, base=10)
+		parameters['mount_to'] = mount_to
+		if fallidos == 'true':
+		    parameters['fallidos'] = True
+		elif fallidos == 'false':
+		    parameters['fallidos'] = False
+		else:
+		    parameters['fallidos'] = False
+		context = {
+			'user_email': request.user.email,
+			'file_name': 'reporte_dinamico.xlsx',
+			'export_type': 'export_dynamic_emails',
+			'params': parameters,
+		}
+		report_queue(context)
+		data = {"status": "ok"}
+		return HttpResponse(json.dumps(data), content_type='application/json')
+
+
 class GeneralReportTemplateView(LoginRequiredMixin, TemplateView):
 
     def get(self, request, date_from, date_to, options, *args, **kwargs):
@@ -261,6 +312,8 @@ def queue_export(request):
 			# Consulta
 			data = Email.get_emails_by_mount_and_dates_async(
 				date_from, date_to, mount_from, mount_to)
+		elif export_type == 'export_dynamic_emails':
+			print request.POST.get('params')
 		# Creación del documento
 		excel_report = create_tablib(data)
 		#new_excel = open(excel_report.xlsx, "rb")

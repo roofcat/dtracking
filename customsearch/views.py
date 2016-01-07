@@ -13,9 +13,63 @@ from django.views.generic import TemplateView
 
 from autenticacion.views import LoginRequiredMixin
 from emails.models import Email
+from perfiles.models import Perfil
+from utils.generics import timestamp_to_date
 
 
-timestamp_to_date = lambda x: datetime.fromtimestamp(x)
+class DynamicQueryTemplateView(LoginRequiredMixin, TemplateView):
+
+    def get(self, request, date_from, date_to, empresa, correo, folio, rut, mount_from, mount_to, fallidos, *args, **kwargs):
+        parameters = {}
+        # preparación de parámetros
+        date_from = int(date_from, base=10)
+        date_to = int(date_to, base=10)
+        date_from = timestamp_to_date(date_from)
+        date_to = timestamp_to_date(date_to)
+        parameters['date_from'] = date_from
+        parameters['date_to'] = date_to
+        if empresa == 'all':
+            empresa = None
+        parameters['empresa'] = empresa
+        if correo == '-':
+            correo = None
+        parameters['correo'] = correo
+        if folio == '-':
+            folio = None
+        parameters['folio'] = folio
+        if rut == '-':
+            rut = None
+        parameters['rut'] = rut
+        if mount_from == '-':
+            mount_from = None
+        else:
+            mount_from = int(mount_from, base=10)
+        parameters['mount_from'] = mount_from
+        if mount_to == '-':
+            mount_to = None
+        else:
+            mount_to = int(mount_to, base=10)
+        parameters['mount_to'] = mount_to
+        if fallidos == 'true':
+            parameters['fallidos'] = True
+        elif fallidos == 'false':
+            parameters['fallidos'] = False
+        else:
+            parameters['fallidos'] = False
+        # preparación de parámetros de paginación
+        echo = request.GET['sEcho']
+        display_start = request.GET['iDisplayStart']
+        display_length = request.GET['iDisplayLength']
+        parameters['display_start'] = int(display_start, base=10)
+        parameters['display_length'] = int(display_length, base=10)
+        emails = Email.get_emails_by_dynamic_query(**parameters)
+        data = {
+            'sEcho': echo,
+            'data': emails['data'],
+            'iTotalDisplayRecords': emails['query_total'],
+            'iTotalRecords': emails['query_total'],
+        }
+        return HttpResponse(json.dumps(data), content_type='application/json')
 
 
 class EmailDetailTemplateView(LoginRequiredMixin, TemplateView):
@@ -181,4 +235,9 @@ class IndexTemplateView(LoginRequiredMixin, TemplateView):
     template_name = 'customsearch/index.html'
 
     def get(self, request, *args, **kwargs):
-        return render(request, self.template_name)
+        perfil = Perfil.get_perfil(request.user)
+        data = {
+            'es_admin': perfil.es_admin,
+            'empresas': perfil.empresas.all(),
+        }
+        return render(request, self.template_name, data)

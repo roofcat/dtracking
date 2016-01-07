@@ -11,6 +11,7 @@ from .views import RutSearchTemplateView
 from .views import FallidosSearchTemplateView
 from .views import MontoSearchTemplateView
 from .views import EmailDetailTemplateView
+from .views import DynamicQueryTemplateView
 
 
 urlpatterns = [
@@ -27,4 +28,7 @@ urlpatterns = [
 		MontoSearchTemplateView.as_view()),
 	# consultas para el modal de detalle (cuando clickean un row de la tabla html)
 	url(r'^email-detail/', EmailDetailTemplateView.as_view()),
+	# consultas dinamicas
+	url(r'^search/(?P<date_from>\d+)/(?P<date_to>\d+)/(?P<empresa>[\S]+)/(?P<correo>[\S]+)/(?P<folio>[\S]+)/(?P<rut>[\S]+)/(?P<mount_from>[\S]+)/(?P<mount_to>[\S]+)/(?P<fallidos>[\S]+)/', 
+		DynamicQueryTemplateView.as_view()),
 ]

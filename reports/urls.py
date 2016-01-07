@@ -11,6 +11,7 @@ from .views import ByEmailReportTemplateView
 from .views import ByFolioReportTemplateView
 from .views import ByRutReportTemplateView
 from .views import ByMountReportTemplateView
+from .views import DynamicReportTemplateView
 from .views import queue_export
 
 urlpatterns = [
@@ -28,6 +29,10 @@ urlpatterns = [
 		ByRutReportTemplateView.as_view()),
 	url(r'^mount/(?P<date_from>\d+)/(?P<date_to>\d+)/(?P<mount_from>\d+)/(?P<mount_to>\d+)/$', 
 		ByMountReportTemplateView.as_view()),
+
+	# url reporte dinamico
+	url(r'^export/(?P<date_from>\d+)/(?P<date_to>\d+)/(?P<empresa>[\S]+)/(?P<correo>[\S]+)/(?P<folio>[\S]+)/(?P<rut>[\S]+)/(?P<mount_from>[\S]+)/(?P<mount_to>[\S]+)/(?P<fallidos>[\S]+)/', 
+		DynamicReportTemplateView.as_view()),
 
 	# ruta de cola de tarea TaskQueue
 	url(r'^exportqueue/$', queue_export),
