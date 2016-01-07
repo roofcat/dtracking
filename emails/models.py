@@ -16,6 +16,7 @@ from django.forms import model_to_dict
 
 from empresas.models import Empresa
 from tipodocumentos.models import TipoDocumento
+from utils.generics import timestamp_to_date
 
 
 TIPOS_RECEPTORES = (
@@ -446,6 +447,57 @@ class Email(models.Model):
         }
         display_start
         display_length
+
+    @classmethod
+    def get_emails_by_dynamic_query_async(self, date_from, date_to, empresa, correo, 
+                                        folio, rut, mount_from, mount_to, fallidos):
+        date_from = timestamp_to_date(date_from)
+        date_to = timestamp_to_date(date_to)
+        if folio is not None:
+            if empresa is None:
+                print "query de folio sin empresa"
+                emails = Email.objects.filter(
+                    numero_folio=folio).order_by('-input_date')
+            else:
+                print "query de folio con empresa"
+                emails = Email.objects.filter(
+                    empresa=empresa, numero_folio=folio
+                ).order_by('-input_date')
+        elif fallidos is True:
+            print "query de fallidos"
+            emails = Email.objects.filter(
+                Q(input_date__range=(date_from, date_to)),
+                Q(bounce_event='bounce') | Q(dropped_event='dropped')
+            ).order_by('-input_date')
+        else:
+            params = {}
+            print "query dinamica"
+            if date_from and date_to:
+                params['input_date__range'] = (date_from, date_to)
+            if empresa is not None:
+                print "con empresa"
+                params['empresa'] = empresa
+            if correo is not None:
+                print "con correo"
+                params['correo'] = correo
+            if rut is not None:
+                print "con rut receptor"
+                params['rut_receptor'] = rut
+            if mount_from is not None and mount_to is not None:
+                print "con montos"
+                params['monto__range'] = (mount_from, mount_to)
+            emails = Email.objects.filter(**params).order_by('-input_date')
+        # imprimir consulta
+        print "query"
+        print emails.query
+        # despues de consultar paginar y preparar retorno de emails
+        query_total = emails.count()
+        print query_total
+        # retornar emails
+        if emails:
+            return emails
+        else:
+            return None
 
     @classmethod
     def get_delayed_emails(self):

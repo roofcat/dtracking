@@ -34,8 +34,6 @@ class DynamicReportTemplateView(LoginRequiredMixin, TemplateView):
 		# preparación de parámetros
 		date_from = int(date_from, base=10)
 		date_to = int(date_to, base=10)
-		date_from = timestamp_to_date(date_from)
-		date_to = timestamp_to_date(date_to)
 		parameters['date_from'] = date_from
 		parameters['date_to'] = date_to
 		if empresa == 'all':
@@ -70,7 +68,7 @@ class DynamicReportTemplateView(LoginRequiredMixin, TemplateView):
 			'user_email': request.user.email,
 			'file_name': 'reporte_dinamico.xlsx',
 			'export_type': 'export_dynamic_emails',
-			'params': parameters,
+			'params': json.dumps(parameters),
 		}
 		report_queue(context)
 		data = {"status": "ok"}
@@ -313,10 +311,14 @@ def queue_export(request):
 			data = Email.get_emails_by_mount_and_dates_async(
 				date_from, date_to, mount_from, mount_to)
 		elif export_type == 'export_dynamic_emails':
-			print request.POST.get('params')
+			user_email = request.POST.get('user_email')
+			file_name = request.POST.get('file_name')
+			params = request.POST.get('params')
+			params = json.loads(params)
+			print params
+			data = Email.get_emails_by_dynamic_query_async(**params)
 		# Creación del documento
 		excel_report = create_tablib(data)
-		#new_excel = open(excel_report.xlsx, "rb")
 		# Crear objeto
 		data = {
 			'name': file_name,
