@@ -92,7 +92,6 @@ $( '#run_search' ).on( 'click', function () {
 
 	var link = queryUrl + date_from + '/' + date_to + '/' + empresas + '/' + correo + '/';
 	link += numeroFolio + '/' + rutReceptor + '/' + mount_from + '/' + mount_to + '/' + checkFallidos + '/';
-	console.log( link );
 
 	$( '#closeLoadingModal' ).click();
 	drawJqueryTable( link );
