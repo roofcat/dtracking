@@ -77,12 +77,13 @@ class DynamicReportTemplateView(LoginRequiredMixin, TemplateView):
 
 class GeneralReportTemplateView(LoginRequiredMixin, TemplateView):
 
-    def get(self, request, date_from, date_to, options, *args, **kwargs):
+    def get(self, request, date_from, date_to, empresa, options, *args, **kwargs):
         try:
             if date_from and date_to:
                 context = {
                     'date_from': int(date_from, base=10),
                     'date_to': int(date_to, base=10),
+                    'empresa': str(empresa),
                     'options': options,
                     'user_email': request.user.email,
                     'file_name': 'reporte_general.xlsx',
@@ -97,12 +98,13 @@ class GeneralReportTemplateView(LoginRequiredMixin, TemplateView):
 
 class SendedReportTemplateView(LoginRequiredMixin, TemplateView):
 
-    def get(self, request, date_from, date_to, options, *args, **kwargs):
+    def get(self, request, date_from, date_to, empresa, options, *args, **kwargs):
         try:
             if date_from and date_to:
                 context = {
                     'date_from': int(date_from, base=10),
                     'date_to': int(date_to, base=10),
+                    'empresa': str(empresa),
                     'options': options,
                     'user_email': request.user.email,
                     'file_name': 'reporte_enviados.xlsx',
@@ -117,12 +119,13 @@ class SendedReportTemplateView(LoginRequiredMixin, TemplateView):
 
 class FailureReportTemplateView(LoginRequiredMixin, TemplateView):
 
-    def get(self, request, date_from, date_to, options, *args, **kwargs):
+    def get(self, request, date_from, date_to, empresa, options, *args, **kwargs):
         try:
             if date_from and date_to:
                 context = {
                     'date_from': int(date_from, base=10),
                     'date_to': int(date_to, base=10),
+                    'empresa': str(empresa),
                     'options': options,
                     'user_email': request.user.email,
                     'file_name': 'reporte_fallidos.xlsx',
@@ -225,6 +228,7 @@ def queue_export(request):
 		export_type = request.POST.get('export_type')
 		if export_type == 'export_general_email':
 			options = request.POST.get('options')
+			empresa = request.POST.get('empresa')
 			user_email = request.POST.get('user_email')
 			file_name = request.POST.get('file_name')
 			date_from = request.POST.get('date_from')
@@ -233,11 +237,16 @@ def queue_export(request):
 			date_to = int(date_to, base=10)
 			date_from = timestamp_to_date(date_from)
 			date_to = timestamp_to_date(date_to)
+			params = {}
+			params['date_from'] = date_from
+			params['date_to'] = date_to
+			params['empresa'] = empresa
+			params['options'] = options
 			# Consulta
-			data = Email.get_emails_by_dates_async(
-				date_from, date_to, options)
+			data = Email.get_emails_by_dates_async(**params)
 		elif export_type == 'export_sended_email':
 			options = request.POST.get('options')
+			empresa = request.POST.get('empresa')
 			user_email = request.POST.get('user_email')
 			file_name = request.POST.get('file_name')
 			date_from = request.POST.get('date_from')
@@ -246,11 +255,16 @@ def queue_export(request):
 			date_to = int(date_to, base=10)
 			date_from = timestamp_to_date(date_from)
 			date_to = timestamp_to_date(date_to)
+			params = {}
+			params['date_from'] = date_from
+			params['date_to'] = date_to
+			params['empresa'] = empresa
+			params['options'] = options
 			# Consulta
-			data = Email.get_sended_emails_by_dates_async(
-				date_from, date_to, options)
+			data = Email.get_sended_emails_by_dates_async(**params)
 		elif export_type == 'export_failure_email':
 			options = request.POST.get('options')
+			empresa = request.POST.get('empresa')
 			user_email = request.POST.get('user_email')
 			file_name = request.POST.get('file_name')
 			date_from = request.POST.get('date_from')
@@ -259,9 +273,13 @@ def queue_export(request):
 			date_to = int(date_to, base=10)
 			date_from = timestamp_to_date(date_from)
 			date_to = timestamp_to_date(date_to)
+			params = {}
+			params['date_from'] = date_from
+			params['date_to'] = date_to
+			params['empresa'] = empresa
+			params['options'] = options
 			# Consulta
-			data = Email.get_failure_emails_by_dates_async(
-				date_from, date_to, options)
+			data = Email.get_failure_emails_by_dates_async(**params)
 		elif export_type == 'export_search_by_email':
 			correo = request.POST.get('email')
 			user_email = request.POST.get('user_email')

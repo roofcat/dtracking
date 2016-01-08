@@ -16,12 +16,13 @@ from .views import queue_export
 
 urlpatterns = [
 	# urls para generar reportes
-	url(r'^general/(?P<date_from>\d+)/(?P<date_to>\d+)/(?P<options>[\w.%+-]+)/$', 
+	url(r'^general/(?P<date_from>\d+)/(?P<date_to>\d+)/(?P<empresa>[\S]+)/(?P<options>[\w.%+-]+)/$', 
 		GeneralReportTemplateView.as_view()),
-	url(r'^sended/(?P<date_from>\d+)/(?P<date_to>\d+)/(?P<options>[\w.%+-]+)/$', 
+	url(r'^sended/(?P<date_from>\d+)/(?P<date_to>\d+)/(?P<empresa>[\S]+)/(?P<options>[\w.%+-]+)/$', 
 		SendedReportTemplateView.as_view()),
-	url(r'^failure/(?P<date_from>\d+)/(?P<date_to>\d+)/(?P<options>[\w.%+-]+)/$', 
+	url(r'^failure/(?P<date_from>\d+)/(?P<date_to>\d+)/(?P<empresa>[\S]+)/(?P<options>[\w.%+-]+)/$', 
 		FailureReportTemplateView.as_view()),
+	# urls para customsearch
 	url(r'^email/(?P<date_from>\d+)/(?P<date_to>\d+)/(?P<correo>[\w.%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,4})/$', 
 		ByEmailReportTemplateView.as_view()),
 	url(r'^folio/(?P<folio>\d+)/$', ByFolioReportTemplateView.as_view()),

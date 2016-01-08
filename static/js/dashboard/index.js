@@ -67,13 +67,14 @@ $( 'div' ).on( 'mouseout', '#spanTooltip', function () {
 function putDownloadLink () {
 	var date_from = $( '#date_from' ).val();
 	var date_to = $( '#date_to' ).val();
+	var empresas = $( '#empresas' ).val();
 	var options = $( '#options' ).val();
 	date_from = getDateAsTimestamp( date_from );
 	date_to = getDateAsTimestamp( date_to );
 	
-	linkGeneral = baseUrl + urlGeneralExport + date_from + '/' + date_to + '/' + options + '/';
-	linkSended = baseUrl + urlSendedExport + date_from + '/' + date_to + '/' + options + '/';
-	linkFailure = baseUrl + urlFailureExport + date_from + '/' + date_to + '/' + options + '/';
+	linkGeneral = baseUrl + urlGeneralExport + date_from + '/' + date_to + '/' + empresas + '/' + options + '/';
+	linkSended = baseUrl + urlSendedExport + date_from + '/' + date_to + '/' + empresas + '/' + options + '/';
+	linkFailure = baseUrl + urlFailureExport + date_from + '/' + date_to + '/' + empresas + '/' + options + '/';
 };
 
 $( 'button' ).on( 'click', function () {
