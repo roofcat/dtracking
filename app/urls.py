@@ -11,7 +11,10 @@ from rest_framework.authtoken.views import obtain_auth_token
 
 from autenticacion.views import log_in, log_out, home_to_dashboard
 from emails.views import EmailDteInputView
-from emails.views import queue_send_email, cron_send_delayed_email, cron_send_delayed_processed_email
+from emails.views import queue_send_email
+from emails.views import cron_send_delayed_email
+from emails.views import cron_send_delayed_processed_email
+from emails.views import cron_clean_emails_history
 from empresas.views import EmpresaViewSet
 from webhooks.views import sendgrid_rest_webhook, sendgrid_api_webhook
 
@@ -31,12 +34,15 @@ urlpatterns = [
     # rutas api rest heredadas de APIView
     # en esta ruta entran las peticiones de correo desde un DTE
     url(r'^api/input/', EmailDteInputView.as_view()),
+    
     # luego el tracking lo pasa a esta cola para 
     # luego enviar el correo por sendgrid
     url(r'^emails/inputqueue/', queue_send_email),
+
     # tarea cron que envia correos con pendiente
-    url(r'^emails/send-delayed/', cron_send_delayed_email),
-    url(r'^emails/send-delayed-processed/', cron_send_delayed_processed_email),
+    url(r'^emails/cron/send-delayed/', cron_send_delayed_email),
+    url(r'^emails/cron/send-delayed-processed/', cron_send_delayed_processed_email),
+    url(r'^emails/cron/clean-history/', cron_clean_emails_history),
 
 	# rutas de las paginas html del tracking
     url(r'^dashboard/', include('dashboard.urls', namespace='dashboard')),

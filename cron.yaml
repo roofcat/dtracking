@@ -1,1 +1,4 @@
 cron:
+- description: Inicia secuencia del proceso para limpiar emails antiguos
+  url: /emails/cron/clean-history/
+  schedule: every sunday 07:00

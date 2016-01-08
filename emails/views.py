@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
+from datetime import date, timedelta
 import json
 import logging
 
@@ -19,6 +20,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from .models import Email
 from .serializers import EmailDteInputSerializer
+from configuraciones.models import EliminacionHistorico
 from utils.queues import input_queue
 from utils.sendgrid_client import EmailClient
 
@@ -66,6 +68,30 @@ def queue_send_email(request):
         except Exception, e:
             logging.error(e)
 
+@csrf_exempt
+@require_POST
+def queue_delete_email(request):
+    if request.method == 'POST':
+        return HttpResponse()
+
+@csrf_exempt
+@require_GET
+def cron_clean_emails_history(request):
+    ''' Método que si tiene habilitada la opción de eliminar correos antiguos
+        antiguos (parametrizado en app configuraciones) lista los correos 
+        desde el numero de meses máximo a retener en la DB.
+    '''
+    if request.method == 'GET':
+        config = EliminacionHistorico.get_configuration()
+        if config.activo == True:
+            if config.dias_a_eliminar is not None:
+                try:
+                    today = date.today()
+                    days = timedelta(days=config.dias_a_eliminar)
+                    date_to_delete = today - days
+                except Exception, e:
+                    logging.error(e)
+        return HttpResponse()
 
 @csrf_exempt
 @require_GET
@@ -90,21 +116,3 @@ def cron_send_delayed_processed_email(request):
             for email in emails:
                 input_queue(email.id)
         return HttpResponse()
-
-
-class EmailViewSet(ModelViewSet):
-    model = Email
-    queryset = Email.objects.all()
-    serializer_class = EmailDteInputSerializer
-    permission_classes = (permissions.AllowAny,)
-
-    def list(self, request, *args, **kwargs):
-        return super(EmailViewSet, self).list(request, *args, **kwargs)
-
-    def create(self, request, *args, **kwargs):
-        logging.info("paso el post ahora mandarlo en cola")
-        logging.info(request.data)
-        return super(EmailViewSet, self).create(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return super(EmailViewSet, self).create(request, *args, **kwargs)

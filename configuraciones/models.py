@@ -24,3 +24,19 @@ class TemplateReporte(models.Model):
 
 	def __unicode__(self):
 		return u'{0}'.format(self.reporte_url)
+
+
+class EliminacionHistorico(models.Model):
+	activo = models.BooleanField(default=False)
+	dias_a_eliminar = models.IntegerField(null=True, blank=True)
+
+	def __unicode__(self):
+		return u'{0} - {1}'.format(self.activo, self.dias_a_eliminar)
+
+	@classmethod
+	def get_configuration(self):
+		conf = EliminacionHistorico.objects.all()[:1]
+		if conf:
+			return conf
+		else:
+			return None
