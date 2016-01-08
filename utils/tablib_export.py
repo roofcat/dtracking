@@ -68,12 +68,12 @@ def create_tablib(data):
                 monto = row.monto
             else:
                 monto = ''
-            if row.fecha_emision:
-                fecha_emision = row.fecha_emision
+            if row.fecha_emision is not None:
+                fecha_emision = timestamp_to_date(row.fecha_emision)
             else:
                 fecha_emision = ''
-            if row.fecha_recepcion:
-                fecha_recepcion = row.fecha_recepcion
+            if row.fecha_recepcion is not None:
+                fecha_recepcion = timestamp_to_date(row.fecha_recepcion)
             else:
                 fecha_recepcion = ''
             if row.estado_documento:
