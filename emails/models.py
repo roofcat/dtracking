@@ -3,6 +3,7 @@
 
 from datetime import datetime
 import calendar
+import cloudstorage
 import json
 import logging
 
@@ -182,6 +183,13 @@ class Email(models.Model):
 
     def __unicode__(self):
         return u"{0} - {1}".format(self.correo, self.numero_folio)
+
+    def delete(self, *args, **kwargs):
+        try:
+            cloudstorage.delete(self.adjunto1.name)
+            super(Email, self).delete(*args, **kwargs)
+        except cloudstorage.NotFoundError, e:
+            logging.error(e)
 
     # funcion utilizada desde el webhook rest
     @classmethod
