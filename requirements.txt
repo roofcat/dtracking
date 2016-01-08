@@ -3,7 +3,7 @@
 # para instalar ejecutar pip install -U -t lib -r requirements.txt
 
 appengine_toolkit
-django-filter==0.11
+django-filter==0.12
 django==1.9.*
 django-debug-toolbar
 djangorestframework==3.3.2
