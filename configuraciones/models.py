@@ -36,7 +36,7 @@ class EliminacionHistorico(models.Model):
 	@classmethod
 	def get_configuration(self):
 		conf = EliminacionHistorico.objects.all()[:1]
-		if conf:
+		if conf is not None:
 			return conf
 		else:
 			return None

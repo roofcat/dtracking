@@ -22,6 +22,7 @@ from .models import Email
 from .serializers import EmailDteInputSerializer
 from configuraciones.models import EliminacionHistorico
 from utils.queues import input_queue
+from utils.queues import delete_queue
 from utils.sendgrid_client import EmailClient
 
 
@@ -72,7 +73,15 @@ def queue_send_email(request):
 @require_POST
 def queue_delete_email(request):
     if request.method == 'POST':
-        return HttpResponse()
+        try:
+            email_id = request.POST.get('email_id')
+            email_id = int(email_id, base=10)
+            email = Email.get_email_by_id(email_id)
+            if email:
+                email.delete()
+        except Exception, e:
+            logging.error(e)
+    return HttpResponse()
 
 @csrf_exempt
 @require_GET
@@ -82,16 +91,23 @@ def cron_clean_emails_history(request):
         desde el numero de meses máximo a retener en la DB.
     '''
     if request.method == 'GET':
-        config = EliminacionHistorico.get_configuration()
+        config = EliminacionHistorico.get_configuration()[0]
         if config.activo == True:
             if config.dias_a_eliminar is not None:
                 try:
                     today = date.today()
                     days = timedelta(days=config.dias_a_eliminar)
                     date_to_delete = today - days
+                    emails = Email.get_old_emails_by_date(date_to_delete)
+                    if emails:
+                        for email in emails:
+                            # recorrer el listado de emails y se pasa el id
+                            # a la cola para que lo elimine
+                            delete_queue(email.pk)
                 except Exception, e:
                     logging.error(e)
-        return HttpResponse()
+                    return HttpResponse(e)
+    return HttpResponse()
 
 @csrf_exempt
 @require_GET

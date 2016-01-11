@@ -15,6 +15,7 @@ from emails.views import queue_send_email
 from emails.views import cron_send_delayed_email
 from emails.views import cron_send_delayed_processed_email
 from emails.views import cron_clean_emails_history
+from emails.views import queue_delete_email
 from empresas.views import EmpresaViewSet
 from webhooks.views import sendgrid_rest_webhook, sendgrid_api_webhook
 
@@ -43,6 +44,9 @@ urlpatterns = [
     url(r'^emails/cron/send-delayed/', cron_send_delayed_email),
     url(r'^emails/cron/send-delayed-processed/', cron_send_delayed_processed_email),
     url(r'^emails/cron/clean-history/', cron_clean_emails_history),
+
+    # colas de tareas para correos
+    url(r'^emails/queue/delete-email/', queue_delete_email),
 
 	# rutas de las paginas html del tracking
     url(r'^dashboard/', include('dashboard.urls', namespace='dashboard')),
