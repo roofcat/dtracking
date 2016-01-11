@@ -392,12 +392,11 @@ class Email(models.Model):
         return data
 
     @classmethod
-    def get_old_emails_by_date(self, date_to_delete):
-        emails = Email.objects.filter(input_date__lt=date_to_delete).order_by('input_date')
-        if emails:
-            return emails
-        else:
-            return None
+    def delete_old_emails_by_date(self, date_to_delete):
+        try:
+            emails = Email.objects.filter(input_date__lt=date_to_delete).delete()
+        except Exception, e:
+            logging.error(e)
 
     @classmethod
     def get_emails_by_dynamic_query(self, date_from, date_to, empresa, correo, 

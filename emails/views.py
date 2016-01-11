@@ -70,20 +70,6 @@ def queue_send_email(request):
             logging.error(e)
 
 @csrf_exempt
-@require_POST
-def queue_delete_email(request):
-    if request.method == 'POST':
-        try:
-            email_id = request.POST.get('email_id')
-            email_id = int(email_id, base=10)
-            email = Email.get_email_by_id(email_id)
-            if email:
-                email.delete()
-        except Exception, e:
-            logging.error(e)
-    return HttpResponse()
-
-@csrf_exempt
 @require_GET
 def cron_clean_emails_history(request):
     ''' Método que si tiene habilitada la opción de eliminar correos antiguos
@@ -98,12 +84,7 @@ def cron_clean_emails_history(request):
                     today = date.today()
                     days = timedelta(days=config.dias_a_eliminar)
                     date_to_delete = today - days
-                    emails = Email.get_old_emails_by_date(date_to_delete)
-                    if emails:
-                        for email in emails:
-                            # recorrer el listado de emails y se pasa el id
-                            # a la cola para que lo elimine
-                            delete_queue(email.pk)
+                    emails = Email.delete_old_emails_by_date(date_to_delete)
                 except Exception, e:
                     logging.error(e)
                     return HttpResponse(e)

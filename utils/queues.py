@@ -19,13 +19,3 @@ def report_queue(context):
     t = taskqueue.Task(url="/reports/exportqueue/", params=context)
     q.add(t)
     data = {"status": "ok"}
-
-def delete_queue(email_id):
-    if email_id is not None:
-        context = {
-            "email_id": email_id,
-        }
-        q = taskqueue.Queue("DeleteQueue")
-        t = taskqueue.Task(url="/emails/queue/delete-email/", params=context)
-        q.add(t)
-        data = {"status": "ok"}
