@@ -64,7 +64,7 @@ def create_tablib(data):
                 resolucion_emisor = row.resolucion_emisor
             else:
                 resolucion_emisor = ''
-            if row.monto:
+            if row.monto is not None:
                 monto = row.monto
             else:
                 monto = ''

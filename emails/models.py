@@ -51,7 +51,6 @@ class FileQuerySet(models.QuerySet):
 
     def delete(self, *args, **kwargs):
         try:
-            logging.info("paso el try")
             for obj in self:
                 logging.info("borrando adjunto de GCS")
                 logging.info(obj)
