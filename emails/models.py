@@ -44,6 +44,23 @@ TIPOS_OPERACIONES = (
 )
 
 
+class FileQuerySet(models.QuerySet):
+    """ Clase encargada de eliminar los adjuntos en casos de
+        DELETE's masivos
+    """
+
+    def delete(self, *args, **kwargs):
+        try:
+            logging.info("paso el try")
+            for obj in self:
+                logging.info("borrando adjunto de GCS")
+                logging.info(obj)
+                cloudstorage.delete(obj.adjunto1.name)
+            super(FileQuerySet, self).delete(*args, **kwargs)
+        except Exception, e:
+            logging.error(e)
+
+
 class Email(models.Model):
     # campos basicos
     input_date = models.DateField(auto_now_add=True, db_index=True)
@@ -180,6 +197,9 @@ class Email(models.Model):
     click_email = models.CharField(max_length=240, null=True, blank=True)
     click_date = models.BigIntegerField(null=True, blank=True)
     click_url = models.CharField(max_length=240, null=True, blank=True)
+
+    # metodos manager al objects
+    objects = FileQuerySet.as_manager()
 
     def __unicode__(self):
         return u"{0} - {1}".format(self.correo, self.numero_folio)

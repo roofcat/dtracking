@@ -22,7 +22,6 @@ from .models import Email
 from .serializers import EmailDteInputSerializer
 from configuraciones.models import EliminacionHistorico
 from utils.queues import input_queue
-from utils.queues import delete_queue
 from utils.sendgrid_client import EmailClient
 
 
