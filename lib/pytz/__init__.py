@@ -9,8 +9,8 @@ on how to use these modules.
 '''
 
 # The Olson database is updated several times a year.
-OLSON_VERSION = '2015f'
-VERSION = '2015.6'  # Switching to pip compatible version numbering.
+OLSON_VERSION = '2015g'
+VERSION = '2015.7'  # Switching to pip compatible version numbering.
 __version__ = VERSION
 
 OLSEN_VERSION = OLSON_VERSION # Old releases had this misspelling
@@ -285,7 +285,7 @@ class UTC(datetime.tzinfo):
         return "UTC"
 
 
-UTC = utc = UTC() # UTC is a singleton
+UTC = utc = UTC()  # UTC is a singleton
 
 
 def _UTC():
@@ -643,6 +643,7 @@ all_timezones = \
  'America/Eirunepe',
  'America/El_Salvador',
  'America/Ensenada',
+ 'America/Fort_Nelson',
  'America/Fort_Wayne',
  'America/Fortaleza',
  'America/Glace_Bay',
@@ -1221,6 +1222,7 @@ common_timezones = \
  'America/Edmonton',
  'America/Eirunepe',
  'America/El_Salvador',
+ 'America/Fort_Nelson',
  'America/Fortaleza',
  'America/Glace_Bay',
  'America/Godthab',
