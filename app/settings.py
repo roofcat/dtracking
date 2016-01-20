@@ -10,7 +10,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '%7)c#yro&000cb_f*-dhc19@p%in)dvcq%(88-7jq7f1%lha5f'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+if os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine'):
+    DEBUG = True
+else:
+    DEBUG = False
 
 ALLOWED_HOSTS = ['*',]
 
