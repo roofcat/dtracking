@@ -132,9 +132,9 @@ def sendgrid_rest_webhook(request):
 def sendgrid_api_webhook(request):
     if request.method == 'POST':
         request_body = json.loads(request.body.decode('utf-8'))
-        logging.info(request_body)
 
         for body in request_body:
+            logging.info(request_body)
             try:
                 evento_sendgrid = str(body['event']).decode('utf-8')
                 correo = str(body['email']).decode('utf-8')
