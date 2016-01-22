@@ -134,7 +134,7 @@ def sendgrid_api_webhook(request):
         request_body = json.loads(request.body.decode('utf-8'))
 
         for body in request_body:
-            logging.info(request_body)
+            logging.info(body)
             try:
                 evento_sendgrid = str(body['event']).decode('utf-8')
                 correo = str(body['email']).decode('utf-8')
@@ -142,6 +142,7 @@ def sendgrid_api_webhook(request):
                 tipo_dte = str(body['tipo_dte']).decode('utf-8')
                 rut_emisor = str(body['rut_emisor']).decode('utf-8')
                 resolucion_emisor = str(body['resolucion_emisor']).decode('utf-8')
+                empresa = str(body['empresa']).decode('utf-8')
                 logging.info(evento_sendgrid)
 
                 if evento_sendgrid and correo and numero_folio and tipo_dte and rut_emisor and resolucion_emisor:
@@ -151,9 +152,9 @@ def sendgrid_api_webhook(request):
 
                     if evento_sendgrid == 'processed':
                         email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
+                        logging.info(email)
 
                         if email is not None:
-                            logging.info(email)
                             email.smtp_id = str(body['smtp-id']).decode('utf-8')
                             email.processed_date = body['timestamp']
                             email.processed_event = evento_sendgrid
@@ -161,10 +162,10 @@ def sendgrid_api_webhook(request):
                             email.processed_sg_message_id = str(body['sg_message_id']).decode('utf-8')
                             email.save()
                         else:
+                            logging.info("paso else no existe")
                             email = Email.set_default_fields(body)
                             # parametros del evento
-                            email.smtp_id = str(
-                            body['smtp-id']).decode('utf-8')
+                            email.smtp_id = str(body['smtp-id']).decode('utf-8')
                             email.processed_date = body['timestamp']
                             email.processed_event = evento_sendgrid
                             email.processed_sg_event_id = str(body['sg_event_id']).decode('utf-8')
@@ -172,9 +173,10 @@ def sendgrid_api_webhook(request):
                             email.save()
                     elif evento_sendgrid == 'delivered':
                         email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
+                        logging.info(email)
 
                         if email is not None:
-                            logging.info(email)
+                            email.empresa_id = empresa
                             email.smtp_id = str(body['smtp-id']).decode('utf-8')
                             email.delivered_date = body['timestamp']
                             email.delivered_event = evento_sendgrid
@@ -194,9 +196,10 @@ def sendgrid_api_webhook(request):
                             email.save()
                     elif evento_sendgrid == 'open':
                         email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
+                        logging.info(email)
 
                         if email is not None:
-                            logging.info(email)
+                            email.empresa_id = empresa
                             if email.opened_first_date is None:
                                 email.opened_first_date = body['timestamp']
                             email.opened_last_date = body['timestamp']
@@ -225,6 +228,7 @@ def sendgrid_api_webhook(request):
 
                         if email is not None:
                             logging.info(email)
+                            email.empresa_id = empresa
                             email.smtp_id = str(body['smtp-id']).decode('utf-8')
                             email.dropped_date = body['timestamp']
                             email.dropped_sg_event_id = str(body['sg_event_id']).decode('utf-8')
@@ -247,6 +251,7 @@ def sendgrid_api_webhook(request):
 
                         if email is not None:
                             logging.info(email)
+                            email.empresa_id = empresa
                             email.smtp_id = str(body['smtp-id']).decode('utf-8')
                             email.bounce_date = body['timestamp']
                             email.bounce_event = evento_sendgrid
@@ -273,6 +278,7 @@ def sendgrid_api_webhook(request):
 
                         if email is not None:
                             logging.info(email)
+                            email.empresa_id = empresa
                             email.unsubscribe_date = body['timestamp']
                             email.unsubscribe_uid = str(body['uid']).decode('utf-8')
                             email.unsubscribe_purchase = str(body['purchase']).decode('utf-8')
@@ -293,6 +299,7 @@ def sendgrid_api_webhook(request):
 
                         if email is not None:
                             logging.info(email)
+                            email.empresa_id = empresa
                             email.click_ip = str(body['ip']).decode('utf-8')
                             email.click_purchase = str(body['purchase']).decode('utf-8')
                             email.click_useragent = str(body['useragent']).decode('utf-8')

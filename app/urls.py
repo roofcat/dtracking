@@ -53,7 +53,7 @@ urlpatterns = [
 
     # url que recibe webhooks de sendgrid
     url(r'^webhook/', sendgrid_rest_webhook, name='webhook_rest'),
-    url(r'^webhook-api/', sendgrid_api_webhook, name='webhook_rest'),
+    url(r'^webhook-api/', sendgrid_api_webhook, name='webhook_api'),
 
     # rutas de autenticación de usuarios
     url(r'^$', home_to_dashboard),

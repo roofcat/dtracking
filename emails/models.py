@@ -54,7 +54,10 @@ class FileQuerySet(models.QuerySet):
             for obj in self:
                 logging.info("borrando adjunto de GCS")
                 logging.info(obj)
-                cloudstorage.delete(obj.adjunto1.name)
+                if obj.adjunto1 == '' or obj.adjunto1 is None:
+                    pass
+                else:
+                    cloudstorage.delete(obj.adjunto1.name)
             super(FileQuerySet, self).delete(*args, **kwargs)
         except Exception, e:
             logging.error(e)
@@ -223,37 +226,61 @@ class Email(models.Model):
 
     # funcion DRY para webhook api
     @classmethod
-    def set_default_fields(body):
-        email = Email.objects.create()
-        email.empresa = str(body['empresa']).decode('utf-8')
-        email.rut_receptor = str(body['rut_receptor']).decode('utf-8')
-        email.rut_emisor = str(body['rut_emisor']).decode('utf-8')
-        email.tipo_envio = str(body['tipo_envio']).decode('utf-8')
-        email.tipo_dte = str(body['tipo_dte']).decode('utf-8')
-        email.numero_folio = str(body['numero_folio']).decode('utf-8')
-        email.resolucion_receptor = str(body['resolucion_receptor']).decode('utf-8')
-        email.resolucion_emisor = str(body['resolucion_emisor']).decode('utf-8')
-        email.monto = str(body['monto']).decode('utf-8')
-        email.fecha_emision = str(body['fecha_emision']).decode('utf-8')
-        email.fecha_recepcion = str(body['fecha_recepcion']).decode('utf-8')
-        email.estado_documento = str(body['estado_documento']).decode('utf-8')
-        email.tipo_operacion = str(body['tipo_operacion']).decode('utf-8')
-        email.tipo_receptor = str(body['tipo_receptor']).decode('utf-8')
-        email.nombre_cliente = str(body['nombre_cliente']).decode('utf-8')
-        email.correo = str(body['correo']).decode('utf-8')
+    def set_default_fields(self, body):
+        empresa_id = str(body['empresa']).decode('utf-8')
+        rut_receptor = str(body['rut_receptor']).decode('utf-8')
+        rut_emisor = str(body['rut_emisor']).decode('utf-8')
+        tipo_envio = str(body['tipo_envio']).decode('utf-8')
+        tipo_dte_id = body['tipo_dte']
+        numero_folio = body['numero_folio']
+        resolucion_receptor = body['resolucion_receptor']
+        if resolucion_receptor == '' or None:
+            resolucion_receptor = 0
+        resolucion_emisor = body['resolucion_emisor']
+        monto = body['monto']
+        fecha_emision = body['fecha_emision']
+        if fecha_emision == '' or None:
+            fecha_emision = 0
+        fecha_recepcion = body['fecha_recepcion']
+        if fecha_recepcion == '' or None:
+            fecha_recepcion = 0
+        estado_documento = str(body['estado_documento']).decode('utf-8')
+        tipo_operacion = str(body['tipo_operacion']).decode('utf-8')
+        tipo_receptor = str(body['tipo_receptor']).decode('utf-8')
+        nombre_cliente = str(body['nombre_cliente']).decode('utf-8')
+        correo = str(body['email']).decode('utf-8')
+
+        email = Email.objects.create(
+            empresa_id=empresa_id,
+            rut_receptor=rut_receptor,
+            rut_emisor=rut_emisor,
+            tipo_envio=tipo_envio,
+            tipo_dte_id=tipo_dte_id,
+            numero_folio=numero_folio,
+            resolucion_receptor=resolucion_receptor,
+            resolucion_emisor=resolucion_emisor,
+            monto=monto,
+            fecha_emision=fecha_emision,
+            fecha_recepcion=fecha_recepcion,
+            estado_documento=estado_documento,
+            tipo_operacion=tipo_operacion,
+            tipo_receptor=tipo_receptor,
+            nombre_cliente=nombre_cliente,
+            correo=correo
+        )
         return email
 
     # funcion utilizada desde el webhook api
     @classmethod
     def get_email(self, correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor):
         try:
-            email = Email.objects.filter(
+            email = Email.objects.get(
                 correo=correo, 
                 numero_folio=numero_folio, 
                 tipo_dte=tipo_dte,
                 rut_emisor=rut_emisor,
                 resolucion_emisor=resolucion_emisor,
-            ).order_by('-input_date')[:1]
+            )
             logging.info("Email Existe")
         except Email.DoesNotExist:
             logging.error("Email.DoesNotExist")
