@@ -406,10 +406,6 @@ function drawJqueryTable ( urlSource ) {
 				'title': 'Rut emisor',
 			},
 			{ 
-				'data': 'empresa',
-				'title': 'Nombre emisor',
-			},
-			{ 
 				'data': 'tipo_envio',
 				'title': 'Tipo envío',
 			},
