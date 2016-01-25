@@ -281,6 +281,18 @@ class Email(models.Model):
             resolucion_emisor = int(resolucion_emisor, base=10)
         """
         try:
+            email = Email.objects.get(
+                correo=correo,
+                numero_folio=numero_folio,
+                tipo_dte_id=tipo_dte,
+                rut_emisor=rut_emisor,
+                resolucion_emisor=resolucion_emisor,
+            )
+            return email
+        except Email.DoesNotExist:
+            return None
+        """
+        try:
             email = Email.objects.filter(
                 correo=correo,
                 numero_folio=numero_folio,
@@ -297,18 +309,6 @@ class Email(models.Model):
                 return None
         except Exception, e:
             logging.error(e)
-            return None
-        """
-        try:
-            email = Email.objects.get(
-                correo=correo,
-                numero_folio=numero_folio,
-                tipo_dte_id=tipo_dte,
-                rut_emisor=rut_emisor,
-                resolucion_emisor=resolucion_emisor,
-            )
-            return email
-        except Email.DoesNotExist:
             return None
 
     # MÉTODOS DE CONSULTAS (para no repetir código)
