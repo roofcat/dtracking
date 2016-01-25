@@ -273,25 +273,43 @@ class Email(models.Model):
     # funcion utilizada desde el webhook api
     @classmethod
     def get_email(self, correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor):
+        if isinstance(numero_folio, (str, basestring)):
+            numero_folio = int(numero_folio, base=10)
+        if isinstance(tipo_dte, (str, basestring)):
+            tipo_dte = int(tipo_dte, base=10)
+        if isinstance(resolucion_emisor, (str, basestring)):
+            resolucion_emisor = int(resolucion_emisor, base=10)
+        """
         try:
             email = Email.objects.filter(
-                correo=correo, 
-                numero_folio=numero_folio, 
+                correo=correo,
+                numero_folio=numero_folio,
                 tipo_dte_id=tipo_dte,
                 rut_emisor=rut_emisor,
                 resolucion_emisor=resolucion_emisor,
-            )[:1]
+            )
             logging.info(email)
+            logging.info(len(email))
+            logging.info(email.query)
             if email:
-                logging.info("Email Existe")
                 return email[0]
             else:
-                logging.info("query vacia")
                 return None
+        except Exception, e:
+            logging.error(e)
+            return None
+        """
+        try:
+            email = Email.objects.get(
+                correo=correo,
+                numero_folio=numero_folio,
+                tipo_dte_id=tipo_dte,
+                rut_emisor=rut_emisor,
+                resolucion_emisor=resolucion_emisor,
+            )
+            return email
         except Email.DoesNotExist:
-            logging.error("Email.DoesNotExist")
-            email = None
-        return email
+            return None
 
     # MÉTODOS DE CONSULTAS (para no repetir código)
     @classmethod

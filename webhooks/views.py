@@ -146,7 +146,7 @@ def sendgrid_api_webhook(request):
                 logging.info(evento_sendgrid)
 
                 if evento_sendgrid and correo and numero_folio and tipo_dte and rut_emisor and resolucion_emisor:
-                    correo = str(correo).lower
+                    correo = str(correo).lower()
                     numero_folio = int(numero_folio, base=10)
                     logging.info("es un webhook para el tracking")
 
