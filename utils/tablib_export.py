@@ -21,7 +21,7 @@ def create_tablib(data):
         'fecha', 'empresa', 'rut_receptor', 'rut_emisor', 'tipo_envio', 'tipo_dte',
         'numero_folio', 'resolucion_receptor', 'resolucion_emisor', 'monto', 'fecha_emision',
         'fecha_recepcion', 'estado_documento', 'tipo_operacion', 'tipo_receptor',
-        'nombre_cliente', 'correo', 'asunto', 'fecha_procesado', 'procesado', 'fecha_envio',
+        'nombre_cliente', 'correo', 'asunto', 'id_envio', 'fecha_procesado', 'procesado', 'fecha_envio',
         'enviado', 'respuesta_envio', 'fecha_primera_lectura', 'fecha_ultima_lectura',
         'abierto', 'ip_lector', 'navegador_lectura', 'cantidad_lectura', 'fecha_drop',
         'razon_drop', 'drop', 'fecha_rebote', 'rebote', 'motivo_rebote', 'estado_Rebote',
@@ -100,6 +100,10 @@ def create_tablib(data):
                 asunto = unicode(row.asunto)
             else:
                 asunto = ''
+            if row.id_envio is not None:
+                id_envio = row.id_envio
+            else:
+                id_envio = 0
             if row.processed_date is not None:
                 processed_date = timestamp_to_date(row.processed_date)
             else:
@@ -224,7 +228,7 @@ def create_tablib(data):
                 input_date, empresa, rut_receptor, rut_emisor, tipo_envio, tipo_dte,
                 numero_folio, resolucion_receptor, resolucion_emisor, monto, 
                 fecha_emision, fecha_recepcion, estado_documento, tipo_operacion, 
-                tipo_receptor, nombre_cliente, correo, asunto, processed_date, 
+                tipo_receptor, nombre_cliente, correo, asunto, id_envio, processed_date, 
                 processed_event, delivered_date, delivered_event, delivered_response, 
                 opened_first_date, opened_last_date, opened_event, opened_ip, 
                 opened_user_agent, opened_count, dropped_date, dropped_reason, 
