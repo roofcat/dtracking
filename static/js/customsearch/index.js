@@ -561,7 +561,8 @@ function drawEmailDetailModal ( data ) {
 	};
 
 	if ( data.bounce_event ) {
-		htmlBody +='Rebotado el ' + timestamp_to_date( data.bounce_date ) + '<br>';
+		htmlBody +='<label class="label label-warning">Rebotado</label> ';
+		htmlBody += 'el ' + timestamp_to_date( data.bounce_date ) + '<br>';
 		htmlBody +='Tipo rebote ' + data.bounce_type + ' status ' + data.bounce_status + '<br>';
 		htmlBody +='Razón del rebote ' + data.bounce_reason + '<br>';
 	};
