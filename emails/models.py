@@ -274,14 +274,20 @@ class Email(models.Model):
     @classmethod
     def get_email(self, correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor):
         try:
-            email = Email.objects.get(
+            email = Email.objects.filter(
                 correo=correo, 
                 numero_folio=numero_folio, 
-                tipo_dte=tipo_dte,
+                tipo_dte_id=tipo_dte,
                 rut_emisor=rut_emisor,
                 resolucion_emisor=resolucion_emisor,
-            )
-            logging.info("Email Existe")
+            )[:1]
+            logging.info(email)
+            if email:
+                logging.info("Email Existe")
+                return email[0]
+            else:
+                logging.info("query vacia")
+                return None
         except Email.DoesNotExist:
             logging.error("Email.DoesNotExist")
             email = None

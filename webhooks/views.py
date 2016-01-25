@@ -163,14 +163,14 @@ def sendgrid_api_webhook(request):
                             email.save()
                         else:
                             logging.info("paso else no existe")
-                            email = Email.set_default_fields(body)
+                            e = Email.set_default_fields(body)
                             # parametros del evento
-                            email.smtp_id = str(body['smtp-id']).decode('utf-8')
-                            email.processed_date = body['timestamp']
-                            email.processed_event = evento_sendgrid
-                            email.processed_sg_event_id = str(body['sg_event_id']).decode('utf-8')
-                            email.processed_sg_message_id = str(body['sg_message_id']).decode('utf-8')
-                            email.save()
+                            e.smtp_id = str(body['smtp-id']).decode('utf-8')
+                            e.processed_date = body['timestamp']
+                            e.processed_event = evento_sendgrid
+                            e.processed_sg_event_id = str(body['sg_event_id']).decode('utf-8')
+                            e.processed_sg_message_id = str(body['sg_message_id']).decode('utf-8')
+                            e.save()
                     elif evento_sendgrid == 'delivered':
                         email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
                         logging.info(email)
@@ -185,15 +185,15 @@ def sendgrid_api_webhook(request):
                             email.delivered_response = str(body['response']).decode('utf-8')
                             email.save()
                         else:
-                            email = Email.set_default_fields(body)
+                            e = Email.set_default_fields(body)
                             # parametros del evento
-                            email.smtp_id = str(body['smtp-id']).decode('utf-8')
-                            email.delivered_date = body['timestamp']
-                            email.delivered_event = evento_sendgrid
-                            email.delivered_sg_event_id = str(body['sg_event_id']).decode('utf-8')
-                            email.delivered_sg_message_id = str(body['sg_message_id']).decode('utf-8')
-                            email.delivered_response = str(body['response']).decode('utf-8')
-                            email.save()
+                            e.smtp_id = str(body['smtp-id']).decode('utf-8')
+                            e.delivered_date = body['timestamp']
+                            e.delivered_event = evento_sendgrid
+                            e.delivered_sg_event_id = str(body['sg_event_id']).decode('utf-8')
+                            e.delivered_sg_message_id = str(body['sg_message_id']).decode('utf-8')
+                            e.delivered_response = str(body['response']).decode('utf-8')
+                            e.save()
                     elif evento_sendgrid == 'open':
                         email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
                         logging.info(email)
@@ -211,18 +211,18 @@ def sendgrid_api_webhook(request):
                             email.opened_count += 1
                             email.save()
                         else:
-                            email = Email.set_default_fields(body)
+                            e = Email.set_default_fields(body)
                             # parametros del evento
-                            if email.opened_first_date is None:
-                                email.opened_first_date = body['timestamp']
-                            email.opened_last_date = body['timestamp']
-                            email.opened_event = evento_sendgrid
-                            email.opened_ip = str(body['ip']).decode('utf-8')
-                            email.opened_user_agent = str(body['useragent']).decode('utf-8')
-                            email.opened_sg_event_id = str(body['sg_event_id']).decode('utf-8')
-                            email.opened_sg_message_id = str(body['sg_message_id']).decode('utf-8')
-                            email.opened_count += 1
-                            email.save()
+                            if e.opened_first_date is None:
+                                e.opened_first_date = body['timestamp']
+                            e.opened_last_date = body['timestamp']
+                            e.opened_event = evento_sendgrid
+                            e.opened_ip = str(body['ip']).decode('utf-8')
+                            e.opened_user_agent = str(body['useragent']).decode('utf-8')
+                            e.opened_sg_event_id = str(body['sg_event_id']).decode('utf-8')
+                            e.opened_sg_message_id = str(body['sg_message_id']).decode('utf-8')
+                            e.opened_count += 1
+                            e.save()
                     elif evento_sendgrid == 'dropped':
                         email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
 
@@ -237,15 +237,15 @@ def sendgrid_api_webhook(request):
                             email.dropped_event = evento_sendgrid
                             email.save()
                         else:
-                            email = Email.set_default_fields(body)
+                            e = Email.set_default_fields(body)
                             # parametros del evento
-                            email.smtp_id = str(body['smtp-id']).decode('utf-8')
-                            email.dropped_date = body['timestamp']
-                            email.dropped_sg_event_id = str(body['sg_event_id']).decode('utf-8')
-                            email.dropped_sg_message_id = str(body['sg_message_id']).decode('utf-8')
-                            email.dropped_reason = str(body['reason']).decode('utf-8')
-                            email.dropped_event = evento_sendgrid
-                            email.save()
+                            e.smtp_id = str(body['smtp-id']).decode('utf-8')
+                            e.dropped_date = body['timestamp']
+                            e.dropped_sg_event_id = str(body['sg_event_id']).decode('utf-8')
+                            e.dropped_sg_message_id = str(body['sg_message_id']).decode('utf-8')
+                            e.dropped_reason = str(body['reason']).decode('utf-8')
+                            e.dropped_event = evento_sendgrid
+                            e.save()
                     elif evento_sendgrid == 'bounce':
                         email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
 
@@ -262,17 +262,17 @@ def sendgrid_api_webhook(request):
                             email.bounce_type = str(body['type']).decode('utf-8')
                             email.save()
                         else:
-                            email = Email.set_default_fields(body)
+                            e = Email.set_default_fields(body)
                             # parametros del evento
-                            email.smtp_id = str(body['smtp-id']).decode('utf-8')
-                            email.bounce_date = body['timestamp']
-                            email.bounce_event = evento_sendgrid
-                            email.bounce_sg_event_id = str(body['sg_event_id']).decode('utf-8')
-                            email.bounce_sg_message_id = str(body['sg_message_id']).decode('utf-8')
-                            email.bounce_reason = str(body['reason']).decode('utf-8')
-                            email.bounce_status = str(body['status']).decode('utf-8')
-                            email.bounce_type = str(body['type']).decode('utf-8')
-                            email.save()
+                            e.smtp_id = str(body['smtp-id']).decode('utf-8')
+                            e.bounce_date = body['timestamp']
+                            e.bounce_event = evento_sendgrid
+                            e.bounce_sg_event_id = str(body['sg_event_id']).decode('utf-8')
+                            e.bounce_sg_message_id = str(body['sg_message_id']).decode('utf-8')
+                            e.bounce_reason = str(body['reason']).decode('utf-8')
+                            e.bounce_status = str(body['status']).decode('utf-8')
+                            e.bounce_type = str(body['type']).decode('utf-8')
+                            e.save()
                     elif evento_sendgrid == 'unsubscribe':
                         email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
 
@@ -286,14 +286,14 @@ def sendgrid_api_webhook(request):
                             email.unsubscribe_event = evento_sendgrid
                             email.save()
                         else:
-                            email = Email.set_default_fields(body)
+                            e = Email.set_default_fields(body)
                             # parametros del evento
-                            email.unsubscribe_date = body['timestamp']
-                            email.unsubscribe_uid = str(body['uid']).decode('utf-8')
-                            email.unsubscribe_purchase = str(body['purchase']).decode('utf-8')
-                            email.unsubscribe_id = str(body['id']).decode('utf-8')
-                            email.unsubscribe_event = evento_sendgrid
-                            email.save()
+                            e.unsubscribe_date = body['timestamp']
+                            e.unsubscribe_uid = str(body['uid']).decode('utf-8')
+                            e.unsubscribe_purchase = str(body['purchase']).decode('utf-8')
+                            e.unsubscribe_id = str(body['id']).decode('utf-8')
+                            e.unsubscribe_event = evento_sendgrid
+                            e.save()
                     elif evento_sendgrid == 'click':
                         email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
 
@@ -309,16 +309,16 @@ def sendgrid_api_webhook(request):
                             email.click_url = str(body['url']).decode('utf-8')
                             email.save()
                         else:
-                            email = Email.set_default_fields(body)
+                            e = Email.set_default_fields(body)
                             # parametros del evento
-                            email.click_ip = str(body['ip']).decode('utf-8')
-                            email.click_purchase = str(body['purchase']).decode('utf-8')
-                            email.click_useragent = str(body['useragent']).decode('utf-8')
-                            email.click_event = evento_sendgrid
-                            email.click_email = str(body['email']).decode('utf-8')
-                            email.click_date = body['timestamp']
-                            email.click_url = str(body['url']).decode('utf-8')
-                            email.save()
+                            e.click_ip = str(body['ip']).decode('utf-8')
+                            e.click_purchase = str(body['purchase']).decode('utf-8')
+                            e.click_useragent = str(body['useragent']).decode('utf-8')
+                            e.click_event = evento_sendgrid
+                            e.click_email = str(body['email']).decode('utf-8')
+                            e.click_date = body['timestamp']
+                            e.click_url = str(body['url']).decode('utf-8')
+                            e.save()
                 else:
                     logging.error("parametros incompletos, correo no corresponde.")
             except Exception, e:
