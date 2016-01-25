@@ -329,13 +329,13 @@ function drawJqueryTable ( urlSource ) {
 						rowBody += "<span class=\"label label-warning\"> </span>&nbsp;";
 						popBody += "<p><span class=\"label label-warning\"> </span>&nbsp;";
 						popBody += " Rechazado el " + timestamp_to_date( row['dropped_date'] ) + "<br> ";
-						popBody += " Motivo: " + row['dropped_reason'] + "</p>";
+						popBody += " Motivo: " + (row['dropped_reason']).replace( "'", " ") + "</p>";
 					};
 					if ( row['bounce_event'] ) {
 						rowBody += "<span class=\"label label-danger\"> </span>&nbsp;";
 						popBody += "<p><span class=\"label label-danger\"> </span>&nbsp;";
 						popBody += " Rebotado el " + timestamp_to_date( row['bounce_date'] ) + "<br> ";
-						popBody += " Motivo: " + row['bounce_reason'] + "</p>";
+						popBody += " Motivo: " + (row['bounce_reason']).replace( "'", " ") + "</p>";
 					};
 					if ( row['unsubscribe_event'] ) {
 						rowBody += "<span class=\"label label-info\"> </span>&nbsp;";
