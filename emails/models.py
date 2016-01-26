@@ -249,10 +249,11 @@ class Email(models.Model):
         tipo_receptor = str(body['tipo_receptor']).decode('utf-8')
         nombre_cliente = str(body['nombre_cliente']).decode('utf-8')
         correo = str(body['email']).decode('utf-8')
-        id_envio = body['id_envio']
+        id_envio = str(body['id_envio']).decode('utf-8')
         if id_envio == '' or None:
             id_envio = 0
-
+        else:
+            id_envio = int(id_envio, base=10)
         email = Email.objects.create(
             empresa_id=empresa_id,
             rut_receptor=rut_receptor,
