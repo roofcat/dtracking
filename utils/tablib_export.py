@@ -144,10 +144,10 @@ def create_tablib(data):
                 opened_user_agent = unicode(row.opened_user_agent).encode('utf-8')
             else:
                 opened_user_agent = ''
-            if row.opened_count:
+            if row.opened_count is not None:
                 opened_count = row.opened_count
             else:
-                opened_count = ''
+                opened_count = 0
             if row.dropped_date is not None:
                 dropped_date = timestamp_to_date(row.dropped_date)
             else:
