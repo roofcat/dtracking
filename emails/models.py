@@ -247,7 +247,7 @@ class Email(models.Model):
         estado_documento = str(body['estado_documento']).decode('utf-8')
         tipo_operacion = str(body['tipo_operacion']).decode('utf-8')
         tipo_receptor = str(body['tipo_receptor']).decode('utf-8')
-        nombre_cliente = str(body['nombre_cliente']).decode('utf-8')
+        nombre_cliente = body['nombre_cliente']
         correo = str(body['email']).decode('utf-8')
         id_envio = str(body['id_envio']).decode('utf-8')
         if id_envio == '' or None:
