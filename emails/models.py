@@ -92,7 +92,7 @@ class Email(models.Model):
                                      choices=TIPOS_RECEPTORES,
                                      null=True,
                                      blank=True)
-    id_envio = models.IntegerField(blank=True, null=True)
+    id_envio = models.BigIntegerField(blank=True, null=True)
     # campos correo
     nombre_cliente = models.CharField(max_length=200)
     correo = models.EmailField(max_length=250, db_index=True)
