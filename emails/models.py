@@ -249,6 +249,9 @@ class Email(models.Model):
         tipo_receptor = str(body['tipo_receptor']).decode('utf-8')
         nombre_cliente = str(body['nombre_cliente']).decode('utf-8')
         correo = str(body['email']).decode('utf-8')
+        id_envio = body['id_envio']
+        if id_envio == '' or None:
+            id_envio = 0
 
         email = Email.objects.create(
             empresa_id=empresa_id,
@@ -266,7 +269,8 @@ class Email(models.Model):
             tipo_operacion=tipo_operacion,
             tipo_receptor=tipo_receptor,
             nombre_cliente=nombre_cliente,
-            correo=correo
+            correo=correo,
+            id_envio=id_envio
         )
         return email
 
