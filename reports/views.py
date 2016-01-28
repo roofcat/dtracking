@@ -3,6 +3,7 @@
 
 from datetime import datetime
 import json
+import logging
 
 
 from django.http import HttpResponse
@@ -93,7 +94,7 @@ class GeneralReportTemplateView(LoginRequiredMixin, TemplateView):
                 data = {"status": "ok"}
                 return HttpResponse(json.dumps(data), content_type="application/json")
         except Exception, e:
-            print e
+            logging.error(e)
 
 
 class SendedReportTemplateView(LoginRequiredMixin, TemplateView):
@@ -114,7 +115,7 @@ class SendedReportTemplateView(LoginRequiredMixin, TemplateView):
             data = {"status": "ok"}
             return HttpResponse(json.dumps(data), content_type="application/json")
         except Exception, e:
-            print e
+            logging.error(e)
 
 
 class FailureReportTemplateView(LoginRequiredMixin, TemplateView):
@@ -135,7 +136,7 @@ class FailureReportTemplateView(LoginRequiredMixin, TemplateView):
             data = {"status": "ok"}
             return HttpResponse(json.dumps(data), content_type="application/json")
         except Exception, e:
-            print e
+            logging.error(e)
 
 
 class ByEmailReportTemplateView(LoginRequiredMixin, TemplateView):
@@ -155,7 +156,7 @@ class ByEmailReportTemplateView(LoginRequiredMixin, TemplateView):
             data = {"status": "ok"}
             return HttpResponse(json.dumps(data), content_type="application/json")
         except Exception, e:
-            print e
+            logging.error(e)
 
 
 class ByFolioReportTemplateView(LoginRequiredMixin, TemplateView):
@@ -173,7 +174,7 @@ class ByFolioReportTemplateView(LoginRequiredMixin, TemplateView):
                 data = {"status": "ok"}
                 return HttpResponse(json.dumps(data), content_type="application/json")
         except Exception, e:
-            print e
+            logging.error(e)
 
 
 class ByRutReportTemplateView(LoginRequiredMixin, TemplateView):
@@ -193,7 +194,7 @@ class ByRutReportTemplateView(LoginRequiredMixin, TemplateView):
             data = {"status": "ok"}
             return HttpResponse(json.dumps(data), content_type="application/json")
         except Exception, e:
-            print e
+            logging.error(e)
 
 
 class ByMountReportTemplateView(LoginRequiredMixin, TemplateView):
@@ -214,7 +215,7 @@ class ByMountReportTemplateView(LoginRequiredMixin, TemplateView):
             data = {"status": "ok"}
             return HttpResponse(json.dumps(data), content_type="application/json")
         except Exception, e:
-            print e
+            logging.error(e)
 
 
 @csrf_exempt
@@ -224,7 +225,7 @@ def queue_export(request):
 	    los reportes y enviarlos por correo
 	"""
 	if request.method == 'POST':
-		print request.body
+		logging.info(request.body)
 		export_type = request.POST.get('export_type')
 		if export_type == 'export_general_email':
 			options = request.POST.get('options')
@@ -333,7 +334,7 @@ def queue_export(request):
 			file_name = request.POST.get('file_name')
 			params = request.POST.get('params')
 			params = json.loads(params)
-			print params
+			logging.info(params)
 			data = Email.get_emails_by_dynamic_query_async(**params)
 		# Creación del documento
 		excel_report = create_tablib(data)
@@ -343,12 +344,12 @@ def queue_export(request):
 			'report': excel_report.xlsx,
 		}
 		report = ReportForm(data)
-		print "imprimir ReportForm"
+		logging.info("imprimir ReportForm")
 		report.name = file_name
 		report.report = excel_report.xlsx
-		print report.is_valid()
-		print report.errors
-		print "se guardo el reporte"
+		logging.info(report.is_valid())
+		logging.info(report.errors)
+		logging.info("se guardo el reporte")
 		# preparación de parametros
 		mail = EmailClient()
 		mail.send_report_to_user_with_attach(user_email, data)

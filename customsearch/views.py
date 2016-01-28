@@ -3,6 +3,7 @@
 
 from datetime import datetime
 import json
+import logging
 
 
 from django.forms.models import model_to_dict
@@ -83,7 +84,7 @@ class EmailDetailTemplateView(LoginRequiredMixin, TemplateView):
                 email['adjunto1'] = email['adjunto1'].name
                 return HttpResponse(json.dumps(email), content_type='application/json')
         except Exception, e:
-            print e
+            logging.error(e)
 
 
 class EmailSearchTemplateView(LoginRequiredMixin, TemplateView):
@@ -113,7 +114,7 @@ class EmailSearchTemplateView(LoginRequiredMixin, TemplateView):
                 data = json.dumps(data)
                 return HttpResponse(data, content_type='application/json')
         except Exception, e:
-            print e
+            logging.error(e)
 
 
 class FolioSearchTemplateView(LoginRequiredMixin, TemplateView):
@@ -139,7 +140,7 @@ class FolioSearchTemplateView(LoginRequiredMixin, TemplateView):
                 data = json.dumps(data)
                 return HttpResponse(data, content_type='application/json')
         except Exception, e:
-            print e
+            logging.error(e)
 
 
 class RutSearchTemplateView(LoginRequiredMixin, TemplateView):
@@ -169,7 +170,7 @@ class RutSearchTemplateView(LoginRequiredMixin, TemplateView):
                 data = json.dumps(data)
                 return HttpResponse(data, content_type='application/json')
         except Exception, e:
-            print e
+            logging.error(e)
 
 
 class FallidosSearchTemplateView(LoginRequiredMixin, TemplateView):
@@ -199,7 +200,7 @@ class FallidosSearchTemplateView(LoginRequiredMixin, TemplateView):
                 data = json.dumps(data)
                 return HttpResponse(data, content_type='application/json')
         except Exception, e:
-            print e
+            logging.error(e)
 
 
 class MontoSearchTemplateView(LoginRequiredMixin, TemplateView):
@@ -236,6 +237,7 @@ class IndexTemplateView(LoginRequiredMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
         perfil = Perfil.get_perfil(request.user)
+        logging.info(perfil)
         data = {
             'es_admin': perfil.es_admin,
             'empresas': perfil.empresas.all(),

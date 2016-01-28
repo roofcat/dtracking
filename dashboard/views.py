@@ -3,6 +3,7 @@
 
 from datetime import datetime
 import json
+import logging
 
 
 from django.core.serializers.json import DjangoJSONEncoder
@@ -42,7 +43,7 @@ class StatisticsView(LoginRequiredMixin, TemplateView):
             data = json.dumps(data)
             return HttpResponse(data, content_type='application/json')
         except Exception, e:
-            print e
+            logging.error(e)
 
 
 class IndexView(LoginRequiredMixin, TemplateView):
@@ -50,7 +51,7 @@ class IndexView(LoginRequiredMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
         perfil = Perfil.get_perfil(request.user)
-        print perfil
+        logging.info(perfil)
         data = {
             'es_admin': perfil.es_admin,
             'empresas': perfil.empresas.all(),

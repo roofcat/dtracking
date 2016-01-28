@@ -479,44 +479,44 @@ class Email(models.Model):
                                     display_start, display_length):
         if folio is not None:
             if empresa is None:
-                print "query de folio sin empresa"
+                logging.info("query de folio sin empresa")
                 emails = Email.objects.filter(
                     numero_folio=folio).order_by('-input_date')
             else:
-                print "query de folio con empresa"
+                logging.info("query de folio con empresa")
                 emails = Email.objects.filter(
                     empresa=empresa, numero_folio=folio
                 ).order_by('-input_date')
         elif fallidos is True:
-            print "query de fallidos"
+            logging.info("query de fallidos")
             emails = Email.objects.filter(
                 Q(input_date__range=(date_from, date_to)),
                 Q(bounce_event='bounce') | Q(dropped_event='dropped')
             ).order_by('-input_date')
         else:
             params = {}
-            print "query dinamica"
+            logging.info("query dinamica")
             if date_from and date_to:
                 params['input_date__range'] = (date_from, date_to)
             if empresa is not None:
-                print "con empresa"
+                logging.info("con empresa")
                 params['empresa'] = empresa
             if correo is not None:
-                print "con correo"
+                logging.info("con correo")
                 params['correo'] = correo
             if rut is not None:
-                print "con rut receptor"
+                logging.info("con rut receptor")
                 params['rut_receptor'] = rut
             if mount_from is not None and mount_to is not None:
-                print "con montos"
+                logging.info("con montos")
                 params['monto__range'] = (mount_from, mount_to)
             emails = Email.objects.filter(**params).order_by('-input_date')
         # imprimir consulta
-        print "query"
-        print emails.query
+        logging.info("query")
+        logging.info(emails.query)
         # despues de consultar paginar y preparar retorno de emails
         query_total = emails.count()
-        print query_total
+        logging.info(query_total)
         if display_start is 0:
             emails = emails[display_start:display_length]
         else:
@@ -546,44 +546,44 @@ class Email(models.Model):
         date_to = timestamp_to_date(date_to)
         if folio is not None:
             if empresa is None:
-                print "query de folio sin empresa"
+                logging.info("query de folio sin empresa")
                 emails = Email.objects.filter(
                     numero_folio=folio).order_by('-input_date')
             else:
-                print "query de folio con empresa"
+                logging.info("query de folio con empresa")
                 emails = Email.objects.filter(
                     empresa=empresa, numero_folio=folio
                 ).order_by('-input_date')
         elif fallidos is True:
-            print "query de fallidos"
+            logging.info("query de fallidos")
             emails = Email.objects.filter(
                 Q(input_date__range=(date_from, date_to)),
                 Q(bounce_event='bounce') | Q(dropped_event='dropped')
             ).order_by('-input_date')
         else:
             params = {}
-            print "query dinamica"
+            logging.info("query dinamica")
             if date_from and date_to:
                 params['input_date__range'] = (date_from, date_to)
             if empresa is not None:
-                print "con empresa"
+                logging.info("con empresa")
                 params['empresa'] = empresa
             if correo is not None:
-                print "con correo"
+                logging.info("con correo")
                 params['correo'] = correo
             if rut is not None:
-                print "con rut receptor"
+                logging.info("con rut receptor")
                 params['rut_receptor'] = rut
             if mount_from is not None and mount_to is not None:
-                print "con montos"
+                logging.info("con montos")
                 params['monto__range'] = (mount_from, mount_to)
             emails = Email.objects.filter(**params).order_by('-input_date')
         # imprimir consulta
-        print "query"
-        print emails.query
+        logging.info("query")
+        logging.info(emails.query)
         # despues de consultar paginar y preparar retorno de emails
         query_total = emails.count()
-        print query_total
+        logging.info(query_total)
         # retornar emails
         if emails:
             return emails
@@ -605,7 +605,7 @@ class Email(models.Model):
     @classmethod
     def get_delayed_emails_only_processed(self):
         emails = Email.objects.filter(
-            Q(processed_event__isnull=False) &  Q(delivered_event__isnull=True) &
+            Q(processed_event__isnull=False) & Q(delivered_event__isnull=True) &
             Q(opened_event__isnull=True ) & Q(dropped_event__isnull=True) & 
             Q(bounce_event__isnull=True)).order_by('input_date')
         if emails:
@@ -807,7 +807,7 @@ class Email(models.Model):
                     Q(bounce_event='bounce') | Q(dropped_event='dropped')
                 )
         emails = emails.order_by('input_date')[:20000]
-        print emails.query
+        logging.info(emails.query)
         if emails:
             return emails
         else:
@@ -815,7 +815,7 @@ class Email(models.Model):
 
     @classmethod
     def get_emails_by_mount_and_dates(self, date_from, date_to, mount_from, mount_to, **kwargs):
-        print kwargs
+        logging.info(kwargs)
         emails = Email.objects.filter(
             input_date__range=(date_from, date_to),
             monto__range=(mount_from, mount_to),
