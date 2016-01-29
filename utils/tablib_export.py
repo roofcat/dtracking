@@ -16,7 +16,7 @@ from .generics import timestamp_to_date
 
 
 def create_tablib(data):
-    my_tab = tablib.Dataset()
+    my_tab = tablib.Dataset(title="Correos registrados")
     my_tab.headers = (
         'fecha', 'empresa', 'rut_receptor', 'rut_emisor', 'tipo_envio', 'tipo_dte',
         'numero_folio', 'resolucion_receptor', 'resolucion_emisor', 'monto', 'fecha_emision',
