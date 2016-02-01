@@ -1,4 +1,4 @@
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+# -*- coding: utf-8 -*-
 import os
 import sys
 
