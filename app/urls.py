@@ -9,7 +9,7 @@ from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
 
 
-from autenticacion.views import log_in, log_out, home_to_dashboard
+from autenticacion.views import log_in, log_out, home_to_dashboard, profile
 from emails.views import EmailDteInputView
 from emails.views import queue_send_email
 from emails.views import cron_send_delayed_email
@@ -59,6 +59,7 @@ urlpatterns = [
     url(r'^$', home_to_dashboard),
     url(r'^login/', log_in, name='login'),
     url(r'^logout/', log_out, name='logout'),
+    url(r'^profile/', profile, name='profile'),
     
     # modulo Administrador Azurian
     url(r'^admin/', include(admin.site.urls)),

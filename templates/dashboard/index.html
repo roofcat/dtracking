@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 
+{% load staticfiles %}
+
 {% block stylesheets %}
-	<link rel="stylesheet" href="/static/css/jquery.datetimepicker.css">
+	<link rel="stylesheet" href="{% static "css/jquery.datetimepicker.css" %}">
 {% endblock %}
 
 {% block title %}Dashboard{% endblock %}
@@ -207,6 +209,6 @@
 {% endblock %}
 
 {% block javascript %}
-	<script src="/static/js/jquery.datetimepicker.js"></script>
-	<script src="/static/js/dashboard/index.min.js"></script>
+	<script src="{% static "js/jquery.datetimepicker.js" %}"></script>
+	<script src="{% static "js/dashboard/index.min.js" %}"></script>
 {% endblock %}

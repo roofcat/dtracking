@@ -7,7 +7,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
-from django.template import RequestContext
+from django.views.generic import TemplateView
 
 
 class LoginRequiredMixin(object):
@@ -16,6 +16,14 @@ class LoginRequiredMixin(object):
 	def as_view(self, **kwargs):
 		view = super(LoginRequiredMixin, self).as_view(**kwargs)
 		return login_required(view, login_url='/login/')
+
+
+class ProfileTemplateView(LoginRequiredMixin, TemplateView):
+
+	def get(self, request, *args, **kwargs):
+		return render(request, 'autenticacion/profile.html')
+
+profile = ProfileTemplateView.as_view()
 
 
 def home_to_dashboard(request):
