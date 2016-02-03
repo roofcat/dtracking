@@ -36,6 +36,9 @@
 		                <a href="bootstrap-elements.html" data-target="#" class="dropdown-toggle" data-toggle="dropdown">{{ user.email | upper }} <b class="glyphicon glyphicon-option-vertical"></b></a>
 		                <ul class="dropdown-menu">
 				        	<!-- <li><a href="/profile/">Perfil de usuario</a></li> -->
+				        	{% if user.is_superuser %}
+				        		<li><a href="/admin/" target="_blank">Admin</a></li>
+				        	{% endif %}
 				        	<li><a href="/logout/">Salir</a></li>
 		                </ul>
 		            </li>
