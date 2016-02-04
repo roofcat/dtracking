@@ -50,7 +50,7 @@ class ProfileTemplateView(LoginRequiredMixin, TemplateView):
 			if new_password1 and new_password2 is not None:
 				user.set_password(new_password1)
 				user.save()
-				return HttpResponse(json.dumps('Contraseña cambiada exitosamente.'), 
+				return HttpResponse(json.dumps('Contraseña cambiada exitosamente, por favor inicie sesión nuevamente.'), 
 									content_type='application/json')
 			else:
 				return HttpResponse(json.dumps('No se pudo cambiar la contraseña.'), 
