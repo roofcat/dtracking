@@ -2,6 +2,7 @@
 
 
 import logging
+import json
 
 
 from django.contrib.auth import login, authenticate, logout
@@ -12,6 +13,9 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse, QueryDict
 from django.shortcuts import render
 from django.views.generic import TemplateView
+
+
+from utils.generics import get_date_from_timezone
 
 
 class LoginRequiredMixin(object):
@@ -37,12 +41,20 @@ class ProfileTemplateView(LoginRequiredMixin, TemplateView):
 			user = User.objects.get(pk=request.user.id)
 			new_password1 = body.get('new_password1')
 			new_password2 = body.get('new_password2')
+			if user.date_joined is None:
+				user.date_joined = get_date_from_timezone()
+				user.save()
+			if user.last_login is None:
+				user.last_login = get_date_from_timezone()
+				user.save()
 			if new_password1 and new_password2 is not None:
 				user.set_password(new_password1)
 				user.save()
-				return HttpResponse('Contraseña cambiada.', content_type='application/json')
+				return HttpResponse(json.dumps('Contraseña cambiada exitosamente.'), 
+									content_type='application/json')
 			else:
-				return HttpResponse('No se pudo cambiar la contraseña.', content_type='application/json')
+				return HttpResponse(json.dumps('No se pudo cambiar la contraseña.'), 
+									content_type='application/json')
 		except Exception, e:
 			logging.error(e)
 			return HttpResponse(e)
@@ -55,10 +67,17 @@ class ProfileTemplateView(LoginRequiredMixin, TemplateView):
 			user = User.objects.get(pk=request.user.id)
 			first_name = body.get('first_name')
 			last_name = body.get('last_name')
+			if user.date_joined is None:
+				user.date_joined = get_date_from_timezone()
+				user.save()
+			if user.last_login is None:
+				user.last_login = get_date_from_timezone()
+				user.save()
 			user.first_name = first_name
 			user.last_name = last_name
 			user.save()
-			return HttpResponse('Registro actualizado.', content_type='application/json')
+			return HttpResponse(json.dumps('Registro actualizado exitosamente.'), 
+								content_type='application/json')
 		except Exception, e:
 			logging.error(e)
 			return HttpResponse(e)
