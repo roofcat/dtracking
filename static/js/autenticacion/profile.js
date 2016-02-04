@@ -40,11 +40,10 @@ function updateProfileAjax ( first_name, last_name ) {
 			'last_name': last_name,
 		},
 		success: function ( data ) {
-			alert( data );
+			notificationModal( 'Cambio datos de usuario', data );
 		},
 		error: function ( jqXHR, textStatus, errorThrown ) {
-			console.log( errorThrown );
-			alert( errorThrown );
+			notificationModal( 'Error', errorThrown );
 		},
 	});
 };
@@ -62,11 +61,18 @@ function updatePasswordAjax ( pass1, pass2 ) {
 			'new_password2': pass2
 		},
 		success: function ( data ) {
-			alert( data );
+			notificationModal( 'Cambio de contraseña', data );
 		},
 		error: function ( jqXHR, textStatus, errorThrown ) {
-			console.log( errorThrown );
-			alert( errorThrown );
+			notificationModal( 'Error', errorThrown );
 		},
 	});
+};
+
+function notificationModal ( t, b ) {
+	var title = $( '#notificationTitle' );
+	var body = $( '#notificationBody' );
+	title.empty().append( t );
+	body.empty().append( b );
+	$( '#notificationModal' ).modal( 'show', true );
 };
