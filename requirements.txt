@@ -16,4 +16,5 @@ sendgrid==1.5.20
 simplejson==3.8.1
 six==1.10
 smtpapi==0.3.1
+suds==0.4
 tablib==0.10
