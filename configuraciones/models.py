@@ -42,7 +42,7 @@ class EliminacionHistorico(models.Model):
             return None
 
 
-class WebServicesWebhooks(models.Model):
+class WebServicesWebhook(models.Model):
     url = models.URLField(max_length=255)
     con_autenticacion = models.BooleanField(default=False)
     usuario_autenticacion = models.CharField(max_length=200, null=True)
@@ -68,7 +68,7 @@ class WebServicesWebhooks(models.Model):
     parametros_rebotado = models.CharField(max_length=255, null=True)
     con_rechazado = models.BooleanField(default=False)
     metodo_rechazado = models.CharField(max_length=200, null=True)
-    paramtros_rechazado = models.CharField(max_length=200, null=True)
+    parametros_rechazado = models.CharField(max_length=200, null=True)
 
     def __unicode__(self):
         return u'{0}'.format(self.url)
