@@ -12,6 +12,7 @@ from django.views.decorators.http import require_POST
 
 
 from emails.models import Email
+from utils.ws_middleware import SoapMiddleware
 
 
 @csrf_exempt

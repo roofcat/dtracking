@@ -5,4 +5,7 @@ queue:
   rate: 60/s
 - name: ReportQueue
   rate: 60/s
-
+- name: SoapWSQueue
+  rate: 60/s
+- name: RestWSQueue
+  rate: 60/s

@@ -19,3 +19,17 @@ def report_queue(context):
     t = taskqueue.Task(url="/reports/exportqueue/", params=context)
     q.add(t)
     data = {"status": "ok"}
+
+
+def soap_ws_queue(context):
+    q = taskqueue.Queue("SoapWSQueue")
+    t = taskqueue.Task(url="/webservices/soap/", params=context)
+    q.add(t)
+    data = {"status": "ok"}
+
+
+def rest_ws_queue(context):
+    q = taskqueue.Queue("RestWSQueue")
+    t = taskqueue.Task(url="/webservices/rest/", params=context)
+    q.add(t)
+    data = {"status": "ok"}

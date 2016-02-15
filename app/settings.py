@@ -50,6 +50,7 @@ INSTALLED_APPS = (
     'reports',
     'tipodocumentos',
     'webhooks',
+    'webservices',
 )
 
 REST_FRAMEWORK = {
