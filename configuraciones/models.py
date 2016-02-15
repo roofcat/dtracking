@@ -42,7 +42,7 @@ class EliminacionHistorico(models.Model):
             return None
 
 
-class WebServicesWebhook(models.Model):
+class SoapWebService(models.Model):
     url = models.URLField(max_length=255)
     con_autenticacion = models.BooleanField(default=False)
     usuario_autenticacion = models.CharField(max_length=200, null=True)
@@ -75,7 +75,7 @@ class WebServicesWebhook(models.Model):
 
     @classmethod
     def get_ws_conf(self):
-        ws = WebServicesWebhooks.objects.all()[:1]
+        ws = SoapWebService.objects.all()[:1]
         if ws is not None:
             return ws
         else:
