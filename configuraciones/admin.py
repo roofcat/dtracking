@@ -4,7 +4,10 @@
 from django.contrib import admin
 
 
-from .models import SendgridConf, TemplateReporte, EliminacionHistorico
+from .models import SendgridConf
+from .models import TemplateReporte
+from .models import EliminacionHistorico
+from .models import WebServicesWebhooks
 
 
 class SengridConfAdmin(admin.ModelAdmin):
@@ -19,6 +22,11 @@ class EliminacionHistoricoAdmin(admin.ModelAdmin):
 	list_display = ('activo', 'dias_a_eliminar',)
 
 
+class WebServicesWebhooksAdmin(admin.ModelAdmin):
+	list_display = ('url', 'parametros',)
+
+
 admin.site.register(SendgridConf, SengridConfAdmin)
 admin.site.register(TemplateReporte, TemplateReporteAdmin)
 admin.site.register(EliminacionHistorico, EliminacionHistoricoAdmin)
+admin.site.register(WebServicesWebhooks, WebServicesWebhooksAdmin)
