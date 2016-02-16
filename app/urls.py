@@ -9,14 +9,14 @@ from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
 
 
-from autenticacion.views import log_in, log_out, home_to_dashboard, profile
+from autenticacion.views import log_in, log_out, home_to_dashboard, ProfileTemplateView
 from emails.views import EmailDteInputView
-from emails.views import queue_send_email
-from emails.views import cron_send_delayed_email
-from emails.views import cron_send_delayed_processed_email
-from emails.views import cron_clean_emails_history
+from emails.views import QueueSendEmailView
+from emails.views import CronSendDelayedEmailView
+from emails.views import CronSendDelayedProcessedEmailView
+from emails.views import CronCleanEmailsHistoryView
 from empresas.views import EmpresaViewSet
-from webhooks.views import sendgrid_rest_webhook, sendgrid_api_webhook
+from webhooks.views import SendGridRestWebhookView, SendGridApiWebhookView
 
 
 # sección de registro de apis rest con django-rest-framework
@@ -37,12 +37,12 @@ urlpatterns = [
     
     # luego el tracking lo pasa a esta cola para 
     # luego enviar el correo por sendgrid
-    url(r'^emails/inputqueue/', queue_send_email),
+    url(r'^emails/inputqueue/', QueueSendEmailView.as_view()),
 
     # tarea cron que envia correos con pendiente
-    url(r'^emails/cron/send-delayed/', cron_send_delayed_email),
-    url(r'^emails/cron/send-delayed-processed/', cron_send_delayed_processed_email),
-    url(r'^emails/cron/clean-history/', cron_clean_emails_history),
+    url(r'^emails/cron/send-delayed/', CronSendDelayedEmailView.as_view()),
+    url(r'^emails/cron/send-delayed-processed/', CronSendDelayedProcessedEmailView.as_view()),
+    url(r'^emails/cron/clean-history/', CronCleanEmailsHistoryView.as_view()),
 
 	# rutas de las paginas html del tracking
     url(r'^dashboard/', include('dashboard.urls', namespace='dashboard')),
@@ -52,8 +52,8 @@ urlpatterns = [
     url(r'^reports/', include('reports.urls', namespace='reports')),
 
     # url que recibe webhooks de sendgrid
-    url(r'^webhook/', sendgrid_rest_webhook, name='webhook_rest'),
-    url(r'^webhook-api/', sendgrid_api_webhook, name='webhook_api'),
+    url(r'^webhook/', SendGridRestWebhookView.as_view(), name='webhook_rest'),
+    url(r'^webhook-api/', SendGridApiWebhookView.as_view(), name='webhook_api'),
 
     # url de manejo de reenvio de eventos a WS de clientes
     url(r'^webservices/', include('webservices.urls', namespace='webservices')),
@@ -62,7 +62,7 @@ urlpatterns = [
     url(r'^$', home_to_dashboard),
     url(r'^login/', log_in, name='login'),
     url(r'^logout/', log_out, name='logout'),
-    url(r'^profile/', profile, name='profile'),
+    url(r'^profile/', ProfileTemplateView.as_view(), name='profile'),
     
     # modulo Administrador Azurian
     url(r'^admin/', include(admin.site.urls)),

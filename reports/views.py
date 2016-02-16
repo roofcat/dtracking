@@ -7,8 +7,8 @@ import logging
 
 
 from django.http import HttpResponse
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
 
 
@@ -218,13 +218,16 @@ class ByMountReportTemplateView(LoginRequiredMixin, TemplateView):
             logging.error(e)
 
 
-@csrf_exempt
-@require_POST
-def queue_export(request):
+class QueueExportView(TemplateView):
 	""" Controlador principal para generar 
 	    los reportes y enviarlos por correo
 	"""
-	if request.method == 'POST':
+
+	@method_decorator(csrf_exempt)
+	def dispatch(self, request, *args, **kwargs):
+		return super(QueueExport, self).dispatch(request, *args, **kwargs)
+
+	def post(self, request, *args, **kwargs):
 		logging.info(request.body)
 		export_type = request.POST.get('export_type')
 		if export_type == 'export_general_email':

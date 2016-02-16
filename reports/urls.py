@@ -12,7 +12,8 @@ from .views import ByFolioReportTemplateView
 from .views import ByRutReportTemplateView
 from .views import ByMountReportTemplateView
 from .views import DynamicReportTemplateView
-from .views import queue_export
+from .views import QueueExportView
+
 
 urlpatterns = [
 	# urls para generar reportes
@@ -36,5 +37,5 @@ urlpatterns = [
 		DynamicReportTemplateView.as_view()),
 
 	# ruta de cola de tarea TaskQueue
-	url(r'^exportqueue/$', queue_export),
+	url(r'^exportqueue/$', QueueExportView.as_view()),
 ]

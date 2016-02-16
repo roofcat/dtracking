@@ -7,18 +7,22 @@ import logging
 
 from django.http import HttpResponse
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST
+from django.views.generic import TemplateView
 
 
 from emails.models import Email
 from utils.ws_middleware import SoapMiddleware
 
 
-@csrf_exempt
-@require_POST
-def sendgrid_rest_webhook(request):
-    if request.method == 'POST':
+class SendGridRestWebhookView(TemplateView):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(SendGridRestWebhookView, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
         request_body = json.loads(request.body.decode('utf-8'))
 
         for body in request_body:
@@ -142,10 +146,13 @@ def sendgrid_rest_webhook(request):
         return HttpResponse()
 
 
-@csrf_exempt
-@require_POST
-def sendgrid_api_webhook(request):
-    if request.method == 'POST':
+class SendGridApiWebhookView(TemplateView):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(SendGridApiWebhookView, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
         request_body = json.loads(request.body.decode('utf-8'))
 
         for body in request_body:

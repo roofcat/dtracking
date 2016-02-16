@@ -8,8 +8,9 @@ import logging
 
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_POST, require_GET
+from django.views.generic import TemplateView
 
 
 from rest_framework import authentication, permissions
@@ -53,10 +54,13 @@ class EmailDteInputView(APIView):
             return Response(email.errors)
 
 
-@csrf_exempt
-@require_POST
-def queue_send_email(request):
-    if request.method == 'POST':
+class QueueSendEmailView(TemplateView):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(QueueSendEmailView, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
         logging.info("entrando a la cola")
         logging.info(request.body)
         try:
@@ -68,14 +72,18 @@ def queue_send_email(request):
         except Exception, e:
             logging.error(e)
 
-@csrf_exempt
-@require_GET
-def cron_clean_emails_history(request):
+
+class CronCleanEmailsHistoryView(TemplateView):
     ''' Método que si tiene habilitada la opción de eliminar correos antiguos
         antiguos (parametrizado en app configuraciones) lista los correos 
         desde el numero de meses máximo a retener en la DB.
     '''
-    if request.method == 'GET':
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(CronCleanEmailsHistoryView, self).dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
         config = EliminacionHistorico.get_configuration()[0]
         if config.activo == True:
             if config.dias_a_eliminar is not None:
@@ -87,12 +95,16 @@ def cron_clean_emails_history(request):
                 except Exception, e:
                     logging.error(e)
                     return HttpResponse(e)
-    return HttpResponse()
+        return HttpResponse()
 
-@csrf_exempt
-@require_GET
-def cron_send_delayed_email(request):
-    if request.method == 'GET':
+
+class CronSendDelayedEmailView(TemplateView):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(CronSendDelayedEmailView, self).dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
         logging.info("entrando a la cola de reenvio de correos")
         logging.info(request.body)
         emails = Email.get_delayed_emails()
@@ -101,10 +113,14 @@ def cron_send_delayed_email(request):
                 input_queue(email.id)
         return HttpResponse()
 
-@csrf_exempt
-@require_GET
-def cron_send_delayed_processed_email(request):
-    if request.method == 'GET':
+
+class CronSendDelayedProcessedEmailView(TemplateView):
+
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(CronSendDelayedProcessedEmailView, self).dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
         logging.info("entrando a la cola de reenvio de correos")
         logging.info(request.body)
         emails = Email.get_delayed_emails_only_processed()

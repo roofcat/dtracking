@@ -82,8 +82,6 @@ class ProfileTemplateView(LoginRequiredMixin, TemplateView):
 			logging.error(e)
 			return HttpResponse(e)
 
-profile = ProfileTemplateView.as_view()
-
 
 def home_to_dashboard(request):
 	return HttpResponseRedirect(reverse('dashboard:index'))
