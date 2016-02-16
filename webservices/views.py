@@ -10,6 +10,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 
 
+from utils.ws_middleware import SoapMiddleware
+
+
 
 class SendEmailEventToSoapWSView(TemplateView):
 
@@ -19,6 +22,10 @@ class SendEmailEventToSoapWSView(TemplateView):
 
 	def post(self, request, *args, **kwargs):
 		logging.info("paso al TemplateView del Soap")
+		email_id = request.POST.get('email_id')
+		event = request.POST.get('event')
+		soap_ws = SoapMiddleware(email_id, event)
+		soap_ws.execute()
 		return HttpResponse()
 
 

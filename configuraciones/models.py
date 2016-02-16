@@ -75,8 +75,7 @@ class SoapWebService(models.Model):
 
     @classmethod
     def get_ws_conf(self):
-        ws = SoapWebService.objects.all()[:1]
-        if ws is not None:
-            return ws
-        else:
+        try:
+            return SoapWebService.objects.all()[:1].get()
+        except Exception, e:
             return None
