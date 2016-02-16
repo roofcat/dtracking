@@ -55,6 +55,9 @@ urlpatterns = [
     url(r'^webhook/', sendgrid_rest_webhook, name='webhook_rest'),
     url(r'^webhook-api/', sendgrid_api_webhook, name='webhook_api'),
 
+    # url de manejo de reenvio de eventos a WS de clientes
+    url(r'^webservices/', include('reports.urls', namespace='webservices')),
+
     # rutas de autenticación de usuarios
     url(r'^$', home_to_dashboard),
     url(r'^login/', log_in, name='login'),

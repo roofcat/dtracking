@@ -14,4 +14,8 @@ class SoapMiddleware(object):
 
 	def evaluate(self):
 		if self.soap_conf.count() > 0:
-			pass
+			context = {
+				'email_id': self.email_id,
+				'event': self.event,
+			}
+			soap_ws_queue(context)

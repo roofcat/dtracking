@@ -43,6 +43,8 @@ def sendgrid_rest_webhook(request):
                             email.processed_sg_event_id = str(body['sg_event_id']).decode('utf-8')
                             email.processed_sg_message_id = str(body['sg_message_id']).decode('utf-8')
                             email.save()
+                            soap_ws = SoapMiddleware(email.pk, evento_sendgrid)
+                            soap_ws.evaluate()
                     elif evento_sendgrid == 'delivered':
                         email = Email.get_email_by_id(email_id)
 
@@ -55,6 +57,8 @@ def sendgrid_rest_webhook(request):
                             email.delivered_sg_message_id = str(body['sg_message_id']).decode('utf-8')
                             email.delivered_response = str(body['response']).decode('utf-8')
                             email.save()
+                            soap_ws = SoapMiddleware(email.pk, evento_sendgrid)
+                            soap_ws.evaluate()
                     elif evento_sendgrid == 'open':
                         email = Email.get_email_by_id(email_id)
 
@@ -70,6 +74,8 @@ def sendgrid_rest_webhook(request):
                             email.opened_sg_message_id = str(body['sg_message_id']).decode('utf-8')
                             email.opened_count += 1
                             email.save()
+                            soap_ws = SoapMiddleware(email.pk, evento_sendgrid)
+                            soap_ws.evaluate()
                     elif evento_sendgrid == 'dropped':
                         email = Email.get_email_by_id(email_id)
 
@@ -82,6 +88,8 @@ def sendgrid_rest_webhook(request):
                             email.dropped_reason = str(body['reason']).decode('utf-8')
                             email.dropped_event = evento_sendgrid
                             email.save()
+                            soap_ws = SoapMiddleware(email.pk, evento_sendgrid)
+                            soap_ws.evaluate()
                     elif evento_sendgrid == 'bounce':
                         email = Email.get_email_by_id(email_id)
 
@@ -96,6 +104,8 @@ def sendgrid_rest_webhook(request):
                             email.bounce_status = str(body['status']).decode('utf-8')
                             email.bounce_type = str(body['type']).decode('utf-8')
                             email.save()
+                            soap_ws = SoapMiddleware(email.pk, evento_sendgrid)
+                            soap_ws.evaluate()
                     elif evento_sendgrid == 'unsubscribe':
                         email = Email.get_email_by_id(email_id)
 
@@ -107,6 +117,8 @@ def sendgrid_rest_webhook(request):
                             email.unsubscribe_id = str(body['id']).decode('utf-8')
                             email.unsubscribe_event = evento_sendgrid
                             email.save()
+                            soap_ws = SoapMiddleware(email.pk, evento_sendgrid)
+                            soap_ws.evaluate()
                     elif evento_sendgrid == 'click':
                         email = Email.get_email_by_id(email_id)
 
@@ -120,6 +132,8 @@ def sendgrid_rest_webhook(request):
                             email.click_date = body['timestamp']
                             email.click_url = str(body['url']).decode('utf-8')
                             email.save()
+                            soap_ws = SoapMiddleware(email.pk, evento_sendgrid)
+                            soap_ws.evaluate()
                 else:
                     logging.error("parametros incompletos, correo no corresponde.")
             except Exception, e:
