@@ -29,30 +29,36 @@ class SoapMiddleware(object):
         if self.soap_conf.url:
             email = Email.get_email_by_id(self.email_id)
             if email is not None:
-            	email = email.__dict__
+                email = email.__dict__
                 if self.soap_conf.con_autenticacion:
                     pass
                 if self.soap_conf.solo_default:
-                    data = {}
+                    data = dict()
                     params = (self.soap_conf.parametros_default).split(';')
                     for param in params:
-                    	data[param] = email[param]
-                	client = SoapClient(self.soap_conf, self.event, data)
-                	client.web_service_load()
+                        data[param] = email[param]
+                        client = SoapClient(self.soap_conf, self.event, data)
+                        client.web_service_load()
                 else:
                     pass
             else:
-            	logging.error("Email id no corresponde")
+                logging.error("Email id no corresponde")
         else:
-        	logging.error('No hay url soap ws configurada')
+            logging.error('No hay url soap ws configurada')
+
 
 class SoapClient(object):
 
-	def __init__(self, conf, event, data):
-		self.conf = conf
-		self.event = event
-		self.data = data
-	
-	def web_service_load(self):
-		client = Client(self.conf.url)
-		logging.info(self.data)
+    def __init__(self, conf, event, data):
+        self.conf = conf
+        self.event = event
+        self.data = data
+
+    def web_service_load(self):
+        try:
+            logging.info(self.conf.url)
+            client = Client(self.conf.url)
+            logging.info(self.data)
+        except Exception, e:
+            logging.error(e)
+            return None
