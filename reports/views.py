@@ -225,7 +225,7 @@ class QueueExportView(TemplateView):
 
 	@method_decorator(csrf_exempt)
 	def dispatch(self, request, *args, **kwargs):
-		return super(QueueExport, self).dispatch(request, *args, **kwargs)
+		return super(QueueExportView, self).dispatch(request, *args, **kwargs)
 
 	def post(self, request, *args, **kwargs):
 		logging.info(request.body)

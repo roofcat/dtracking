@@ -18,8 +18,8 @@ from tablib.compat import OrderedDict, unicode
 
 
 __title__ = 'tablib'
-__version__ = '0.11.1'
-__build__ = 0x001101
+__version__ = '0.11.2'
+__build__ = 0x001102
 __author__ = 'Kenneth Reitz'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2016 Kenneth Reitz'
@@ -252,12 +252,13 @@ class Dataset(object):
             try:
                 try:
                     setattr(cls, fmt.title, property(fmt.export_set, fmt.import_set))
+                    setattr(cls, 'get_%s' % fmt.title, fmt.export_set)
+                    setattr(cls, 'set_%s' % fmt.title, fmt.import_set)
                     cls._formats[fmt.title] = (fmt.export_set, fmt.import_set)
                 except AttributeError:
                     setattr(cls, fmt.title, property(fmt.export_set))
+                    setattr(cls, 'get_%s' % fmt.title, fmt.export_set)
                     cls._formats[fmt.title] = (fmt.export_set, None)
-                setattr(cls, 'get_%s' % fmt.title, fmt.export_set)
-                setattr(cls, 'set_%s' % fmt.title, fmt.import_set)
 
             except AttributeError:
                 cls._formats[fmt.title] = (None, None)
