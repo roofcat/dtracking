@@ -27,38 +27,47 @@ class SoapMiddleware(object):
 
     def execute(self):
         if self.soap_conf.url:
+            client = Client(self.soap_conf.url)
             email = Email.get_email_by_id(self.email_id)
+            documento = None
+
             if email is not None:
                 email = email.__dict__
                 if self.soap_conf.con_autenticacion:
                     pass
+
+                if self.soap_conf.con_objeto_documento:
+                    documento = client.factory.create(self.soap_conf.nombre_objeto_documento)
+                    doc_attr = (self.soap_conf.parametros_objeto_documento).split(';')
+                    doc_field = (self.soap_conf.campos_objeto_documento).split(';')
+                    for att, field in doc_attr, doc_field:
+                        documento[att] = email[field]
+                    print documento
+
                 if self.soap_conf.solo_default:
                     data = dict()
                     params = (self.soap_conf.parametros_default).split(';')
                     for param in params:
                         data[param] = email[param]
-                        client = SoapClient(self.soap_conf, self.event, data)
-                        client.web_service_load()
+                    if documento is not None:
+                        data[self.soap_conf.nombre_objeto_documento] = documento
+                    client = getattr(client.service, self.soap_conf.metodo_default)
+                    print client(**data)
                 else:
-                    pass
+                    if self.event == 'processed':
+                        pass
+                    elif self.event == 'delivered':
+                        pass
+                    elif self.event == 'open':
+                        pass
+                    elif self.event == 'dropped':
+                        pass
+                    elif self.event == 'bounce':
+                        pass
             else:
                 logging.error("Email id no corresponde")
         else:
             logging.error('No hay url soap ws configurada')
 
-
-class SoapClient(object):
-
-    def __init__(self, conf, event, data):
-        self.conf = conf
-        self.event = event
-        self.data = data
-
-    def web_service_load(self):
-        try:
-            logging.info(self.conf.url)
-            client = Client(self.conf.url)
-            logging.info(self.data)
-        except Exception, e:
-            logging.error(e)
-            return None
+    def __objeto_documento():
+        pass
