@@ -49,6 +49,7 @@ class SoapWebService(models.Model):
     clave_autenticacion = models.CharField(max_length=200, null=True, blank=True)
     con_objeto_documento = models.BooleanField(default=False)
     nombre_objeto_documento = models.CharField(max_length=200, null=True, blank=True)
+    nombre_parametro_documento = models.CharField(max_length=200, null=True, blank=True)
     parametros_objeto_documento = models.CharField(max_length=255, null=True, blank=True)
     campos_objeto_documento = models.CharField(max_length=255, null=True, blank=True)
     solo_default = models.BooleanField(default=False)
