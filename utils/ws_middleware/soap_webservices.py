@@ -30,12 +30,14 @@ class SoapMiddleware(object):
         if self.soap_conf.url:
             client = Client(self.soap_conf.url, cache=None)
             email = Email.get_email_by_id(self.email_id)
-            print email
             documento = None
 
             if email is not None:
                 email = email.__dict__
                 if self.soap_conf.con_autenticacion:
+                    """ Método por definir cuando el cliente solicita
+                        algún metodo de autenticación a un web service
+                    """
                     pass
 
                 if self.soap_conf.con_objeto_documento:
@@ -44,21 +46,15 @@ class SoapMiddleware(object):
                     doc_attr = (self.soap_conf.parametros_objeto_documento).split(';')
                     doc_field = (self.soap_conf.campos_objeto_documento).split(';')
                     for att, field in map(None, doc_attr, doc_field):
-                        print u"{0} - {1}".format(att, field)
                         documento[att] = email[field]
-                    print "imprimiendo documento"
-                    print documento
+                    logging.info("imprimiendo documento")
+                    logging.info(documento)
 
                 if self.soap_conf.solo_default:
-                    data = dict()
-                    params = (self.soap_conf.parametros_default).split(';')
-                    fields = (self.soap_conf.campos_default).split(';')
-                    for param, field in map(None, params, fields):
-                        data[param] = email[field]
-                    if documento is not None:
-                        data[self.soap_conf.nombre_parametro_documento] = documento
-                    client = getattr(client.service, self.soap_conf.metodo_default)
-                    print client(**data)
+                    """ Método por definir cuando se utiliza un solo metodo para
+                        notificar eventos sendgrid a un web service
+                    """
+                    pass
                 else:
 
                     if self.event == 'processed':
@@ -68,7 +64,7 @@ class SoapMiddleware(object):
                         fields = (self.soap_conf.campos_procesado).split(';')
                         for param, field in map(None, params, fields):
                             if field.endswith('_date'):
-                                print email[field]
+                                logging.info(email[field])
                                 field = timestamp_to_date(email[field])
                                 data[param] = field
                             else:
@@ -76,7 +72,7 @@ class SoapMiddleware(object):
                         if documento is not None:
                             data[self.soap_conf.nombre_parametro_documento] = documento
                         client = getattr(client.service, self.soap_conf.metodo_procesado)
-                        print client(**data)
+                        logging.info(client(**data))
                     
                     elif self.event == 'delivered':
                         logging.info("ws enviados")
@@ -85,7 +81,7 @@ class SoapMiddleware(object):
                         fields = (self.soap_conf.campos_enviado).split(';')
                         for param, field in map(None, params, fields):
                             if field.endswith('_date'):
-                                print email[field]
+                                logging.info(email[field])
                                 field = timestamp_to_date(email[field])
                                 data[param] = field
                             else:
@@ -93,7 +89,7 @@ class SoapMiddleware(object):
                         if documento is not None:
                             data[self.soap_conf.nombre_parametro_documento] = documento
                         client = getattr(client.service, self.soap_conf.metodo_enviado)
-                        print client(**data)
+                        logging.info(client(**data))
                     
                     elif self.event == 'open':
                         logging.info("ws leidos")
@@ -102,18 +98,18 @@ class SoapMiddleware(object):
                         fields = (self.soap_conf.campos_leido).split(';')
                         for param, field in map(None, params, fields):
                             if field.endswith('_date'):
-                                print email[field]
+                                logging.info(email[field])
                                 field = timestamp_to_date(email[field])
                                 data[param] = field
                             else:
                                 data[param] = email[field]
                         if documento is not None:
                             data[self.soap_conf.nombre_parametro_documento] = documento
-                        print "imprimiendo data"
-                        print data
+                        logging.info("imprimiendo data")
+                        logging.info(data)
                         client = getattr(client.service, self.soap_conf.metodo_leido)
-                        print "imprimiendo resultado del WS"
-                        print client(**data)
+                        logging.info("imprimiendo resultado del WS")
+                        logging.info(client(**data))
                     
                     elif self.event == 'dropped':
                         logging.info("ws rechazados")
@@ -122,7 +118,7 @@ class SoapMiddleware(object):
                         fields = (self.soap_conf.campos_rechazado).split(';')
                         for param, field in map(None, params, fields):
                             if field.endswith('_date'):
-                                print email[field]
+                                logging.info(email[field])
                                 field = timestamp_to_date(email[field])
                                 data[param] = field
                             else:
@@ -130,7 +126,7 @@ class SoapMiddleware(object):
                         if documento is not None:
                             data[self.soap_conf.nombre_parametro_documento] = documento
                         client = getattr(client.service, self.soap_conf.metodo_rechazado)
-                        print client(**data)
+                        logging.info(client(**data))
                     
                     elif self.event == 'bounce':
                         logging.info("ws rebotados")
@@ -139,7 +135,7 @@ class SoapMiddleware(object):
                         fields = (self.soap_conf.campos_rebotado).split(';')
                         for param, field in map(None, params, fields):
                             if field.endswith('_date'):
-                                print email[field]
+                                logging.info(email[field])
                                 field = timestamp_to_date(email[field])
                                 data[param] = field
                             else:
@@ -147,7 +143,7 @@ class SoapMiddleware(object):
                         if documento is not None:
                             data[self.soap_conf.nombre_parametro_documento] = documento
                         client = getattr(client.service, self.soap_conf.metodo_rebotado)
-                        print client(**data)
+                        logging.info(client(**data))
 
             else:
                 logging.error("Email id no corresponde")
