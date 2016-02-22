@@ -62,7 +62,7 @@ class SoapWebService(models.Model):
     con_procesado = models.BooleanField(default=False, blank=True)
     metodo_procesado = models.CharField(max_length=200, null=True, blank=True)
     parametros_procesado = models.CharField(max_length=255, null=True, blank=True)
-    campos_parametros_procesados = models.CharField(max_length=255, null=True, blank=True)
+    campos_procesado = models.CharField(max_length=255, null=True, blank=True)
     con_enviado = models.BooleanField(default=False, blank=True)
     metodo_enviado = models.CharField(max_length=200, null=True, blank=True)
     parametros_enviado = models.CharField(max_length=255, null=True, blank=True)
