@@ -80,7 +80,7 @@ class SoapMiddleware(object):
                         params = (self.soap_conf.parametros_enviado).split(';')
                         fields = (self.soap_conf.campos_enviado).split(';')
                         for param, field in map(None, params, fields):
-                            if field.endswith('_date'):
+                            if field.endswith('_date') and email[field] is not None:
                                 logging.info(email[field])
                                 field = timestamp_to_date(email[field])
                                 data[param] = field
