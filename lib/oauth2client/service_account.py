@@ -216,6 +216,38 @@ class ServiceAccountCredentials(AssertionCredentials):
         return cls._from_parsed_json_keyfile(keyfile_dict, scopes)
 
     @classmethod
+    def _from_p12_keyfile_contents(cls, service_account_email,
+                                   private_key_pkcs12,
+                                   private_key_password=None, scopes=''):
+        """Factory constructor from JSON keyfile.
+
+        Args:
+            service_account_email: string, The email associated with the
+                                   service account.
+            private_key_pkcs12: string, The contents of a PKCS#12 keyfile.
+            private_key_password: string, (Optional) Password for PKCS#12
+                                  private key. Defaults to ``notasecret``.
+            scopes: List or string, (Optional) Scopes to use when acquiring an
+                    access token.
+
+        Returns:
+            ServiceAccountCredentials, a credentials object created from
+            the keyfile.
+
+        Raises:
+            NotImplementedError if pyOpenSSL is not installed / not the
+            active crypto library.
+        """
+        if private_key_password is None:
+            private_key_password = _PASSWORD_DEFAULT
+        signer = crypt.Signer.from_string(private_key_pkcs12,
+                                          private_key_password)
+        credentials = cls(service_account_email, signer, scopes=scopes)
+        credentials._private_key_pkcs12 = private_key_pkcs12
+        credentials._private_key_password = private_key_password
+        return credentials
+
+    @classmethod
     def from_p12_keyfile(cls, service_account_email, filename,
                          private_key_password=None, scopes=''):
         """Factory constructor from JSON keyfile.
@@ -239,14 +271,37 @@ class ServiceAccountCredentials(AssertionCredentials):
         """
         with open(filename, 'rb') as file_obj:
             private_key_pkcs12 = file_obj.read()
-        if private_key_password is None:
-            private_key_password = _PASSWORD_DEFAULT
-        signer = crypt.Signer.from_string(private_key_pkcs12,
-                                          private_key_password)
-        credentials = cls(service_account_email, signer, scopes=scopes)
-        credentials._private_key_pkcs12 = private_key_pkcs12
-        credentials._private_key_password = private_key_password
-        return credentials
+        return cls._from_p12_keyfile_contents(
+            service_account_email, private_key_pkcs12,
+            private_key_password=private_key_password, scopes=scopes)
+
+    @classmethod
+    def from_p12_keyfile_buffer(cls, service_account_email, file_buffer,
+                                private_key_password=None, scopes=''):
+        """Factory constructor from JSON keyfile.
+
+        Args:
+            service_account_email: string, The email associated with the
+                                   service account.
+            file_buffer: stream, A buffer that implements ``read()``
+                         and contains the PKCS#12 key contents.
+            private_key_password: string, (Optional) Password for PKCS#12
+                                  private key. Defaults to ``notasecret``.
+            scopes: List or string, (Optional) Scopes to use when acquiring an
+                    access token.
+
+        Returns:
+            ServiceAccountCredentials, a credentials object created from
+            the keyfile.
+
+        Raises:
+            NotImplementedError if pyOpenSSL is not installed / not the
+            active crypto library.
+        """
+        private_key_pkcs12 = file_buffer.read()
+        return cls._from_p12_keyfile_contents(
+            service_account_email, private_key_pkcs12,
+            private_key_password=private_key_password, scopes=scopes)
 
     def _generate_assertion(self):
         """Generate the assertion that will be used in the request."""
@@ -346,6 +401,41 @@ class ServiceAccountCredentials(AssertionCredentials):
                                 client_id=self.client_id,
                                 user_agent=self._user_agent,
                                 **self._kwargs)
+        result.token_uri = self.token_uri
+        result.revoke_uri = self.revoke_uri
+        result._private_key_pkcs8_pem = self._private_key_pkcs8_pem
+        result._private_key_pkcs12 = self._private_key_pkcs12
+        result._private_key_password = self._private_key_password
+        return result
+
+    def create_delegated(self, sub):
+        """Create credentials that act as domain-wide delegation of authority.
+
+        Use the ``sub`` parameter as the subject to delegate on behalf of
+        that user.
+
+        For example::
+
+          >>> account_sub = 'foo@email.com'
+          >>> delegate_creds = creds.create_delegated(account_sub)
+
+        Args:
+            sub: string, An email address that this service account will
+                 act on behalf of (via domain-wide delegation).
+
+        Returns:
+            ServiceAccountCredentials, a copy of the current service account
+            updated to act on behalf of ``sub``.
+        """
+        new_kwargs = dict(self._kwargs)
+        new_kwargs['sub'] = sub
+        result = self.__class__(self._service_account_email,
+                                self._signer,
+                                scopes=self._scopes,
+                                private_key_id=self._private_key_id,
+                                client_id=self.client_id,
+                                user_agent=self._user_agent,
+                                **new_kwargs)
         result.token_uri = self.token_uri
         result.revoke_uri = self.revoke_uri
         result._private_key_pkcs8_pem = self._private_key_pkcs8_pem

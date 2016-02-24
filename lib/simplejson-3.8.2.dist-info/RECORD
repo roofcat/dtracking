@@ -41,7 +41,7 @@ simplejson-3.8.2.dist-info/RECORD,,
 simplejson-3.8.2.dist-info/WHEEL,sha256=LgENoDL_AkiRWbJ7HCJLnTXVvHl9ZtXZ7UZmjmcCeN0,105
 simplejson-3.8.2.dist-info/metadata.json,sha256=4cQMUPd5bHnuM_hNhS0uRoMPhkshdDj2mx3CArQknRs,1169
 simplejson-3.8.2.dist-info/top_level.txt,sha256=ohU816e0ltfT8aBFol4_XY1q9GBh9tEBbcPpNn49200,11
-/tmp/tmp38rwZl/lib/python/simplejson-3.8.2.dist-info/INSTALLER,sha256=zuuue4knoyJ-UwPPXg8fezS7VCrXJQrAP7zeNuwvFQg,4
+/tmp/tmpAA0v2n/lib/python/simplejson-3.8.2.dist-info/INSTALLER,sha256=zuuue4knoyJ-UwPPXg8fezS7VCrXJQrAP7zeNuwvFQg,4
 simplejson/ordered_dict.pyc,,
 simplejson/tests/test_decimal.pyc,,
 simplejson/tests/test_scanstring.pyc,,
