@@ -63,7 +63,7 @@ class SoapMiddleware(object):
                         params = (self.soap_conf.parametros_procesado).split(';')
                         fields = (self.soap_conf.campos_procesado).split(';')
                         for param, field in map(None, params, fields):
-                            if field.endswith('_date'):
+                            if field.endswith('_date') and email[field] is not None:
                                 logging.info(email[field])
                                 field = timestamp_to_date(email[field])
                                 data[param] = field
@@ -97,7 +97,7 @@ class SoapMiddleware(object):
                         params = (self.soap_conf.parametros_leido).split(';')
                         fields = (self.soap_conf.campos_leido).split(';')
                         for param, field in map(None, params, fields):
-                            if field.endswith('_date'):
+                            if field.endswith('_date') and email[field] is not None:
                                 logging.info(email[field])
                                 field = timestamp_to_date(email[field])
                                 data[param] = field
@@ -117,7 +117,7 @@ class SoapMiddleware(object):
                         params = (self.soap_conf.parametros_rechazado).split(';')
                         fields = (self.soap_conf.campos_rechazado).split(';')
                         for param, field in map(None, params, fields):
-                            if field.endswith('_date'):
+                            if field.endswith('_date') and email[field] is not None:
                                 logging.info(email[field])
                                 field = timestamp_to_date(email[field])
                                 data[param] = field
@@ -134,7 +134,7 @@ class SoapMiddleware(object):
                         params = (self.soap_conf.parametros_rebotado).split(';')
                         fields = (self.soap_conf.campos_rebotado).split(';')
                         for param, field in map(None, params, fields):
-                            if field.endswith('_date'):
+                            if field.endswith('_date') and email[field] is not None:
                                 logging.info(email[field])
                                 field = timestamp_to_date(email[field])
                                 data[param] = field
