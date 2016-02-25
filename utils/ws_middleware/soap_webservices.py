@@ -63,6 +63,8 @@ class SoapMiddleware(object):
                         params = (self.soap_conf.parametros_procesado).split(';')
                         fields = (self.soap_conf.campos_procesado).split(';')
                         for param, field in map(None, params, fields):
+                            logging.info(field)
+                            logging.info(email[field])
                             if field.endswith('_date') and email[field] is not None:
                                 logging.info(email[field])
                                 field = timestamp_to_date(email[field])
@@ -80,6 +82,7 @@ class SoapMiddleware(object):
                         params = (self.soap_conf.parametros_enviado).split(';')
                         fields = (self.soap_conf.campos_enviado).split(';')
                         for param, field in map(None, params, fields):
+                            logging.info(field)
                             if field.endswith('_date') and email[field] is not None:
                                 logging.info(email[field])
                                 field = timestamp_to_date(email[field])

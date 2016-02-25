@@ -49,6 +49,7 @@ class SendGridRestWebhookView(TemplateView):
                             email.save()
                             soap_ws = SoapMiddleware(email.pk, evento_sendgrid)
                             soap_ws.evaluate()
+
                     elif evento_sendgrid == 'delivered':
                         email = Email.get_email_by_id(email_id)
 
@@ -63,6 +64,7 @@ class SendGridRestWebhookView(TemplateView):
                             email.save()
                             soap_ws = SoapMiddleware(email.pk, evento_sendgrid)
                             soap_ws.evaluate()
+
                     elif evento_sendgrid == 'open':
                         email = Email.get_email_by_id(email_id)
 
@@ -80,6 +82,7 @@ class SendGridRestWebhookView(TemplateView):
                             email.save()
                             soap_ws = SoapMiddleware(email.pk, evento_sendgrid)
                             soap_ws.evaluate()
+
                     elif evento_sendgrid == 'dropped':
                         email = Email.get_email_by_id(email_id)
 
@@ -94,6 +97,7 @@ class SendGridRestWebhookView(TemplateView):
                             email.save()
                             soap_ws = SoapMiddleware(email.pk, evento_sendgrid)
                             soap_ws.evaluate()
+
                     elif evento_sendgrid == 'bounce':
                         email = Email.get_email_by_id(email_id)
 
@@ -110,6 +114,7 @@ class SendGridRestWebhookView(TemplateView):
                             email.save()
                             soap_ws = SoapMiddleware(email.pk, evento_sendgrid)
                             soap_ws.evaluate()
+
                     elif evento_sendgrid == 'unsubscribe':
                         email = Email.get_email_by_id(email_id)
 
@@ -123,6 +128,7 @@ class SendGridRestWebhookView(TemplateView):
                             email.save()
                             soap_ws = SoapMiddleware(email.pk, evento_sendgrid)
                             soap_ws.evaluate()
+                    
                     elif evento_sendgrid == 'click':
                         email = Email.get_email_by_id(email_id)
 
@@ -183,6 +189,8 @@ class SendGridApiWebhookView(TemplateView):
                             email.processed_sg_event_id = str(body['sg_event_id']).decode('utf-8')
                             email.processed_sg_message_id = str(body['sg_message_id']).decode('utf-8')
                             email.save()
+                            soap_ws = SoapMiddleware(email.pk, evento_sendgrid)
+                            soap_ws.evaluate()
                         else:
                             logging.info("paso else no existe")
                             e = Email.set_default_fields(body)
@@ -193,6 +201,9 @@ class SendGridApiWebhookView(TemplateView):
                             e.processed_sg_event_id = str(body['sg_event_id']).decode('utf-8')
                             e.processed_sg_message_id = str(body['sg_message_id']).decode('utf-8')
                             e.save()
+                            soap_ws = SoapMiddleware(e.pk, evento_sendgrid)
+                            soap_ws.evaluate()
+
                     elif evento_sendgrid == 'delivered':
                         email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
                         logging.info(email)
@@ -206,6 +217,8 @@ class SendGridApiWebhookView(TemplateView):
                             email.delivered_sg_message_id = str(body['sg_message_id']).decode('utf-8')
                             email.delivered_response = str(body['response']).decode('utf-8')
                             email.save()
+                            soap_ws = SoapMiddleware(email.pk, evento_sendgrid)
+                            soap_ws.evaluate()
                         else:
                             e = Email.set_default_fields(body)
                             # parametros del evento
@@ -216,6 +229,9 @@ class SendGridApiWebhookView(TemplateView):
                             e.delivered_sg_message_id = str(body['sg_message_id']).decode('utf-8')
                             e.delivered_response = str(body['response']).decode('utf-8')
                             e.save()
+                            soap_ws = SoapMiddleware(e.pk, evento_sendgrid)
+                            soap_ws.evaluate()
+
                     elif evento_sendgrid == 'open':
                         email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
                         logging.info(email)
@@ -232,6 +248,8 @@ class SendGridApiWebhookView(TemplateView):
                             email.opened_sg_message_id = str(body['sg_message_id']).decode('utf-8')
                             email.opened_count += 1
                             email.save()
+                            soap_ws = SoapMiddleware(email.pk, evento_sendgrid)
+                            soap_ws.evaluate()
                         else:
                             e = Email.set_default_fields(body)
                             # parametros del evento
@@ -245,6 +263,9 @@ class SendGridApiWebhookView(TemplateView):
                             e.opened_sg_message_id = str(body['sg_message_id']).decode('utf-8')
                             e.opened_count += 1
                             e.save()
+                            soap_ws = SoapMiddleware(e.pk, evento_sendgrid)
+                            soap_ws.evaluate()
+
                     elif evento_sendgrid == 'dropped':
                         email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
 
@@ -258,6 +279,8 @@ class SendGridApiWebhookView(TemplateView):
                             email.dropped_reason = str(body['reason']).decode('utf-8')
                             email.dropped_event = evento_sendgrid
                             email.save()
+                            soap_ws = SoapMiddleware(email.pk, evento_sendgrid)
+                            soap_ws.evaluate()
                         else:
                             e = Email.set_default_fields(body)
                             # parametros del evento
@@ -268,6 +291,9 @@ class SendGridApiWebhookView(TemplateView):
                             e.dropped_reason = str(body['reason']).decode('utf-8')
                             e.dropped_event = evento_sendgrid
                             e.save()
+                            soap_ws = SoapMiddleware(e.pk, evento_sendgrid)
+                            soap_ws.evaluate()
+
                     elif evento_sendgrid == 'bounce':
                         email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
 
@@ -283,6 +309,8 @@ class SendGridApiWebhookView(TemplateView):
                             email.bounce_status = str(body['status']).decode('utf-8')
                             email.bounce_type = str(body['type']).decode('utf-8')
                             email.save()
+                            soap_ws = SoapMiddleware(email.pk, evento_sendgrid)
+                            soap_ws.evaluate()
                         else:
                             e = Email.set_default_fields(body)
                             # parametros del evento
@@ -295,6 +323,9 @@ class SendGridApiWebhookView(TemplateView):
                             e.bounce_status = str(body['status']).decode('utf-8')
                             e.bounce_type = str(body['type']).decode('utf-8')
                             e.save()
+                            soap_ws = SoapMiddleware(e.pk, evento_sendgrid)
+                            soap_ws.evaluate()
+
                     elif evento_sendgrid == 'unsubscribe':
                         email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
 
@@ -307,6 +338,8 @@ class SendGridApiWebhookView(TemplateView):
                             email.unsubscribe_id = str(body['id']).decode('utf-8')
                             email.unsubscribe_event = evento_sendgrid
                             email.save()
+                            soap_ws = SoapMiddleware(email.pk, evento_sendgrid)
+                            soap_ws.evaluate()
                         else:
                             e = Email.set_default_fields(body)
                             # parametros del evento
@@ -316,6 +349,9 @@ class SendGridApiWebhookView(TemplateView):
                             e.unsubscribe_id = str(body['id']).decode('utf-8')
                             e.unsubscribe_event = evento_sendgrid
                             e.save()
+                            soap_ws = SoapMiddleware(e.pk, evento_sendgrid)
+                            soap_ws.evaluate()
+
                     elif evento_sendgrid == 'click':
                         email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
 
@@ -330,6 +366,8 @@ class SendGridApiWebhookView(TemplateView):
                             email.click_date = body['timestamp']
                             email.click_url = str(body['url']).decode('utf-8')
                             email.save()
+                            soap_ws = SoapMiddleware(email.pk, evento_sendgrid)
+                            soap_ws.evaluate()
                         else:
                             e = Email.set_default_fields(body)
                             # parametros del evento
@@ -341,6 +379,8 @@ class SendGridApiWebhookView(TemplateView):
                             e.click_date = body['timestamp']
                             e.click_url = str(body['url']).decode('utf-8')
                             e.save()
+                            soap_ws = SoapMiddleware(e.pk, evento_sendgrid)
+                            soap_ws.evaluate()
                 else:
                     logging.error("parametros incompletos, correo no corresponde.")
             except Exception, e:
