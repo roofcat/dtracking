@@ -20,7 +20,8 @@ from utils.generics import timestamp_to_date
 
 class DynamicQueryTemplateView(LoginRequiredMixin, TemplateView):
 
-    def get(self, request, date_from, date_to, empresa, correo, folio, rut, mount_from, mount_to, fallidos, *args, **kwargs):
+    def get(self, request, date_from, date_to, empresa, correo, folio, 
+                rut, mount_from, mount_to, fallidos, *args, **kwargs):
         parameters = {}
         # preparación de parámetros
         date_from = int(date_from, base=10)
@@ -77,9 +78,10 @@ class EmailDetailTemplateView(LoginRequiredMixin, TemplateView):
     
     def get(self, request, *args, **kwargs):
         try:
-            smtp_id = request.GET['smtp_id']
-            if smtp_id:
-                email = get_object_or_404(Email, smtp_id=smtp_id)
+            pk = request.GET['pk']
+            if pk:
+                pk = int(pk, base=10)
+                email = get_object_or_404(Email, pk=pk)
                 email = model_to_dict(email)
                 email['adjunto1'] = email['adjunto1'].name
                 return HttpResponse(json.dumps(email), content_type='application/json')

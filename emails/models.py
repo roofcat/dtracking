@@ -529,7 +529,9 @@ class Email(models.Model):
         emails = json.loads(emails)
         data = []
         for e in emails:
-            data.append(e['fields'])
+            email = e['fields']
+            email['pk'] = e['pk']
+            data.append(email)
         return {
             'query_total': query_total,
             'query_length': query_length,

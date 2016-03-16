@@ -352,12 +352,12 @@ function drawJqueryTable ( urlSource ) {
 				},
 			},
 			{
-				'data': 'smtp_id',
+				'data': 'pk',
 				'title': 'Detalle',
 				'render': function ( data, type, row, meta ) {
-					if ( typeof( data ) === 'string' && data != null ) {
+					if ( data != null ) {
 						var html = '';
-						html += '<span style="font-size:16px;color:#2196f3;align:center;cursor:pointer;" title="Click para ver más detalle." class="glyphicon glyphicon-info-sign" id="spanDetail" data-smtp="' + data + '"></span>';
+						html += '<span style="font-size:16px;color:#2196f3;align:center;cursor:pointer;" title="Click para ver más detalle." class="glyphicon glyphicon-info-sign" id="spanDetail" data-pk="' + data + '"></span>';
 						return html;
 					} else {
 						return "";
@@ -445,20 +445,20 @@ function drawJqueryTable ( urlSource ) {
 */
 $( "#tableCards" ).on( "click", "td", function () {
 	var span = $( this ).find( "#spanDetail" );
-	var smtp_id = span.data( "smtp" );
-	if ( smtp_id ) {
+	var pk = span.data( "pk" );
+	if ( pk ) {
 		$( '#loadingModal' ).modal( 'show', true );
-		getEmailDetailAjax( smtp_id );
+		getEmailDetailAjax( pk );
 	};
 });
 
-function getEmailDetailAjax ( smtp_id ) {
+function getEmailDetailAjax ( pk ) {
 	$.ajax({
 		url: emailDetailUrl,
 		type: 'GET',
 		dataType: 'json',
 		data: {
-			'smtp_id': smtp_id,
+			'pk': pk,
 		},
 		success: function ( data ) {
 			//console.log( data );
