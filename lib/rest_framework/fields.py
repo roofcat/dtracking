@@ -117,9 +117,9 @@ def to_choices_dict(choices):
     """
     Convert choices into key/value dicts.
 
-    pairwise_choices([1]) -> {1: 1}
-    pairwise_choices([(1, '1st'), (2, '2nd')]) -> {1: '1st', 2: '2nd'}
-    pairwise_choices([('Group', ((1, '1st'), 2))]) -> {'Group': {1: '1st', 2: '2nd'}}
+    to_choices_dict([1]) -> {1: 1}
+    to_choices_dict([(1, '1st'), (2, '2nd')]) -> {1: '1st', 2: '2nd'}
+    to_choices_dict([('Group', ((1, '1st'), 2))]) -> {'Group': {1: '1st', 2: '2nd'}}
     """
     # Allow single, paired or grouped choices style:
     # choices = [1, 2, 3]
@@ -145,8 +145,8 @@ def flatten_choices_dict(choices):
     """
     Convert a group choices dict into a flat dict of choices.
 
-    flatten_choices({1: '1st', 2: '2nd'}) -> {1: '1st', 2: '2nd'}
-    flatten_choices({'Group': {1: '1st', 2: '2nd'}}) -> {1: '1st', 2: '2nd'}
+    flatten_choices_dict({1: '1st', 2: '2nd'}) -> {1: '1st', 2: '2nd'}
+    flatten_choices_dict({'Group': {1: '1st', 2: '2nd'}}) -> {1: '1st', 2: '2nd'}
     """
     ret = OrderedDict()
     for key, value in choices.items():
@@ -1061,6 +1061,9 @@ class DateTimeField(Field):
         self.fail('invalid', format=humanized_format)
 
     def to_representation(self, value):
+        if not value:
+            return None
+
         output_format = getattr(self, 'format', api_settings.DATETIME_FORMAT)
 
         if output_format is None:
@@ -1118,10 +1121,10 @@ class DateField(Field):
         self.fail('invalid', format=humanized_format)
 
     def to_representation(self, value):
-        output_format = getattr(self, 'format', api_settings.DATE_FORMAT)
-
         if not value:
             return None
+
+        output_format = getattr(self, 'format', api_settings.DATE_FORMAT)
 
         if output_format is None:
             return value
@@ -1136,7 +1139,7 @@ class DateField(Field):
         )
 
         if output_format.lower() == ISO_8601:
-            if (isinstance(value, str)):
+            if isinstance(value, six.string_types):
                 value = datetime.datetime.strptime(value, '%Y-%m-%d').date()
             return value.isoformat()
 
@@ -1183,6 +1186,9 @@ class TimeField(Field):
         self.fail('invalid', format=humanized_format)
 
     def to_representation(self, value):
+        if not value:
+            return None
+
         output_format = getattr(self, 'format', api_settings.TIME_FORMAT)
 
         if output_format is None:
@@ -1198,6 +1204,8 @@ class TimeField(Field):
         )
 
         if output_format.lower() == ISO_8601:
+            if isinstance(value, six.string_types):
+                value = datetime.datetime.strptime(value, '%H:%M:%S').time()
             return value.isoformat()
         return value.strftime(output_format)
 

@@ -153,16 +153,25 @@ if 'patch' not in View.http_method_names:
 try:
     import markdown
 
+    if markdown.version <= '2.2':
+        HEADERID_EXT_PATH = 'headerid'
+    else:
+        HEADERID_EXT_PATH = 'markdown.extensions.headerid'
 
     def apply_markdown(text):
         """
         Simple wrapper around :func:`markdown.markdown` to set the base level
         of '#' style headers to <h2>.
         """
-
-        extensions = ['headerid(level=2)']
-        safe_mode = False
-        md = markdown.Markdown(extensions=extensions, safe_mode=safe_mode)
+        extensions = [HEADERID_EXT_PATH]
+        extension_configs = {
+            HEADERID_EXT_PATH: {
+                'level': '2'
+            }
+        }
+        md = markdown.Markdown(
+            extensions=extensions, extension_configs=extension_configs
+        )
         return md.convert(text)
 except ImportError:
     apply_markdown = None
@@ -242,7 +251,7 @@ def get_all_related_objects(opts):
     :param opts: Options instance
     :return: list of relations except many-to-many ones
     """
-    if django.VERSION < (1, 9):
+    if django.VERSION < (1, 8):
         return opts.get_all_related_objects()
     else:
         return [r for r in opts.related_objects if not r.field.many_to_many]
@@ -255,7 +264,7 @@ def get_all_related_many_to_many_objects(opts):
     :param opts: Options instance
     :return: list of many-to-many relations
     """
-    if django.VERSION < (1, 9):
+    if django.VERSION < (1, 8):
         return opts.get_all_related_many_to_many_objects()
     else:
         return [r for r in opts.related_objects if r.field.many_to_many]
