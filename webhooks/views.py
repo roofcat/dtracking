@@ -135,7 +135,7 @@ class SendGridRestWebhookView(TemplateView):
                         if email is not None:
                             logging.info(email)
                             email.click_ip = str(body['ip']).decode('utf-8')
-                            email.click_purchase = str(body['purchase']).decode('utf-8')
+                            email.click_purchase = ''
                             email.click_useragent = str(body['useragent']).decode('utf-8')
                             email.click_event = evento_sendgrid
                             email.click_email = str(body['email']).decode('utf-8')
@@ -359,7 +359,7 @@ class SendGridApiWebhookView(TemplateView):
                             logging.info(email)
                             email.empresa_id = empresa
                             email.click_ip = str(body['ip']).decode('utf-8')
-                            email.click_purchase = str(body['purchase']).decode('utf-8')
+                            email.click_purchase = ''
                             email.click_useragent = str(body['useragent']).decode('utf-8')
                             email.click_event = evento_sendgrid
                             email.click_email = str(body['email']).decode('utf-8')
@@ -372,7 +372,7 @@ class SendGridApiWebhookView(TemplateView):
                             e = Email.set_default_fields(body)
                             # parametros del evento
                             e.click_ip = str(body['ip']).decode('utf-8')
-                            e.click_purchase = str(body['purchase']).decode('utf-8')
+                            e.click_purchase = ''
                             e.click_useragent = str(body['useragent']).decode('utf-8')
                             e.click_event = evento_sendgrid
                             e.click_email = str(body['email']).decode('utf-8')
