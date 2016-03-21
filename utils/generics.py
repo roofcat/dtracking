@@ -15,9 +15,13 @@ def timestamp_to_date(x):
 
 def to_unix_timestamp(x):
 	if x is not None:
+		print "paso el to_unix_timestamp"
 		if len(str(x)) > 10:
+			print "es mayor a 10"
 			x = int(str(x)[0:10], base=10)
 		return x
+	else:
+		return None
 
 
 def get_date_from_timezone():

@@ -43,7 +43,7 @@ class SendGridRestWebhookView(TemplateView):
                         if email is not None:
                             logging.info(email)
                             email.smtp_id = str(body['smtp-id']).decode('utf-8')
-                            email.processed_date = to_unix_timestamp(body['timestamp'])
+                            email.processed_date = body['timestamp']
                             email.processed_event = evento_sendgrid
                             email.processed_sg_event_id = str(body['sg_event_id']).decode('utf-8')
                             email.processed_sg_message_id = str(body['sg_message_id']).decode('utf-8')
@@ -57,7 +57,7 @@ class SendGridRestWebhookView(TemplateView):
                         if email is not None:
                             logging.info(email)
                             email.smtp_id = str(body['smtp-id']).decode('utf-8')
-                            email.delivered_date = to_unix_timestamp(body['timestamp'])
+                            email.delivered_date = body['timestamp']
                             email.delivered_event = evento_sendgrid
                             email.delivered_sg_event_id = str(body['sg_event_id']).decode('utf-8')
                             email.delivered_sg_message_id = str(body['sg_message_id']).decode('utf-8')
@@ -72,8 +72,8 @@ class SendGridRestWebhookView(TemplateView):
                         if email is not None:
                             logging.info(email)
                             if email.opened_first_date is None:
-                                email.opened_first_date = to_unix_timestamp(body['timestamp'])
-                            email.opened_last_date = to_unix_timestamp(body['timestamp'])
+                                email.opened_first_date = body['timestamp']
+                            email.opened_last_date = body['timestamp']
                             email.opened_event = evento_sendgrid
                             email.opened_ip = str(body['ip']).decode('utf-8')
                             email.opened_user_agent = str(body['useragent']).decode('utf-8')
@@ -90,7 +90,7 @@ class SendGridRestWebhookView(TemplateView):
                         if email is not None:
                             logging.info(email)
                             email.smtp_id = str(body['smtp-id']).decode('utf-8')
-                            email.dropped_date = to_unix_timestamp(body['timestamp'])
+                            email.dropped_date = body['timestamp']
                             email.dropped_sg_event_id = str(body['sg_event_id']).decode('utf-8')
                             email.dropped_sg_message_id = str(body['sg_message_id']).decode('utf-8')
                             email.dropped_reason = str(body['reason']).decode('utf-8')
@@ -105,7 +105,7 @@ class SendGridRestWebhookView(TemplateView):
                         if email is not None:
                             logging.info(email)
                             email.smtp_id = str(body['smtp-id']).decode('utf-8')
-                            email.bounce_date = to_unix_timestamp(body['timestamp'])
+                            email.bounce_date = body['timestamp']
                             email.bounce_event = evento_sendgrid
                             email.bounce_sg_event_id = str(body['sg_event_id']).decode('utf-8')
                             email.bounce_sg_message_id = str(body['sg_message_id']).decode('utf-8')
@@ -121,7 +121,7 @@ class SendGridRestWebhookView(TemplateView):
 
                         if email is not None:
                             logging.info(email)
-                            email.unsubscribe_date = to_unix_timestamp(body['timestamp'])
+                            email.unsubscribe_date = body['timestamp']
                             email.unsubscribe_uid = str(body['uid']).decode('utf-8')
                             email.unsubscribe_purchase = str(body['purchase']).decode('utf-8')
                             email.unsubscribe_id = str(body['id']).decode('utf-8')
@@ -140,7 +140,7 @@ class SendGridRestWebhookView(TemplateView):
                             email.click_useragent = str(body['useragent']).decode('utf-8')
                             email.click_event = evento_sendgrid
                             email.click_email = str(body['email']).decode('utf-8')
-                            email.click_date = to_unix_timestamp(body['timestamp'])
+                            email.click_date = body['timestamp']
                             email.click_url = str(body['url']).decode('utf-8')
                             email.save()
                             soap_ws = SoapMiddleware(email.pk, evento_sendgrid)
@@ -185,7 +185,7 @@ class SendGridApiWebhookView(TemplateView):
 
                         if email is not None:
                             email.smtp_id = str(body['smtp-id']).decode('utf-8')
-                            email.processed_date = to_unix_timestamp(body['timestamp'])
+                            email.processed_date = body['timestamp']
                             email.processed_event = evento_sendgrid
                             email.processed_sg_event_id = str(body['sg_event_id']).decode('utf-8')
                             email.processed_sg_message_id = str(body['sg_message_id']).decode('utf-8')
@@ -197,7 +197,7 @@ class SendGridApiWebhookView(TemplateView):
                             e = Email.set_default_fields(body)
                             # parametros del evento
                             e.smtp_id = str(body['smtp-id']).decode('utf-8')
-                            e.processed_date = to_unix_timestamp(body['timestamp'])
+                            e.processed_date = body['timestamp']
                             e.processed_event = evento_sendgrid
                             e.processed_sg_event_id = str(body['sg_event_id']).decode('utf-8')
                             e.processed_sg_message_id = str(body['sg_message_id']).decode('utf-8')
@@ -212,7 +212,7 @@ class SendGridApiWebhookView(TemplateView):
                         if email is not None:
                             email.empresa_id = empresa
                             email.smtp_id = str(body['smtp-id']).decode('utf-8')
-                            email.delivered_date = to_unix_timestamp(body['timestamp'])
+                            email.delivered_date = body['timestamp']
                             email.delivered_event = evento_sendgrid
                             email.delivered_sg_event_id = str(body['sg_event_id']).decode('utf-8')
                             email.delivered_sg_message_id = str(body['sg_message_id']).decode('utf-8')
@@ -224,7 +224,7 @@ class SendGridApiWebhookView(TemplateView):
                             e = Email.set_default_fields(body)
                             # parametros del evento
                             e.smtp_id = str(body['smtp-id']).decode('utf-8')
-                            e.delivered_date = to_unix_timestamp(body['timestamp'])
+                            e.delivered_date = body['timestamp']
                             e.delivered_event = evento_sendgrid
                             e.delivered_sg_event_id = str(body['sg_event_id']).decode('utf-8')
                             e.delivered_sg_message_id = str(body['sg_message_id']).decode('utf-8')
@@ -240,8 +240,8 @@ class SendGridApiWebhookView(TemplateView):
                         if email is not None:
                             email.empresa_id = empresa
                             if email.opened_first_date is None:
-                                email.opened_first_date = to_unix_timestamp(body['timestamp'])
-                            email.opened_last_date = to_unix_timestamp(body['timestamp'])
+                                email.opened_first_date = body['timestamp']
+                            email.opened_last_date = body['timestamp']
                             email.opened_event = evento_sendgrid
                             email.opened_ip = str(body['ip']).decode('utf-8')
                             email.opened_user_agent = str(body['useragent']).decode('utf-8')
@@ -255,8 +255,8 @@ class SendGridApiWebhookView(TemplateView):
                             e = Email.set_default_fields(body)
                             # parametros del evento
                             if e.opened_first_date is None:
-                                e.opened_first_date = to_unix_timestamp(body['timestamp'])
-                            e.opened_last_date = to_unix_timestamp(body['timestamp'])
+                                e.opened_first_date = body['timestamp']
+                            e.opened_last_date = body['timestamp']
                             e.opened_event = evento_sendgrid
                             e.opened_ip = str(body['ip']).decode('utf-8')
                             e.opened_user_agent = str(body['useragent']).decode('utf-8')
@@ -274,7 +274,7 @@ class SendGridApiWebhookView(TemplateView):
                             logging.info(email)
                             email.empresa_id = empresa
                             email.smtp_id = str(body['smtp-id']).decode('utf-8')
-                            email.dropped_date = to_unix_timestamp(body['timestamp'])
+                            email.dropped_date = body['timestamp']
                             email.dropped_sg_event_id = str(body['sg_event_id']).decode('utf-8')
                             email.dropped_sg_message_id = str(body['sg_message_id']).decode('utf-8')
                             email.dropped_reason = str(body['reason']).decode('utf-8')
@@ -286,7 +286,7 @@ class SendGridApiWebhookView(TemplateView):
                             e = Email.set_default_fields(body)
                             # parametros del evento
                             e.smtp_id = str(body['smtp-id']).decode('utf-8')
-                            e.dropped_date = to_unix_timestamp(body['timestamp'])
+                            e.dropped_date = body['timestamp']
                             e.dropped_sg_event_id = str(body['sg_event_id']).decode('utf-8')
                             e.dropped_sg_message_id = str(body['sg_message_id']).decode('utf-8')
                             e.dropped_reason = str(body['reason']).decode('utf-8')
@@ -302,7 +302,7 @@ class SendGridApiWebhookView(TemplateView):
                             logging.info(email)
                             email.empresa_id = empresa
                             email.smtp_id = str(body['smtp-id']).decode('utf-8')
-                            email.bounce_date = to_unix_timestamp(body['timestamp'])
+                            email.bounce_date = body['timestamp']
                             email.bounce_event = evento_sendgrid
                             email.bounce_sg_event_id = str(body['sg_event_id']).decode('utf-8')
                             email.bounce_sg_message_id = str(body['sg_message_id']).decode('utf-8')
@@ -316,7 +316,7 @@ class SendGridApiWebhookView(TemplateView):
                             e = Email.set_default_fields(body)
                             # parametros del evento
                             e.smtp_id = str(body['smtp-id']).decode('utf-8')
-                            e.bounce_date = to_unix_timestamp(body['timestamp'])
+                            e.bounce_date = body['timestamp']
                             e.bounce_event = evento_sendgrid
                             e.bounce_sg_event_id = str(body['sg_event_id']).decode('utf-8')
                             e.bounce_sg_message_id = str(body['sg_message_id']).decode('utf-8')
@@ -333,7 +333,7 @@ class SendGridApiWebhookView(TemplateView):
                         if email is not None:
                             logging.info(email)
                             email.empresa_id = empresa
-                            email.unsubscribe_date = to_unix_timestamp(body['timestamp'])
+                            email.unsubscribe_date = body['timestamp']
                             email.unsubscribe_uid = str(body['uid']).decode('utf-8')
                             email.unsubscribe_purchase = str(body['purchase']).decode('utf-8')
                             email.unsubscribe_id = str(body['id']).decode('utf-8')
@@ -344,7 +344,7 @@ class SendGridApiWebhookView(TemplateView):
                         else:
                             e = Email.set_default_fields(body)
                             # parametros del evento
-                            e.unsubscribe_date = to_unix_timestamp(body['timestamp'])
+                            e.unsubscribe_date = body['timestamp']
                             e.unsubscribe_uid = str(body['uid']).decode('utf-8')
                             e.unsubscribe_purchase = str(body['purchase']).decode('utf-8')
                             e.unsubscribe_id = str(body['id']).decode('utf-8')
@@ -364,7 +364,7 @@ class SendGridApiWebhookView(TemplateView):
                             email.click_useragent = str(body['useragent']).decode('utf-8')
                             email.click_event = evento_sendgrid
                             email.click_email = str(body['email']).decode('utf-8')
-                            email.click_date = to_unix_timestamp(body['timestamp'])
+                            email.click_date = body['timestamp']
                             email.click_url = str(body['url']).decode('utf-8')
                             email.save()
                             soap_ws = SoapMiddleware(email.pk, evento_sendgrid)
@@ -377,7 +377,7 @@ class SendGridApiWebhookView(TemplateView):
                             e.click_useragent = str(body['useragent']).decode('utf-8')
                             e.click_event = evento_sendgrid
                             e.click_email = str(body['email']).decode('utf-8')
-                            e.click_date = to_unix_timestamp(body['timestamp'])
+                            e.click_date = body['timestamp']
                             e.click_url = str(body['url']).decode('utf-8')
                             e.save()
                             soap_ws = SoapMiddleware(e.pk, evento_sendgrid)

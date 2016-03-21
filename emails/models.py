@@ -17,7 +17,7 @@ from django.forms import model_to_dict
 
 from empresas.models import Empresa
 from tipodocumentos.models import TipoDocumento
-from utils.generics import timestamp_to_date
+from utils.generics import timestamp_to_date, to_unix_timestamp
 
 
 TIPOS_RECEPTORES = (
@@ -238,10 +238,10 @@ class Email(models.Model):
             resolucion_receptor = 0
         resolucion_emisor = body['resolucion_emisor']
         monto = body['monto']
-        fecha_emision = body['fecha_emision']
+        fecha_emision = to_unix_timestamp(body['fecha_emision'])
         if fecha_emision == '' or None:
             fecha_emision = 0
-        fecha_recepcion = body['fecha_recepcion']
+        fecha_recepcion = to_unix_timestamp(body['fecha_recepcion'])
         if fecha_recepcion == '' or None:
             fecha_recepcion = 0
         estado_documento = str(body['estado_documento']).decode('utf-8')
