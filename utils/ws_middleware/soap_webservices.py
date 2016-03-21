@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
+from datetime import datetime
 import logging
 from suds.client import Client
 
@@ -69,6 +70,8 @@ class SoapMiddleware(object):
                                 logging.info(email[field])
                                 field = timestamp_to_date(email[field])
                                 data[param] = field
+                            elif field.endswith('_date') and email[field] is None:
+                                data[param] = datetime.now()
                             else:
                                 data[param] = email[field]
                         if documento is not None:
@@ -87,6 +90,8 @@ class SoapMiddleware(object):
                                 logging.info(email[field])
                                 field = timestamp_to_date(email[field])
                                 data[param] = field
+                            elif field.endswith('_date') and email[field] is None:
+                                data[param] = datetime.now()
                             else:
                                 data[param] = email[field]
                         if documento is not None:
@@ -104,6 +109,8 @@ class SoapMiddleware(object):
                                 logging.info(email[field])
                                 field = timestamp_to_date(email[field])
                                 data[param] = field
+                            elif field.endswith('_date') and email[field] is None:
+                                data[param] = datetime.now()
                             else:
                                 data[param] = email[field]
                         if documento is not None:
@@ -124,6 +131,8 @@ class SoapMiddleware(object):
                                 logging.info(email[field])
                                 field = timestamp_to_date(email[field])
                                 data[param] = field
+                            elif field.endswith('_date') and email[field] is None:
+                                data[param] = datetime.now()
                             else:
                                 data[param] = email[field]
                         if documento is not None:
@@ -141,6 +150,8 @@ class SoapMiddleware(object):
                                 logging.info(email[field])
                                 field = timestamp_to_date(email[field])
                                 data[param] = field
+                            elif field.endswith('_date') and email[field] is None:
+                                data[param] = datetime.now()
                             else:
                                 data[param] = email[field]
                         if documento is not None:
