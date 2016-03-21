@@ -5,11 +5,19 @@ from datetime import datetime
 import pytz
 
 
-timestamp_to_date = lambda x: datetime.fromtimestamp(
-	x, tz=pytz.timezone("America/Santiago"))
+tz = pytz.timezone("America/Santiago")
+
+
+def timestamp_to_date(x):
+    if x is not None:
+        if len(str(x)) > 10:
+            x = int(str(x)[0:10], base=10)
+        return datetime.fromtimestamp(x, tz=tz)
+
 
 def get_date_from_timezone():
-	return datetime.now(tz=pytz.timezone("America/Santiago"))
+    return datetime.now(tz=tz)
+
 
 def get_file_name_from_storage(name):
     if name is not None:
