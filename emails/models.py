@@ -671,6 +671,7 @@ class Email(models.Model):
     def get_sended_emails_by_dates_async(self, date_from, date_to, empresa, options='all'):
         params = {}
         params['input_date__range'] = (date_from, date_to)
+        params['delivered_event'] = 'delivered'
         if empresa != 'all':
             params['empresa'] = empresa
         if options != 'all':
