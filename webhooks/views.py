@@ -32,7 +32,11 @@ class SendGridRestWebhookView(TemplateView):
                 evento_sendgrid = str(body['event']).decode('utf-8')
                 email_id = str(body['email_id']).decode('utf-8')
                 logging.info(evento_sendgrid)
+            except Exception, e:
+                logging.error(e)
+                return HttpResponse(e)
 
+            try:
                 if evento_sendgrid and email_id:
                     email_id = int(email_id, base=10)
                     logging.info("es un webhook para el tracking")
@@ -149,7 +153,7 @@ class SendGridRestWebhookView(TemplateView):
                     logging.error("parametros incompletos, correo no corresponde.")
             except Exception, e:
                 logging.error(e)
-                return HttpResponse(e)
+                return HttpResponse(e, status=500)
         return HttpResponse()
 
 
@@ -173,7 +177,11 @@ class SendGridApiWebhookView(TemplateView):
                 resolucion_emisor = str(body['resolucion_emisor']).decode('utf-8')
                 empresa = str(body['empresa']).decode('utf-8')
                 logging.info(evento_sendgrid)
+            except Exception, e:
+                logging.error(e)
+                return HttpResponse(e)
 
+            try:
                 if evento_sendgrid and correo and numero_folio and tipo_dte and rut_emisor and resolucion_emisor:
                     correo = str(correo).lower()
                     numero_folio = int(numero_folio, base=10)
@@ -386,5 +394,5 @@ class SendGridApiWebhookView(TemplateView):
                     logging.error("parametros incompletos, correo no corresponde.")
             except Exception, e:
                 logging.error(e)
-                return HttpResponse(e)
+                return HttpResponse(e, status=500)
         return HttpResponse()
