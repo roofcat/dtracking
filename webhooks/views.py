@@ -108,7 +108,6 @@ class SendGridRestWebhookView(TemplateView):
 
                         if email is not None:
                             logging.info(email)
-                            email.smtp_id = str(body['smtp-id']).decode('utf-8')
                             email.bounce_date = body['timestamp']
                             email.bounce_event = evento_sendgrid
                             email.bounce_sg_event_id = str(body['sg_event_id']).decode('utf-8')
