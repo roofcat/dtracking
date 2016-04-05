@@ -25,11 +25,11 @@ django_filters/locale/pl/LC_MESSAGES/django.po,sha256=_JcFeOifH-BMiyFq-4vsFoEW_d
 django_filters/locale/zh_CN/LC_MESSAGES/django.po,sha256=9Kj2VQ9TuPgAeQdauY5zR0wOZpkCL1L-GMUpm8fnxT4,1305
 django_filter-0.13.0.dist-info/INSTALLER,sha256=zuuue4knoyJ-UwPPXg8fezS7VCrXJQrAP7zeNuwvFQg,4
 django_filters/filters.pyc,,
+django_filters/views.pyc,,
 django_filters/utils.pyc,,
 django_filters/widgets.pyc,,
 django_filters/filterset.pyc,,
 django_filters/__init__.pyc,,
 django_filters/compat.pyc,,
-django_filters/views.pyc,,
 django_filters/fields.pyc,,
 django_filters/models.pyc,,

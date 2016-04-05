@@ -10,12 +10,13 @@ appengine_toolkit/templates/appengine_toolkit/base.html,sha256=zzaUPjEgvwxg-Gn2r
 appengine_toolkit-0.1.0.dist-info/DESCRIPTION.rst,sha256=rkhfPqS9LJ6UR447FJUGCPthtNTjGk1rzQymMffOwEs,2661
 appengine_toolkit-0.1.0.dist-info/METADATA,sha256=1lPmzX9_wn1pdY9HJv71bgPSRakzMlVcLLQJqBaXDtM,3235
 appengine_toolkit-0.1.0.dist-info/RECORD,,
-appengine_toolkit-0.1.0.dist-info/WHEEL,sha256=JTb7YztR8fkPg6aSjc571Q4eiVHCwmUDlX8PhuuqIIE,92
-appengine_toolkit-0.1.0.dist-info/metadata.json,sha256=pAyhf9w20Rj5MSkekyohFKkbaFiFQsH62jU_uDZLKsw,721
+appengine_toolkit-0.1.0.dist-info/WHEEL,sha256=BtVfdXUcEYLcFjOkbIrCFRyXU4qszVPt-E9o3RWkSNw,93
+appengine_toolkit-0.1.0.dist-info/metadata.json,sha256=oQePHcOkk8bdjyyUm7i9cfZIu8RMT_znLau_zVvrH6E,721
 appengine_toolkit-0.1.0.dist-info/top_level.txt,sha256=tHOd87Z1wlmTyYB6cyKNANzwGYnO2nIjwmmywnJG8hk,18
+appengine_toolkit-0.1.0.dist-info/INSTALLER,sha256=zuuue4knoyJ-UwPPXg8fezS7VCrXJQrAP7zeNuwvFQg,4
+appengine_toolkit/management/commands/collectdeps.pyc,,
 appengine_toolkit/models.pyc,,
 appengine_toolkit/management/commands/__init__.pyc,,
-appengine_toolkit/management/commands/collectdeps.pyc,,
 appengine_toolkit/__init__.pyc,,
 appengine_toolkit/settings.pyc,,
 appengine_toolkit/management/__init__.pyc,,

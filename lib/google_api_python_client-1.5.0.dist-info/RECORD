@@ -18,7 +18,7 @@ googleapiclient/discovery_cache/__init__.py,sha256=P3tKH7-PhxLvOGYmn0pEGgYL1FLYz
 googleapiclient/discovery_cache/appengine_memcache.py,sha256=586tx9Iwn_O5xAX54z1cHlymzhETUWIlMGpsPR6fbbI,1562
 googleapiclient/discovery_cache/base.py,sha256=EqRfVHAW2bMT4X1HqMakadGiIfMy3_SxJUFYy50xL3Y,1320
 googleapiclient/discovery_cache/file_cache.py,sha256=NFbk98dsJfQjTDR6jAE7plps2bJDLrGjrMkXkKqcFYI,4036
-/tmp/tmpAA0v2n/lib/python/google_api_python_client-1.5.0.dist-info/INSTALLER,sha256=zuuue4knoyJ-UwPPXg8fezS7VCrXJQrAP7zeNuwvFQg,4
+google_api_python_client-1.5.0.dist-info/INSTALLER,sha256=zuuue4knoyJ-UwPPXg8fezS7VCrXJQrAP7zeNuwvFQg,4
 googleapiclient/schema.pyc,,
 googleapiclient/discovery.pyc,,
 googleapiclient/channel.pyc,,
