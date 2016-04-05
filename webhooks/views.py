@@ -309,7 +309,6 @@ class SendGridApiWebhookView(TemplateView):
                         if email is not None:
                             logging.info(email)
                             email.empresa_id = empresa
-                            email.smtp_id = str(body['smtp-id']).decode('utf-8')
                             email.bounce_date = body['timestamp']
                             email.bounce_event = evento_sendgrid
                             email.bounce_sg_event_id = str(body['sg_event_id']).decode('utf-8')
@@ -323,7 +322,6 @@ class SendGridApiWebhookView(TemplateView):
                         else:
                             e = Email.set_default_fields(body)
                             # parametros del evento
-                            e.smtp_id = str(body['smtp-id']).decode('utf-8')
                             e.bounce_date = body['timestamp']
                             e.bounce_event = evento_sendgrid
                             e.bounce_sg_event_id = str(body['sg_event_id']).decode('utf-8')
