@@ -15,6 +15,7 @@ from emails.views import QueueSendEmailView
 from emails.views import CronSendDelayedEmailView
 from emails.views import CronSendDelayedProcessedEmailView
 from emails.views import CronCleanEmailsHistoryView
+from emails.views import DeleteEmailFileView
 from empresas.views import EmpresaViewSet
 from webhooks.views import SendGridRestWebhookView, SendGridApiWebhookView
 
@@ -43,6 +44,9 @@ urlpatterns = [
     url(r'^emails/cron/send-delayed/', CronSendDelayedEmailView.as_view()),
     url(r'^emails/cron/send-delayed-processed/', CronSendDelayedProcessedEmailView.as_view()),
     url(r'^emails/cron/clean-history/', CronCleanEmailsHistoryView.as_view()),
+
+    # colas de tareas
+    url(r'^emails/queue/delete-file/', DeleteEmailFileView.as_view()),
 
 	# rutas de las paginas html del tracking
     url(r'^dashboard/', include('dashboard.urls', namespace='dashboard')),

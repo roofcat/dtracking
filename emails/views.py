@@ -2,6 +2,7 @@
 
 
 from datetime import date, timedelta
+import cloudstorage
 import json
 import logging
 
@@ -127,4 +128,17 @@ class CronSendDelayedProcessedEmailView(TemplateView):
         if emails is not None:
             for email in emails:
                 input_queue(email.id)
+        return HttpResponse()
+
+
+class DeleteEmailFileView(TemplateView):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args, **kwargs):
+        return super(DeleteEmailFileView, self).dispatch(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        logging.info("entrando a la cola de eliminación de archivos")
+        logging.info(request.body)
+        file_url = request.POST.get('file_url')
+        cloudstorage.delete(file_url)
         return HttpResponse()

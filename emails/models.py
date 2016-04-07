@@ -3,7 +3,6 @@
 
 from datetime import datetime
 import calendar
-import cloudstorage
 import json
 import logging
 
@@ -18,6 +17,7 @@ from django.forms import model_to_dict
 from empresas.models import Empresa
 from tipodocumentos.models import TipoDocumento
 from utils.generics import timestamp_to_date, to_unix_timestamp
+from utils.queues import delete_file_queue
 
 
 TIPOS_RECEPTORES = (
@@ -54,12 +54,12 @@ class FileQuerySet(models.QuerySet):
     def delete(self, *args, **kwargs):
         try:
             for obj in self:
-                logging.info("borrando adjunto de GCS")
+                logging.info("Encolando para eliminar archivo adjunto de GCS")
                 logging.info(obj)
                 if obj.adjunto1 == '' or obj.adjunto1 is None:
                     pass
                 else:
-                    cloudstorage.delete(obj.adjunto1.name)
+                    delete_file_queue(obj.adjunto1.name)
             super(FileQuerySet, self).delete(*args, **kwargs)
         except Exception, e:
             logging.error(e)

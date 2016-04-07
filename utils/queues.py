@@ -21,6 +21,16 @@ def report_queue(context):
     data = {"status": "ok"}
 
 
+def delete_file_queue(file_url):
+    context = {
+        "file_url": file_url,
+    }
+    q = taskqueue.Queue("DeleteFileQueue")
+    t = taskqueue.Task(url="/emails/queue/delete-file/", params=context)
+    q.add(t)
+    data = {"status": "ok"}
+
+
 def soap_ws_queue(context):
     q = taskqueue.Queue("SoapWSQueue")
     t = taskqueue.Task(url="/webservices/soap/", params=context)
