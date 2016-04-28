@@ -7,7 +7,7 @@ django-filter==0.13
 django==1.9.*
 django-debug-toolbar
 djangorestframework==3.3.3
-gaerpytz==2016.1
+gaerpytz
 google-api-python-client
 GoogleAppEngineCloudStorageClient
 markdown==2.6.6
