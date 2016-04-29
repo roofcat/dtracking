@@ -62,9 +62,10 @@ $( '#run_search' ).on( 'click', function () {
 	var mount_to = $( '#mount_to' ).val();
 	var checkFallidos = $( '#checkFallidos' ).is( ':checked' );
 
-	if ( rutReceptor && !validaRut( rutReceptor ) ) {
-		$( '#closeLoadingModal' ).click();
-		return;
+	if ( rutReceptor ) {
+		if ( !validaRut( rutReceptor ) ) {
+			$( '#closeLoadingModal' ).click();
+		};
 	} else {
 		rutReceptor = '-';
 	};
@@ -252,7 +253,7 @@ function validaRut ( rut ) {
 		};
 
 		if ( dv == RUT[1].toLowerCase() ) {
-			//console.log( "El rut es valido." );
+			console.log( "El rut es valido." );
 			return true;
 		} else {
 		alert( "El rut es incorrecto." );
