@@ -12,7 +12,7 @@ from .models import TemplateReporte
 
 
 class GeneralConfigurationAdmin(admin.ModelAdmin):
-	pass
+	list_display = ('report_row_max_length',)
 
 
 class SengridConfAdmin(admin.ModelAdmin):

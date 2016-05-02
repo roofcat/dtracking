@@ -14,6 +14,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.forms import model_to_dict
 
 
+from configuraciones.models import GeneralConfiguration
 from empresas.models import Empresa
 from tipodocumentos.models import TipoDocumento
 from utils.generics import timestamp_to_date, to_unix_timestamp
@@ -43,7 +44,7 @@ TIPOS_OPERACIONES = (
     ('venta', 'venta'),
 )
 
-MAX_QUERY_LENGTH = 17000
+MAX_QUERY_LENGTH = 10000
 
 
 class FileQuerySet(models.QuerySet):
@@ -649,7 +650,7 @@ class Email(models.Model):
     def get_emails_by_correo_async(self, date_from, date_to, correo, **kwargs):
         emails = Email.objects.filter(
             input_date__range=(date_from, date_to),
-            correo=correo).order_by('-input_date')[:MAX_QUERY_LENGTH]
+            correo=correo).order_by('-input_date')[:self.get_max_query_length()]
         if emails:
             return emails
         else:
@@ -663,7 +664,7 @@ class Email(models.Model):
             params['empresa'] = empresa
         if options != 'all':
             params['tipo_receptor'] = options
-        emails = Email.objects.filter(**params).order_by('input_date')[:MAX_QUERY_LENGTH]
+        emails = Email.objects.filter(**params).order_by('input_date')[:self.get_max_query_length()]
         if emails:
             return emails
         else:
@@ -678,7 +679,7 @@ class Email(models.Model):
             params['empresa'] = empresa
         if options != 'all':
             params['tipo_receptor'] = options
-        emails = Email.objects.filter(**params).order_by('input_date')[:MAX_QUERY_LENGTH]
+        emails = Email.objects.filter(**params).order_by('input_date')[:self.get_max_query_length()]
         if emails:
             return emails
         else:
@@ -714,7 +715,7 @@ class Email(models.Model):
     def get_emails_by_folio_async(self, folio, **kwargs):
         if folio:
             emails = Email.objects.filter(
-                numero_folio=folio).order_by('-input_date')[:MAX_QUERY_LENGTH]
+                numero_folio=folio).order_by('-input_date')[:self.get_max_query_length()]
             if emails:
                 return emails
             else:
@@ -752,7 +753,7 @@ class Email(models.Model):
         if date_from and date_to and rut:
             emails = Email.objects.filter(
                 input_date__range=(date_from, date_to),
-                rut_receptor=rut).order_by('-input_date')[:MAX_QUERY_LENGTH]
+                rut_receptor=rut).order_by('-input_date')[:self.get_max_query_length()]
             if emails:
                 return emails
             else:
@@ -811,7 +812,7 @@ class Email(models.Model):
                     Q(tipo_receptor=options), Q(empresa=empresa),
                     Q(bounce_event='bounce') | Q(dropped_event='dropped')
                 )
-        emails = emails.order_by('input_date')[:MAX_QUERY_LENGTH]
+        emails = emails.order_by('input_date')[:self.get_max_query_length()]
         logging.info(emails.query)
         if emails:
             return emails
@@ -849,8 +850,16 @@ class Email(models.Model):
     def get_emails_by_mount_and_dates_async(self, date_from, date_to, mount_from, mount_to, **kwargs):
         emails = Email.objects.filter(
             input_date__range=(date_from, date_to),
-            monto__range=(mount_from, mount_to)).order_by('-input_date')[:MAX_QUERY_LENGTH]
+            monto__range=(mount_from, mount_to)).order_by('-input_date')[:self.get_max_query_length()]
         if emails:
             return emails
         else:
             return None
+
+    @classmethod
+    def get_max_query_length(self):
+        conf = GeneralConfiguration.get_configuration()
+        if conf is not None:
+            return conf.report_row_max_length
+        else:
+            return MAX_QUERY_LENGTH

@@ -9,10 +9,9 @@ class GeneralConfiguration(models.Model):
 
     @classmethod
     def get_configuration(self):
-        conf = GeneralConfiguration.objects.all()[:1].get()
-        if conf is not None:
-            return conf
-        else:
+        try:
+            return GeneralConfiguration.objects.all()[:1].get()
+        except GeneralConfiguration.DoesNotExist:
             return None
 
 
