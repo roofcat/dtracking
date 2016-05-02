@@ -43,7 +43,7 @@ TIPOS_OPERACIONES = (
     ('venta', 'venta'),
 )
 
-MAX_QUERY_LENGTH = 18000
+MAX_QUERY_LENGTH = 17000
 
 
 class FileQuerySet(models.QuerySet):
