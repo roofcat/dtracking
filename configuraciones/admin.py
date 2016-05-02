@@ -4,10 +4,15 @@
 from django.contrib import admin
 
 
-from .models import SendgridConf
-from .models import TemplateReporte
 from .models import EliminacionHistorico
+from .models import GeneralConfiguration
+from .models import SendgridConf
 from .models import SoapWebService
+from .models import TemplateReporte
+
+
+class GeneralConfigurationAdmin(admin.ModelAdmin):
+	pass
 
 
 class SengridConfAdmin(admin.ModelAdmin):
@@ -30,3 +35,4 @@ admin.site.register(SendgridConf, SengridConfAdmin)
 admin.site.register(TemplateReporte, TemplateReporteAdmin)
 admin.site.register(EliminacionHistorico, EliminacionHistoricoAdmin)
 admin.site.register(SoapWebService, SoapWebServiceAdmin)
+admin.site.register(GeneralConfiguration, GeneralConfigurationAdmin)

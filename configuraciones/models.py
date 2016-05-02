@@ -4,6 +4,18 @@
 from django.db import models
 
 
+class GeneralConfiguration(models.Model):
+    report_row_max_length = models.IntegerField()
+
+    @classmethod
+    def get_configuration(self):
+        conf = GeneralConfiguration.objects.all()[:1].get()
+        if conf is not None:
+            return conf
+        else:
+            return None
+
+
 class SendgridConf(models.Model):
     api_key = models.CharField(max_length=200, db_index=True)
     api_user = models.CharField(max_length=200, db_index=True)
