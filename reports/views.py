@@ -14,17 +14,29 @@ from django.views.generic import TemplateView
 
 from .forms import ReportForm
 from autenticacion.views import LoginRequiredMixin
+from configuraciones.models import GeneralConfiguration
 from emails.models import Email
-from utils.sendgrid_client import EmailClient
-from utils.tablib_export import create_tablib
 from utils.generics import timestamp_to_date
 from utils.queues import report_queue
+from utils.sendgrid_client import EmailClient
+from utils.tablib_export import create_tablib
 
 
 """ Serie de clases controladoras que reciben parametros
 	para enviarlos en una cola controladora para enviar
 	reporte por correo
 """
+
+
+REPORT_FILE_FORMAT = 'xlsx'
+
+
+def get_report_file_format():
+	conf = GeneralConfiguration.get_configuration()
+	if conf is not None:
+		return conf.report_file_format
+	else:
+		return REPORT_FILE_FORMAT
 
 
 class DynamicReportTemplateView(LoginRequiredMixin, TemplateView):
@@ -65,12 +77,12 @@ class DynamicReportTemplateView(LoginRequiredMixin, TemplateView):
 		    parameters['fallidos'] = False
 		else:
 		    parameters['fallidos'] = False
-		context = {
-			'user_email': request.user.email,
-			'file_name': 'reporte_dinamico.xlsx',
-			'export_type': 'export_dynamic_emails',
-			'params': json.dumps(parameters),
-		}
+
+		context = dict()
+		context['user_email'] = request.user.email
+		context['file_name'] = 'reporte_dinamico.' + get_report_file_format()
+		context['export_type'] = 'export_dynamic_emails'
+		context['params'] = json.dumps(parameters)
 		report_queue(context)
 		data = {"status": "ok"}
 		return HttpResponse(json.dumps(data), content_type='application/json')
@@ -87,7 +99,7 @@ class GeneralReportTemplateView(LoginRequiredMixin, TemplateView):
                     'empresa': str(empresa),
                     'options': options,
                     'user_email': request.user.email,
-                    'file_name': 'reporte_general.xlsx',
+                    'file_name': 'reporte_general.' + get_report_file_format(),
                     'export_type': 'export_general_email',
                 }
                 report_queue(context)
@@ -108,7 +120,7 @@ class SendedReportTemplateView(LoginRequiredMixin, TemplateView):
                     'empresa': str(empresa),
                     'options': options,
                     'user_email': request.user.email,
-                    'file_name': 'reporte_enviados.xlsx',
+                    'file_name': 'reporte_enviados.' + get_report_file_format(),
                     'export_type': 'export_sended_email',
                 }
             report_queue(context)
@@ -129,7 +141,7 @@ class FailureReportTemplateView(LoginRequiredMixin, TemplateView):
                     'empresa': str(empresa),
                     'options': options,
                     'user_email': request.user.email,
-                    'file_name': 'reporte_fallidos.xlsx',
+                    'file_name': 'reporte_fallidos.' + get_report_file_format(),
                     'export_type': 'export_failure_email',
                 }
             report_queue(context)
@@ -149,7 +161,7 @@ class ByEmailReportTemplateView(LoginRequiredMixin, TemplateView):
                     'date_to': int(date_to, base=10),
                     'email': str(correo).lower(),
                     'user_email': request.user.email,
-                    'file_name': 'reporte_por_email.xlsx',
+                    'file_name': 'reporte_por_email.' + get_report_file_format(),
                     'export_type': 'export_search_by_email',
                 }
             report_queue(context)
@@ -167,7 +179,7 @@ class ByFolioReportTemplateView(LoginRequiredMixin, TemplateView):
                 context = {
                     'folio': int(folio, base=10),
                     'user_email': request.user.email,
-                    'file_name': 'reporte_por_folio.xlsx',
+                    'file_name': 'reporte_por_folio.' + get_report_file_format(),
                     'export_type': 'export_search_by_folio',
                 }
                 report_queue(context)
@@ -187,7 +199,7 @@ class ByRutReportTemplateView(LoginRequiredMixin, TemplateView):
                     'date_to': int(date_to, base=10),
                     'rut': str(rut).upper(),
                     'user_email': request.user.email,
-                    'file_name': 'reporte_por_rut.xlsx',
+                    'file_name': 'reporte_por_rut.' + get_report_file_format(),
                     'export_type': 'export_search_by_rut',
                 }
             report_queue(context)
@@ -208,7 +220,7 @@ class ByMountReportTemplateView(LoginRequiredMixin, TemplateView):
                     'mount_from': mount_from,
                     'mount_to': mount_to,
                     'user_email': request.user.email,
-                    'file_name': 'reporte_por_monto.xlsx',
+                    'file_name': 'reporte_por_monto.' + get_report_file_format(),
                     'export_type': 'export_search_by_mount',
                 }
             report_queue(context)
@@ -342,10 +354,12 @@ class QueueExportView(TemplateView):
 		# Creación del documento
 		excel_report = create_tablib(data)
 		# Crear objeto
-		data = {
-			'name': file_name,
-			'report': excel_report.xlsx,
-		}
+		data = dict()
+		data['name'] = file_name
+		if get_report_file_format() == 'xlsx':
+			data['report'] = excel_report.xlsx
+		else:
+			data['report'] = excel_report.csv
 		# preparación de parametros
 		mail = EmailClient()
 		mail.send_report_to_user_with_attach(user_email, data)

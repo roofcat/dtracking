@@ -4,8 +4,15 @@
 from django.db import models
 
 
+REPORT_FILE_FORMAT = (
+    ('xlsx', 'xlsx'),
+    ('csv', 'csv'),
+)
+
+
 class GeneralConfiguration(models.Model):
     report_row_max_length = models.IntegerField()
+    report_file_format = models.CharField(max_length=100, choices=REPORT_FILE_FORMAT)
 
     @classmethod
     def get_configuration(self):
