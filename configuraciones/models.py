@@ -58,11 +58,16 @@ class SoapWebService(models.Model):
     con_autenticacion = models.BooleanField(default=False, blank=True)
     usuario_autenticacion = models.CharField(max_length=200, null=True, blank=True)
     clave_autenticacion = models.CharField(max_length=200, null=True, blank=True)
+    # documento
     con_objeto_documento = models.BooleanField(default=False)
     nombre_objeto_documento = models.CharField(max_length=200, null=True, blank=True)
     nombre_parametro_documento = models.CharField(max_length=200, null=True, blank=True)
     parametros_objeto_documento = models.CharField(max_length=255, null=True, blank=True)
     campos_objeto_documento = models.CharField(max_length=255, null=True, blank=True)
+    # request
+    con_objeto_request = models.BooleanField(default=False)
+    nombre_objeto_request = models.CharField(max_length=200, null=True, blank=True)
+    # default
     solo_default = models.BooleanField(default=False)
     metodo_default = models.CharField(max_length=200, null=True, blank=True)
     parametros_default = models.CharField(max_length=255, blank=True,
@@ -71,22 +76,27 @@ class SoapWebService(models.Model):
                                           separado por ; sin espacios ejemplo: \
 										  "rut_emisor;numero_folio;input_date"')
     campos_default = models.CharField(max_length=255, null=True, blank=True)
+    # procesados
     con_procesado = models.BooleanField(default=False, blank=True)
     metodo_procesado = models.CharField(max_length=200, null=True, blank=True)
     parametros_procesado = models.CharField(max_length=255, null=True, blank=True)
     campos_procesado = models.CharField(max_length=255, null=True, blank=True)
+    # enviados
     con_enviado = models.BooleanField(default=False, blank=True)
     metodo_enviado = models.CharField(max_length=200, null=True, blank=True)
     parametros_enviado = models.CharField(max_length=255, null=True, blank=True)
     campos_enviado = models.CharField(max_length=255, null=True, blank=True)
+    # leidos
     con_leido = models.BooleanField(default=False, blank=True)
     metodo_leido = models.CharField(max_length=200, null=True, blank=True)
     parametros_leido = models.CharField(max_length=255, null=True, blank=True)
     campos_leido = models.CharField(max_length=255, null=True, blank=True)
+    # rebotados
     con_rebotado = models.BooleanField(default=False, blank=True)
     metodo_rebotado = models.CharField(max_length=200, null=True, blank=True)
     parametros_rebotado = models.CharField(max_length=255, null=True, blank=True)
     campos_rebotado = models.CharField(max_length=255, null=True, blank=True)
+    # rechazados
     con_rechazado = models.BooleanField(default=False, blank=True)
     metodo_rechazado = models.CharField(max_length=200, null=True, blank=True)
     parametros_rechazado = models.CharField(max_length=200, null=True, blank=True)
