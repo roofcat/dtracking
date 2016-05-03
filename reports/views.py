@@ -346,13 +346,6 @@ class QueueExportView(TemplateView):
 			'name': file_name,
 			'report': excel_report.xlsx,
 		}
-		report = ReportForm(data)
-		logging.info("imprimir ReportForm")
-		report.name = file_name
-		report.report = excel_report.xlsx
-		logging.info(report.is_valid())
-		logging.info(report.errors)
-		logging.info("se guardo el reporte")
 		# preparación de parametros
 		mail = EmailClient()
 		mail.send_report_to_user_with_attach(user_email, data)
