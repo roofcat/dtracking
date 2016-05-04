@@ -400,6 +400,8 @@ class QueueExportView(TemplateView):
 		data['name'] = file_name
 		if get_report_file_format() == 'xlsx':
 			data['report'] = excel_report.xlsx
+		elif:
+			data['report'] = excel_report.tsv
 		else:
 			data['report'] = excel_report.csv
 		# preparación de parametros
