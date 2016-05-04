@@ -7,6 +7,7 @@ from django.db import models
 REPORT_FILE_FORMAT = (
     ('xlsx', 'xlsx'),
     ('csv', 'csv'),
+    ('tsv', 'tsv'),
 )
 
 

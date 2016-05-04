@@ -64,9 +64,20 @@ class ReporteConsolidadoTemplateView(LoginRequiredMixin, TemplateView):
 		date_to = datetime.strptime(str(date_to), '%d/%m/%Y')
 		empresa = str(empresa)
 		data = Email.get_emails_by_dates(date_from, date_to, empresa)
-		excel_report = create_tablib(data)
-		response = HttpResponse(excel_report.xlsx, content_type="application/vnd.ms-excel")
-		response['Content-Disposition'] = 'attachment; filename="consolidado.xlsx"'
+		report_file = create_tablib(data)
+
+		if get_report_file_format() == 'xlsx':
+			response = HttpResponse(report_file.xlsx, content_type="application/vnd.ms-excel")
+			response['Content-Disposition'] = 'attachment; filename="consolidado.xlsx"'
+		elif get_report_file_format() == 'csv':
+			response = HttpResponse(report_file.csv, content_type="text/csv")
+			response['Content-Disposition'] = 'attachment; filename="consolidado.csv"'
+		elif get_report_file_format() == 'tsv':
+			response = HttpResponse(report_file.tsv, content_type="text/tsv")
+			response['Content-Disposition'] = 'attachment; filename="consolidado.tsv"'
+		else:
+			response = HttpResponse(report_file.xlsx, content_type="application/vnd.ms-excel")
+			response['Content-Disposition'] = 'attachment; filename="consolidado.xlsx"'
 		return response
 
 
