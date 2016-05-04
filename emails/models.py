@@ -211,7 +211,10 @@ class Email(models.Model):
 
     def delete(self, *args, **kwargs):
         try:
-            cloudstorage.delete(self.adjunto1.name)
+            if self.adjunto1 == '' or self.adjunto1 is None:
+                pass
+            else:
+                delete_file_queue(self.adjunto1.name)
             super(Email, self).delete(*args, **kwargs)
         except cloudstorage.NotFoundError, e:
             logging.error(e)
@@ -665,6 +668,19 @@ class Email(models.Model):
         if options != 'all':
             params['tipo_receptor'] = options
         emails = Email.objects.filter(**params).order_by('input_date')[:self.get_max_query_length()]
+        if emails:
+            return emails
+        else:
+            return None
+
+    @classmethod
+    def get_emails_by_dates(self, date_from, date_to, empresa):
+        params = dict()
+        params['input_date__range'] = (date_from, date_to)
+        params['empresa'] = empresa
+        emails = Email.objects.filter(**params).order_by('input_date')
+        print emails.query
+        print emails.count()
         if emails:
             return emails
         else:

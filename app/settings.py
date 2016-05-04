@@ -17,10 +17,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = '%7)c#yro&000cb_f*-dhc19@p%in)dvcq%(88-7jq7f1%lha5f'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-if os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine'):
-    DEBUG = True
-else:
-    DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*',]
 
@@ -156,13 +153,12 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
-if os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine'):
-    STATIC_ROOT = 'static'
-else:
-    # comentar el staticfiles_dir para ejecutar collecstatic
-    # y descomentar el static_root
-    #STATIC_ROOT = 'static'
+if DEBUG:
+    # comentar el staticfiles_dirs para ejecutar collecstatic
+    #STATIC_ROOT = os.path.join(BASE_DIR, 'static')
     STATICFILES_DIRS = (os.path.join(BASE_DIR, 'static'),)
+else:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 STATIC_URL = '/static/'
 
 

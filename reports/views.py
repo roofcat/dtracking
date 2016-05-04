@@ -7,6 +7,7 @@ import logging
 
 
 from django.http import HttpResponse
+from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
@@ -16,6 +17,7 @@ from .forms import ReportForm
 from autenticacion.views import LoginRequiredMixin
 from configuraciones.models import GeneralConfiguration
 from emails.models import Email
+from perfiles.models import Perfil
 from utils.generics import timestamp_to_date
 from utils.queues import report_queue
 from utils.sendgrid_client import EmailClient
@@ -37,6 +39,35 @@ def get_report_file_format():
 		return conf.report_file_format
 	else:
 		return REPORT_FILE_FORMAT
+
+
+class ReporteConsolidadoTemplateView(LoginRequiredMixin, TemplateView):
+	""" Esta vista esta creada para extraer reportes consoliados
+		dentro de algun periodo de tiempo en base a un rango de fechas
+		desde - hasta
+	"""
+
+	def get(self, request, *args, **kwargs):
+		perfil = Perfil.get_perfil(request.user)
+		logging.info(perfil)
+		data = {
+			'es_admin': perfil.es_admin,
+			'empresas': perfil.empresas.all(),
+		}
+		return render(request, 'reports/consolidados.html', data)
+
+	def post(self, request, *args, **kwargs):
+		date_from = request.POST['date_from']
+		date_to = request.POST['date_to']
+		empresa = request.POST['empresas']
+		date_from = datetime.strptime(str(date_from), '%d/%m/%Y')
+		date_to = datetime.strptime(str(date_to), '%d/%m/%Y')
+		empresa = str(empresa)
+		data = Email.get_emails_by_dates(date_from, date_to, empresa)
+		excel_report = create_tablib(data)
+		response = HttpResponse(excel_report.xlsx, content_type="application/vnd.ms-excel")
+		response['Content-Disposition'] = 'attachment; filename="consolidado.xlsx"'
+		return response
 
 
 class DynamicReportTemplateView(LoginRequiredMixin, TemplateView):

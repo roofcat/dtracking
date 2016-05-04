@@ -4,15 +4,16 @@
 from django.conf.urls import include, url
 
 
-from .views import GeneralReportTemplateView
-from .views import SendedReportTemplateView 
-from .views import FailureReportTemplateView
 from .views import ByEmailReportTemplateView
 from .views import ByFolioReportTemplateView
-from .views import ByRutReportTemplateView
 from .views import ByMountReportTemplateView
+from .views import ByRutReportTemplateView
 from .views import DynamicReportTemplateView
+from .views import FailureReportTemplateView
+from .views import GeneralReportTemplateView
 from .views import QueueExportView
+from .views import ReporteConsolidadoTemplateView
+from .views import SendedReportTemplateView 
 
 
 urlpatterns = [
@@ -38,4 +39,7 @@ urlpatterns = [
 
 	# ruta de cola de tarea TaskQueue
 	url(r'^exportqueue/$', QueueExportView.as_view()),
+
+	# reportes privados para consolidados solo de forma local
+	url(r'^consolidados/', ReporteConsolidadoTemplateView.as_view()),
 ]
