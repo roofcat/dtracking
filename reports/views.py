@@ -4,6 +4,8 @@
 from datetime import datetime
 import json
 import logging
+from StringIO import StringIO
+from zipfile import ZipFile, ZIP_DEFLATED
 
 
 from django.http import HttpResponse
@@ -67,18 +69,35 @@ class ReporteConsolidadoTemplateView(LoginRequiredMixin, TemplateView):
 		report_file = create_tablib(data)
 
 		if get_report_file_format() == 'xlsx':
-			response = HttpResponse(report_file.xlsx, content_type="application/vnd.ms-excel")
-			response['Content-Disposition'] = 'attachment; filename="consolidado.xlsx"'
-		elif get_report_file_format() == 'csv':
-			response = HttpResponse(report_file.csv, content_type="text/csv")
-			response['Content-Disposition'] = 'attachment; filename="consolidado.csv"'
+			response_file = report_file.xlsx
+			response_filename = 'consolidado.' + get_report_file_format()
+			response_filetype = 'application/vnd.ms-excel'
 		elif get_report_file_format() == 'tsv':
-			response = HttpResponse(report_file.tsv, content_type="text/tsv")
-			response['Content-Disposition'] = 'attachment; filename="consolidado.tsv"'
+			response_file = report_file.tsv
+			response_filename = 'consolidado.' + get_report_file_format()
+			response_filetype = 'text/tsv'
 		else:
-			response = HttpResponse(report_file.xlsx, content_type="application/vnd.ms-excel")
-			response['Content-Disposition'] = 'attachment; filename="consolidado.xlsx"'
-		return response
+			response_file = report_file.csv
+			response_filename = 'consolidado.' + get_report_file_format()
+			response_filetype = 'text/csv'
+
+		general_conf = GeneralConfiguration.get_configuration()
+
+		if general_conf is not None and general_conf.report_file_zipped:
+			# ejecutar proceso de comprimir reporte
+			in_memory = StringIO()
+
+			with ZipFile(in_memory, 'w') as archive:
+				archive.writestr(response_filename, str(response_file), ZIP_DEFLATED)
+			
+			response = HttpResponse(in_memory.getvalue(), content_type="application/x-zip-compressed")
+			response['Content-Disposition'] = 'attachment; filename="reporte.zip"'
+			return response
+		else:
+			# retornar el reporte
+			response = HttpResponse(response_file, content_type=response_filetype)
+			response['Content-Disposition'] = 'attachment; filename="' + response_filename + '"'
+			return response
 
 
 class DynamicReportTemplateView(LoginRequiredMixin, TemplateView):
@@ -393,17 +412,39 @@ class QueueExportView(TemplateView):
 			params = json.loads(params)
 			logging.info(params)
 			data = Email.get_emails_by_dynamic_query_async(**params)
+		
 		# Creación del documento
-		excel_report = create_tablib(data)
-		# Crear objeto
-		data = dict()
-		data['name'] = file_name
+		report_file = create_tablib(data)
+
+		# evaluacion del formato del archivo reporte
 		if get_report_file_format() == 'xlsx':
-			data['report'] = excel_report.xlsx
+			response_file = report_file.xlsx
+			response_filename = file_name
 		elif get_report_file_format() == 'tsv':
-			data['report'] = excel_report.tsv
+			response_file = report_file.tsv
+			response_filename = file_name
 		else:
-			data['report'] = excel_report.csv
+			response_file = report_file.csv
+			response_filename = file_name
+
+		# evaluar si el archivo es comprimido en zip
+		general_conf = GeneralConfiguration.get_configuration()
+
+		if general_conf is not None and general_conf.report_file_zipped:
+			# ejecutar proceso de comprimir reporte
+			in_memory = StringIO()
+
+			with ZipFile(in_memory, 'w') as archive:
+				archive.writestr(response_filename, str(response_file), ZIP_DEFLATED)
+
+			response_file = in_memory.getvalue()
+			response_filename = file_name + '.zip'
+
+		# Crear objeto para enviarlo por correo
+		data = dict()
+		data['name'] = response_filename
+		data['report'] = response_file
+		
 		# preparación de parametros
 		mail = EmailClient()
 		mail.send_report_to_user_with_attach(user_email, data)

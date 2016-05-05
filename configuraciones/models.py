@@ -14,6 +14,7 @@ REPORT_FILE_FORMAT = (
 class GeneralConfiguration(models.Model):
     report_row_max_length = models.IntegerField()
     report_file_format = models.CharField(max_length=100, choices=REPORT_FILE_FORMAT)
+    report_file_zipped = models.BooleanField(default=True)
 
     @classmethod
     def get_configuration(self):
