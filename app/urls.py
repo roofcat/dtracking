@@ -53,13 +53,14 @@ urlpatterns = [
 	# rutas de las paginas html del tracking
     url(r'^dashboard/', include('dashboard.urls', namespace='dashboard')),
     url(r'^customsearch/', include('customsearch.urls', namespace='customsearch')),
+    url(r'^webhook-api/', SendGridApiWebhookView.as_view(), name='webhook_api'),
 
     # rutas para reportes
     url(r'^reports/', include('reports.urls', namespace='reports')),
 
     # url que recibe webhooks de sendgrid
     url(r'^webhook/', SendGridRestWebhookView.as_view(), name='webhook_rest'),
-    url(r'^webhook-api/', SendGridApiWebhookView.as_view(), name='webhook_api'),
+    url(r'^resumen/',include('resumen.urls', namespace="resumen")),
 
     # url de manejo de reenvio de eventos a WS de clientes
     url(r'^webservices/', include('webservices.urls', namespace='webservices')),

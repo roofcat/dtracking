@@ -49,3 +49,10 @@ class EmailLogEvent(models.Model):
                         nombre_evento=event,
                     )
                     log_event.save()
+
+    @classmethod
+    def get_count_by_months(self, date_from, date_to, empresa):
+        params = dict()
+        params['input_date__range'] = (date_from, date_to)
+        params['empresa'] = empresa
+        return EmailLogEvent.objects.filter(**params).count()

@@ -45,6 +45,7 @@ INSTALLED_APPS = (
     'empresas',
     'perfiles',
     'reports',
+    'resumen',
     'tipodocumentos',
     'webhooks',
     'webservices',
