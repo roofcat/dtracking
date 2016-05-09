@@ -12,9 +12,13 @@ REPORT_FILE_FORMAT = (
 
 
 class GeneralConfiguration(models.Model):
+    # seccion reportes
     report_row_max_length = models.IntegerField()
     report_file_format = models.CharField(max_length=100, choices=REPORT_FILE_FORMAT)
     report_file_zipped = models.BooleanField(default=True)
+    # seccion registro de eventos
+    events_register = models.BooleanField(default=False)
+    events_to_register = models.CharField(max_length=255, default='processed')
 
     @classmethod
     def get_configuration(self):

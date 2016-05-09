@@ -290,19 +290,7 @@ class Email(models.Model):
             tipo_dte = int(tipo_dte, base=10)
         if isinstance(resolucion_emisor, (str, basestring)):
             resolucion_emisor = int(resolucion_emisor, base=10)
-        """
-        try:
-            email = Email.objects.get(
-                correo=correo,
-                numero_folio=numero_folio,
-                tipo_dte_id=tipo_dte,
-                rut_emisor=rut_emisor,
-                resolucion_emisor=resolucion_emisor,
-            )
-            return email
-        except Email.DoesNotExist:
-            return None
-        """
+
         try:
             email = Email.objects.filter(
                 correo=correo,
