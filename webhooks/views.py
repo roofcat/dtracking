@@ -188,6 +188,7 @@ class SendGridApiWebhookView(TemplateView):
                 rut_emisor = str(body['rut_emisor']).decode('utf-8')
                 resolucion_emisor = str(body['resolucion_emisor']).decode('utf-8')
                 empresa = str(body['empresa']).decode('utf-8')
+                id_envio = int(body['id_envio'], base=10)
                 logging.info(evento_sendgrid)
             except Exception, e:
                 logging.error(e)
@@ -200,7 +201,7 @@ class SendGridApiWebhookView(TemplateView):
                     logging.info("es un webhook para el tracking")
 
                     if evento_sendgrid == 'processed':
-                        email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
+                        email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor, id_envio)
                         logging.info(email)
 
                         if email is not None:
@@ -232,7 +233,7 @@ class SendGridApiWebhookView(TemplateView):
                             EmailLogEvent.write_event(evento_sendgrid, body)
 
                     elif evento_sendgrid == 'delivered':
-                        email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
+                        email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor, id_envio)
                         logging.info(email)
 
                         if email is not None:
@@ -266,7 +267,7 @@ class SendGridApiWebhookView(TemplateView):
                             EmailLogEvent.write_event(evento_sendgrid, body)
 
                     elif evento_sendgrid == 'open':
-                        email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
+                        email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor, id_envio)
                         logging.info(email)
 
                         if email is not None:
@@ -306,7 +307,7 @@ class SendGridApiWebhookView(TemplateView):
                             EmailLogEvent.write_event(evento_sendgrid, body)
 
                     elif evento_sendgrid == 'dropped':
-                        email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
+                        email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor, id_envio)
 
                         if email is not None:
                             logging.info(email)
@@ -340,7 +341,7 @@ class SendGridApiWebhookView(TemplateView):
                             EmailLogEvent.write_event(evento_sendgrid, body)
 
                     elif evento_sendgrid == 'bounce':
-                        email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
+                        email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor, id_envio)
 
                         if email is not None:
                             logging.info(email)
@@ -376,7 +377,7 @@ class SendGridApiWebhookView(TemplateView):
                             EmailLogEvent.write_event(evento_sendgrid, body)
 
                     elif evento_sendgrid == 'unsubscribe':
-                        email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
+                        email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor, id_envio)
 
                         if email is not None:
                             logging.info(email)
@@ -408,7 +409,7 @@ class SendGridApiWebhookView(TemplateView):
                             EmailLogEvent.write_event(evento_sendgrid, body)
 
                     elif evento_sendgrid == 'click':
-                        email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor)
+                        email = Email.get_email(correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor, id_envio)
 
                         if email is not None:
                             logging.info(email)

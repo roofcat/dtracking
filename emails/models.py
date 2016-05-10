@@ -283,13 +283,19 @@ class Email(models.Model):
 
     # funcion utilizada desde el webhook api
     @classmethod
-    def get_email(self, correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor):
+    def get_email(self, correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor, id_envio):
+        
         if isinstance(numero_folio, (str, basestring)):
             numero_folio = int(numero_folio, base=10)
+
         if isinstance(tipo_dte, (str, basestring)):
             tipo_dte = int(tipo_dte, base=10)
+        
         if isinstance(resolucion_emisor, (str, basestring)):
             resolucion_emisor = int(resolucion_emisor, base=10)
+        
+        if isinstance(id_envio, (str, basestring)):
+            id_envio = int(id_envio, base=10)
 
         try:
             email = Email.objects.filter(
@@ -298,10 +304,12 @@ class Email(models.Model):
                 tipo_dte_id=tipo_dte,
                 rut_emisor=rut_emisor,
                 resolucion_emisor=resolucion_emisor,
+                id_envio=id_envio,
             )
             logging.info(email)
             logging.info(len(email))
             logging.info(email.query)
+            
             if email:
                 return email[0]
             else:
