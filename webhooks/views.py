@@ -188,7 +188,7 @@ class SendGridApiWebhookView(TemplateView):
                 rut_emisor = str(body['rut_emisor']).decode('utf-8')
                 resolucion_emisor = str(body['resolucion_emisor']).decode('utf-8')
                 empresa = str(body['empresa']).decode('utf-8')
-                id_envio = str(body['id_envio']).decode('utf-8cd ..')
+                id_envio = str(body['id_envio']).decode('utf-8')
                 logging.info(evento_sendgrid)
             except Exception, e:
                 logging.error(e)
