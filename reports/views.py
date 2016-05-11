@@ -21,6 +21,7 @@ from configuraciones.models import GeneralConfiguration
 from emails.models import Email
 from perfiles.models import Perfil
 from utils.generics import timestamp_to_date
+from utils.generics import get_date_to_string
 from utils.queues import report_queue
 from utils.sendgrid_client import EmailClient
 from utils.tablib_export import create_tablib
@@ -70,15 +71,15 @@ class ReporteConsolidadoTemplateView(LoginRequiredMixin, TemplateView):
 
 		if get_report_file_format() == 'xlsx':
 			response_file = report_file.xlsx
-			response_filename = 'consolidado.' + get_report_file_format()
+			response_filename = 'consolidado' + get_date_to_string() + get_report_file_format()
 			response_filetype = 'application/vnd.ms-excel'
 		elif get_report_file_format() == 'tsv':
 			response_file = report_file.tsv
-			response_filename = 'consolidado.' + get_report_file_format()
+			response_filename = 'consolidado' + get_date_to_string() + get_report_file_format()
 			response_filetype = 'text/tsv'
 		else:
 			response_file = report_file.csv
-			response_filename = 'consolidado.' + get_report_file_format()
+			response_filename = 'consolidado' + get_date_to_string() + get_report_file_format()
 			response_filetype = 'text/csv'
 
 		general_conf = GeneralConfiguration.get_configuration()
@@ -141,7 +142,7 @@ class DynamicReportTemplateView(LoginRequiredMixin, TemplateView):
 
 		context = dict()
 		context['user_email'] = request.user.email
-		context['file_name'] = 'reporte_dinamico.' + get_report_file_format()
+		context['file_name'] = 'reporte_dinamico' + get_date_to_string() + get_report_file_format()
 		context['export_type'] = 'export_dynamic_emails'
 		context['params'] = json.dumps(parameters)
 		report_queue(context)
@@ -160,7 +161,7 @@ class GeneralReportTemplateView(LoginRequiredMixin, TemplateView):
                     'empresa': str(empresa),
                     'options': options,
                     'user_email': request.user.email,
-                    'file_name': 'reporte_general.' + get_report_file_format(),
+                    'file_name': 'reporte_general' + get_date_to_string() + get_report_file_format(),
                     'export_type': 'export_general_email',
                 }
                 report_queue(context)
@@ -181,7 +182,7 @@ class SendedReportTemplateView(LoginRequiredMixin, TemplateView):
                     'empresa': str(empresa),
                     'options': options,
                     'user_email': request.user.email,
-                    'file_name': 'reporte_enviados.' + get_report_file_format(),
+                    'file_name': 'reporte_enviados' + get_date_to_string() + get_report_file_format(),
                     'export_type': 'export_sended_email',
                 }
             report_queue(context)
@@ -202,7 +203,7 @@ class FailureReportTemplateView(LoginRequiredMixin, TemplateView):
                     'empresa': str(empresa),
                     'options': options,
                     'user_email': request.user.email,
-                    'file_name': 'reporte_fallidos.' + get_report_file_format(),
+                    'file_name': 'reporte_fallidos' + get_date_to_string() + get_report_file_format(),
                     'export_type': 'export_failure_email',
                 }
             report_queue(context)
@@ -222,7 +223,7 @@ class ByEmailReportTemplateView(LoginRequiredMixin, TemplateView):
                     'date_to': int(date_to, base=10),
                     'email': str(correo).lower(),
                     'user_email': request.user.email,
-                    'file_name': 'reporte_por_email.' + get_report_file_format(),
+                    'file_name': 'reporte_por_email' + get_date_to_string() + get_report_file_format(),
                     'export_type': 'export_search_by_email',
                 }
             report_queue(context)
@@ -240,7 +241,7 @@ class ByFolioReportTemplateView(LoginRequiredMixin, TemplateView):
                 context = {
                     'folio': int(folio, base=10),
                     'user_email': request.user.email,
-                    'file_name': 'reporte_por_folio.' + get_report_file_format(),
+                    'file_name': 'reporte_por_folio' + get_date_to_string() + get_report_file_format(),
                     'export_type': 'export_search_by_folio',
                 }
                 report_queue(context)
@@ -260,7 +261,7 @@ class ByRutReportTemplateView(LoginRequiredMixin, TemplateView):
                     'date_to': int(date_to, base=10),
                     'rut': str(rut).upper(),
                     'user_email': request.user.email,
-                    'file_name': 'reporte_por_rut.' + get_report_file_format(),
+                    'file_name': 'reporte_por_rut' + get_date_to_string() + get_report_file_format(),
                     'export_type': 'export_search_by_rut',
                 }
             report_queue(context)
@@ -281,7 +282,7 @@ class ByMountReportTemplateView(LoginRequiredMixin, TemplateView):
                     'mount_from': mount_from,
                     'mount_to': mount_to,
                     'user_email': request.user.email,
-                    'file_name': 'reporte_por_monto.' + get_report_file_format(),
+                    'file_name': 'reporte_por_monto' + get_date_to_string() + get_report_file_format(),
                     'export_type': 'export_search_by_mount',
                 }
             report_queue(context)

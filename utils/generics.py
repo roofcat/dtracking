@@ -31,3 +31,8 @@ def get_file_name_from_storage(name):
 		name = name.split("/")
 		length = len(name) - 1
 		return name[length]
+
+def get_date_to_string():
+	today = datetime.now()
+	date_str = datetime.strftime(today, '_%Y_%m_%d_%H_%M_%S.')
+	return unicode(date_str)
