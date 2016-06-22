@@ -61,7 +61,7 @@ OAUTH2CLIENT_NAMESPACE = 'oauth2client#ns'
 
 XSRF_MEMCACHE_ID = 'xsrf_secret_key'
 
-if _appengine_ndb is None:
+if _appengine_ndb is None:  # pragma: NO COVER
     CredentialsNDBModel = None
     CredentialsNDBProperty = None
     FlowNDBProperty = None
@@ -273,7 +273,7 @@ class CredentialsProperty(db.Property):
     """App Engine datastore Property for Credentials.
 
     Utility property that allows easy storage and retrieval of
-    oath2client.Credentials
+    oauth2client.Credentials
     """
 
     # Tell what the user type is.
