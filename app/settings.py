@@ -105,7 +105,7 @@ if os.getenv('SERVER_SOFTWARE', '').startswith('Google App Engine'):
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'HOST': '/cloudsql/django-tracking:azurian-tracking',
+            'HOST': '/cloudsql/django-tracking:azurian-track',
             'NAME': 'azurian_tracking',
             'USER': 'root',
         }
@@ -114,7 +114,7 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',
-            'HOST': '173.194.80.144',
+            'HOST': '173.194.226.63',
             'NAME': 'azurian_tracking',
             'USER': 'azurian-tracking',
             'PASSWORD': 'Paso.1234.',
