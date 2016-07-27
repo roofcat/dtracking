@@ -11,8 +11,8 @@ from __future__ import unicode_literals
 import json
 from collections import OrderedDict
 
-import django
 from django import forms
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.core.paginator import Page
 from django.http.multipartparser import parse_header
@@ -22,7 +22,8 @@ from django.utils import six
 
 from rest_framework import VERSION, exceptions, serializers, status
 from rest_framework.compat import (
-    INDENT_SEPARATORS, LONG_SEPARATORS, SHORT_SEPARATORS, template_render
+    INDENT_SEPARATORS, LONG_SEPARATORS, SHORT_SEPARATORS, coreapi,
+    template_render
 )
 from rest_framework.exceptions import ParseError
 from rest_framework.request import is_form_media_type, override_method
@@ -41,7 +42,6 @@ class BaseRenderer(object):
     All renderers should extend this class, setting the `media_type`
     and `format` attributes, and override the `.render()` method.
     """
-
     media_type = None
     format = None
     charset = 'utf-8'
@@ -55,7 +55,6 @@ class JSONRenderer(BaseRenderer):
     """
     Renderer which serializes to JSON.
     """
-
     media_type = 'application/json'
     format = 'json'
     encoder_class = encoders.JSONEncoder
@@ -137,7 +136,6 @@ class TemplateHTMLRenderer(BaseRenderer):
 
     For pre-rendered HTML, see StaticHTMLRenderer.
     """
-
     media_type = 'text/html'
     format = 'html'
     template_name = None
@@ -475,31 +473,37 @@ class BrowsableAPIRenderer(BaseRenderer):
                 return
 
             if existing_serializer is not None:
-                serializer = existing_serializer
-            else:
-                if has_serializer:
-                    if method in ('PUT', 'PATCH'):
-                        serializer = view.get_serializer(instance=instance, **kwargs)
-                    else:
-                        serializer = view.get_serializer(**kwargs)
+                try:
+                    return self.render_form_for_serializer(existing_serializer)
+                except TypeError:
+                    pass
+
+            if has_serializer:
+                if method in ('PUT', 'PATCH'):
+                    serializer = view.get_serializer(instance=instance, **kwargs)
                 else:
-                    # at this point we must have a serializer_class
-                    if method in ('PUT', 'PATCH'):
-                        serializer = self._get_serializer(view.serializer_class, view,
-                                                          request, instance=instance, **kwargs)
-                    else:
-                        serializer = self._get_serializer(view.serializer_class, view,
-                                                          request, **kwargs)
+                    serializer = view.get_serializer(**kwargs)
+            else:
+                # at this point we must have a serializer_class
+                if method in ('PUT', 'PATCH'):
+                    serializer = self._get_serializer(view.serializer_class, view,
+                                                      request, instance=instance, **kwargs)
+                else:
+                    serializer = self._get_serializer(view.serializer_class, view,
+                                                      request, **kwargs)
 
-            if hasattr(serializer, 'initial_data'):
-                serializer.is_valid()
+            return self.render_form_for_serializer(serializer)
 
-            form_renderer = self.form_renderer_class()
-            return form_renderer.render(
-                serializer.data,
-                self.accepted_media_type,
-                {'style': {'template_pack': 'rest_framework/horizontal'}}
-            )
+    def render_form_for_serializer(self, serializer):
+        if hasattr(serializer, 'initial_data'):
+            serializer.is_valid()
+
+        form_renderer = self.form_renderer_class()
+        return form_renderer.render(
+            serializer.data,
+            self.accepted_media_type,
+            {'style': {'template_pack': 'rest_framework/horizontal'}}
+        )
 
     def get_raw_data_form(self, data, view, method, request):
         """
@@ -638,6 +642,7 @@ class BrowsableAPIRenderer(BaseRenderer):
             'view': view,
             'request': request,
             'response': response,
+            'user': request.user,
             'description': self.get_description(view, response.status_code),
             'name': self.get_name(view),
             'version': VERSION,
@@ -661,7 +666,8 @@ class BrowsableAPIRenderer(BaseRenderer):
 
             'display_edit_forms': bool(response.status_code != 403),
 
-            'api_settings': api_settings
+            'api_settings': api_settings,
+            'csrf_cookie_name': settings.CSRF_COOKIE_NAME,
         }
         return context
 
@@ -714,12 +720,12 @@ class AdminRenderer(BrowsableAPIRenderer):
 
         # Creation and deletion should use redirects in the admin style.
         if (response.status_code == status.HTTP_201_CREATED) and ('Location' in response):
-            response.status_code = status.HTTP_302_FOUND
+            response.status_code = status.HTTP_303_SEE_OTHER
             response['Location'] = request.build_absolute_uri()
             ret = ''
 
         if response.status_code == status.HTTP_204_NO_CONTENT:
-            response.status_code = status.HTTP_302_FOUND
+            response.status_code = status.HTTP_303_SEE_OTHER
             try:
                 # Attempt to get the parent breadcrumb URL.
                 response['Location'] = self.get_breadcrumbs(request)[-2][1]
@@ -773,7 +779,7 @@ class MultiPartRenderer(BaseRenderer):
     media_type = 'multipart/form-data; boundary=BoUnDaRyStRiNg'
     format = 'multipart'
     charset = 'utf-8'
-    BOUNDARY = 'BoUnDaRyStRiNg' if django.VERSION >= (1, 5) else b'BoUnDaRyStRiNg'
+    BOUNDARY = 'BoUnDaRyStRiNg'
 
     def render(self, data, accepted_media_type=None, renderer_context=None):
         if hasattr(data, 'items'):
@@ -785,3 +791,17 @@ class MultiPartRenderer(BaseRenderer):
                     "test case." % key
                 )
         return encode_multipart(self.BOUNDARY, data)
+
+
+class CoreJSONRenderer(BaseRenderer):
+    media_type = 'application/vnd.coreapi+json'
+    charset = None
+    format = 'corejson'
+
+    def __init__(self):
+        assert coreapi, 'Using CoreJSONRenderer, but `coreapi` is not installed.'
+
+    def render(self, data, media_type=None, renderer_context=None):
+        indent = bool(renderer_context.get('indent', 0))
+        codec = coreapi.codecs.CoreJSONCodec()
+        return codec.dump(data, indent=indent)

@@ -23,13 +23,8 @@ $( document ).ready( function () {
 	setDefaultDates();
 	putDownloadLink();
 
-	$( '.datePicker' ).datetimepicker ({
-		'dayOfWeekStart': 1,
-		'lang': 'es',
-		'timepicker': false,
-		'format': 'd/m/Y',
-		'formatDate': 'Y/m/d',
-	});
+	setDateTimePicker( '#date_from' );
+    setDateTimePicker( '#date_to' );
 	// realizar carga por defecto
 	$( "#run_search" ).click();
 });

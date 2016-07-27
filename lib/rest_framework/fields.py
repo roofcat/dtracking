@@ -14,22 +14,25 @@ from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import (
-    EmailValidator, RegexValidator, URLValidator, ip_address_validators
+    EmailValidator, MaxLengthValidator, MaxValueValidator, MinLengthValidator,
+    MinValueValidator, RegexValidator, URLValidator, ip_address_validators
 )
 from django.forms import FilePathField as DjangoFilePathField
 from django.forms import ImageField as DjangoImageField
 from django.utils import six, timezone
-from django.utils.dateparse import parse_date, parse_datetime, parse_time
+from django.utils.dateparse import (
+    parse_date, parse_datetime, parse_duration, parse_time
+)
+from django.utils.duration import duration_string
 from django.utils.encoding import is_protected_type, smart_text
+from django.utils.formats import localize_input, sanitize_separators
 from django.utils.functional import cached_property
 from django.utils.ipv6 import clean_ipv6_address
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import ISO_8601
 from rest_framework.compat import (
-    MaxLengthValidator, MaxValueValidator, MinLengthValidator,
-    MinValueValidator, duration_string, parse_duration, unicode_repr,
-    unicode_to_repr
+    get_remote_field, unicode_repr, unicode_to_repr, value_from_object
 )
 from rest_framework.exceptions import ValidationError
 from rest_framework.settings import api_settings
@@ -370,6 +373,8 @@ class Field(object):
         Return a value to use when the field is being returned as a primitive
         value, without any object instance.
         """
+        if callable(self.initial):
+            return self.initial()
         return self.initial
 
     def get_value(self, dictionary):
@@ -867,6 +872,7 @@ class FloatField(Field):
             self.validators.append(MinValueValidator(self.min_value, message=message))
 
     def to_internal_value(self, data):
+
         if isinstance(data, six.text_type) and len(data) > self.MAX_STRING_LENGTH:
             self.fail('max_string_length')
 
@@ -891,11 +897,15 @@ class DecimalField(Field):
     }
     MAX_STRING_LENGTH = 1000  # Guard against malicious string inputs.
 
-    def __init__(self, max_digits, decimal_places, coerce_to_string=None, max_value=None, min_value=None, **kwargs):
+    def __init__(self, max_digits, decimal_places, coerce_to_string=None, max_value=None, min_value=None,
+                 localize=False, **kwargs):
         self.max_digits = max_digits
         self.decimal_places = decimal_places
+        self.localize = localize
         if coerce_to_string is not None:
             self.coerce_to_string = coerce_to_string
+        if self.localize:
+            self.coerce_to_string = True
 
         self.max_value = max_value
         self.min_value = min_value
@@ -919,7 +929,12 @@ class DecimalField(Field):
         Validate that the input is a decimal number and return a Decimal
         instance.
         """
+
         data = smart_text(data).strip()
+
+        if self.localize:
+            data = sanitize_separators(data)
+
         if len(data) > self.MAX_STRING_LENGTH:
             self.fail('max_string_length')
 
@@ -984,12 +999,18 @@ class DecimalField(Field):
 
         if not coerce_to_string:
             return quantized
+        if self.localize:
+            return localize_input(quantized)
+
         return '{0:f}'.format(quantized)
 
     def quantize(self, value):
         """
         Quantize the decimal value to the configured precision.
         """
+        if self.decimal_places is None:
+            return value
+
         context = decimal.getcontext().copy()
         context.prec = self.max_digits
         return value.quantize(
@@ -1066,7 +1087,7 @@ class DateTimeField(Field):
 
         output_format = getattr(self, 'format', api_settings.DATETIME_FORMAT)
 
-        if output_format is None:
+        if output_format is None or isinstance(value, six.string_types):
             return value
 
         if output_format.lower() == ISO_8601:
@@ -1126,7 +1147,7 @@ class DateField(Field):
 
         output_format = getattr(self, 'format', api_settings.DATE_FORMAT)
 
-        if output_format is None:
+        if output_format is None or isinstance(value, six.string_types):
             return value
 
         # Applying a `DateField` to a datetime value is almost always
@@ -1139,8 +1160,6 @@ class DateField(Field):
         )
 
         if output_format.lower() == ISO_8601:
-            if isinstance(value, six.string_types):
-                value = datetime.datetime.strptime(value, '%Y-%m-%d').date()
             return value.isoformat()
 
         return value.strftime(output_format)
@@ -1186,12 +1205,12 @@ class TimeField(Field):
         self.fail('invalid', format=humanized_format)
 
     def to_representation(self, value):
-        if not value:
+        if value in (None, ''):
             return None
 
         output_format = getattr(self, 'format', api_settings.TIME_FORMAT)
 
-        if output_format is None:
+        if output_format is None or isinstance(value, six.string_types):
             return value
 
         # Applying a `TimeField` to a datetime value is almost always
@@ -1204,8 +1223,6 @@ class TimeField(Field):
         )
 
         if output_format.lower() == ISO_8601:
-            if isinstance(value, six.string_types):
-                value = datetime.datetime.strptime(value, '%H:%M:%S').time()
             return value.isoformat()
         return value.strftime(output_format)
 
@@ -1214,12 +1231,6 @@ class DurationField(Field):
     default_error_messages = {
         'invalid': _('Duration has wrong format. Use one of these formats instead: {format}.'),
     }
-
-    def __init__(self, *args, **kwargs):
-        if parse_duration is None:
-            raise NotImplementedError(
-                'DurationField not supported for django versions prior to 1.8')
-        return super(DurationField, self).__init__(*args, **kwargs)
 
     def to_internal_value(self, value):
         if isinstance(value, datetime.timedelta):
@@ -1481,7 +1492,7 @@ class ListField(Field):
         """
         List of object instances -> List of dicts of primitive datatypes.
         """
-        return [self.child.to_representation(item) for item in data]
+        return [self.child.to_representation(item) if item is not None else None for item in data]
 
 
 class DictField(Field):
@@ -1528,7 +1539,7 @@ class DictField(Field):
         List of object instances -> List of dicts of primitive datatypes.
         """
         return {
-            six.text_type(key): self.child.to_representation(val)
+            six.text_type(key): self.child.to_representation(val) if val is not None else None
             for key, val in value.items()
         }
 
@@ -1675,7 +1686,7 @@ class ModelField(Field):
             self.validators.append(MaxLengthValidator(max_length, message=message))
 
     def to_internal_value(self, data):
-        rel = getattr(self.model_field, 'rel', None)
+        rel = get_remote_field(self.model_field, default=None)
         if rel is not None:
             return rel.to._meta.get_field(rel.field_name).to_python(data)
         return self.model_field.to_python(data)
@@ -1686,7 +1697,7 @@ class ModelField(Field):
         return obj
 
     def to_representation(self, obj):
-        value = self.model_field._get_val_from_obj(obj)
+        value = value_from_object(self.model_field, obj)
         if is_protected_type(value):
             return value
         return self.model_field.value_to_string(obj)

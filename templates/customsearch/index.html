@@ -4,7 +4,7 @@
 
 {% block stylesheets %}
 	<link rel="stylesheet" href="https://cdn.datatables.net/r/bs/jqc-1.11.3,dt-1.10.9/datatables.min.css"/>
-	<link rel="stylesheet" href="{% static "/static/css/jquery.datetimepicker.css" %}">
+	<link rel="stylesheet" href="{% static "/static/css/bootstrap-material-datetimepicker.css" %}">
 	<link rel="stylesheet" href="{% static "/static/css/dataTables.bootstrap.min.css" %}">
 {% endblock %}
 
@@ -13,7 +13,7 @@
 {% block content %}
 <div style="display:none;" id="divCards"></div>
 <table class="table table-hover table-striped table-condensed table-responsive" id="tableCards" style="font-size:10px;">
-	<tr>
+	<thead>
 		<th>Resumen de envío</th>
 		<th>Detalle</th>
 		<th>Adjuntos</th>
@@ -26,7 +26,7 @@
 		<th>Tipo envío</th>
 		<th>Tipo DTE</th>
 		<th>Monto</th>
-	</tr>
+	</thead>
 </table>
 
 <!-- BOTON MATERIAL EXPORT -->
@@ -42,7 +42,7 @@
 
 <!-- BOTON MATERIAL MENU -->
 <div class="search-btn" align="right">
-	<button class="btn btn-fab btn-raised btn-material-red mdi-action-search" id="showMenu" 
+	<button class="btn btn-fab btn-raised btn-material-green mdi-action-search" id="showMenu" 
 	type="button" rel="popover" data-animation="true" data-trigger="hover" 
 	data-html="true" data-placement="left" data-container="body" data-toggle="popover" 
 	data-content="<p>Click para abrir panel de filtro por fechas de período.</p>">
@@ -63,25 +63,25 @@
             	<div class="row">
             		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
 		            	<div class="form-horizontal">
-		                	<div class="form-group form-group-material-indigo has-feedback">
+		                	<div class="form-group form-group-material-green has-feedback">
 								<label class="control-label">Desde</label>
-								<input class="form-control datePicker" type="text" id="date_from">
+								<input class="form-control" type="text" id="date_from">
 								<span class="mdi-action-today form-control-feedback" aria-hidden="true"></span>
 							</div>
 		            	</div>
             		</div>
             		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
 		            	<div class="form-horizontal">
-							<div class="form-group form-group-material-indigo has-feedback">
+							<div class="form-group form-group-material-green has-feedback">
 								<label class="control-label">Hasta</label>
-								<input class="form-control datePicker" type="text" id="date_to">
+								<input class="form-control" type="text" id="date_to">
 								<span class="mdi-action-today form-control-feedback" aria-hidden="true"></span>
 							</div>
 		            	</div>
             		</div>
             		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
             			<div class="form-horizontal">
-            				<div class="form-group form-group-material-indigo has-feedback">
+            				<div class="form-group form-group-material-green has-feedback">
 								<label class="control-label">Empresa</label>
 								<select name="empresas" id="empresas" class="form-control">
 									{% if es_admin %}
@@ -97,7 +97,7 @@
             		</div>
             		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
 		                <div class="form-horizontal">
-		                	<div class="form-group form-group-material-indigo has-feedback">
+		                	<div class="form-group form-group-material-green has-feedback">
 								<label class="control-label">Nº de folio</label>
 								<input class="form-control" type="number" id="numeroFolio">
 							</div>
@@ -105,7 +105,7 @@
             		</div>
             		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
 	            		<div class="form-horizontal">
-		                	<div class="form-group form-group-material-indigo has-feedback">
+		                	<div class="form-group form-group-material-green has-feedback">
 								<label class="control-label">Correo</label>
 								<input class="form-control" type="email" id="correoDestinatario">
 							</div>
@@ -113,7 +113,7 @@
             		</div>
             		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
             			<div class="form-horizontal">
-							<div class="form-group form-group-material-indigo has-feedback">
+							<div class="form-group form-group-material-green has-feedback">
 								<label class="control-label">Rut receptor</label>
 								<input class="form-control" type="text" id="rutReceptor">
 							</div>
@@ -121,7 +121,7 @@
             		</div>
             		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
             			<div class="form-horizontal">
-		                	<div class="form-group form-group-material-indigo has-feedback">
+		                	<div class="form-group form-group-material-green has-feedback">
 								<label class="control-label">Monto desde</label>
 								<input class="form-control" type="number" id="mount_from" min="0">
 							</div>
@@ -129,15 +129,15 @@
             		</div>
             		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
             			<div class="form-horizontal">
-							<div class="form-group form-group-material-indigo has-feedback">
+							<div class="form-group form-group-material-green has-feedback">
 								<label class="control-label">Monto hasta</label>
 								<input class="form-control" type="number" id="mount_to" min="0">
 							</div>
 		                </div>
             		</div>
             		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-            			<div class="form-group form-group-material-indigo has-feedback">
-            				<div class="checkbox checkbox-material-indigo">
+            			<div class="form-group form-group-material-green">
+            				<div class="checkbox checkbox-material-green">
 		            			<label>
 		            				<input type="checkbox" id="checkFallidos"> Sólo fallidos
 		        				</label>
@@ -149,8 +149,8 @@
 
             <div class="modal-footer">
             	<div class="form-group" align="right" style="margin-right:20px;">
-            		<button class="btn btn-flat btn-material-indigo" data-dismiss="modal">Cancelar</button>
-					<button class="btn btn-material-indigo" id="run_search">Buscar</button>
+            		<button class="btn btn-flat" data-dismiss="modal">Cancelar</button>
+					<button class="btn btn-material-green" id="run_search">Buscar</button>
 				</div>
             </div>
 
@@ -170,7 +170,7 @@
                 <p id="emailDetailBody" style="font-size:12px;"></p>
             </div>
             <div class="modal-footer">
-            	<button class="btn btn-material-indigo" data-dismiss="modal">Cerrar</button>            	
+            	<button class="btn btn-material-green" data-dismiss="modal">Cerrar</button>            	
             </div>
         </div>
     </div>
@@ -205,7 +205,7 @@
             </div>
             <div class="modal-footer">
             	<div class="form-group" align="right" style="margin-right:20px;">
-					<button class="btn btn-flat btn-material-indigo" data-dismiss="modal">Cerrar</button>
+					<button class="btn btn-flat btn-material-green" data-dismiss="modal">Cerrar</button>
 				</div>
             </div>
         </div>
@@ -225,7 +225,7 @@
             </div>
             <div class="modal-footer">
             	<div class="form-group" align="right" style="margin-right:20px;">
-					<button class="btn btn-flat btn-material-indigo" data-dismiss="modal">Cerrar</button>
+					<button class="btn btn-flat btn-material-green" data-dismiss="modal">Cerrar</button>
 				</div>
             </div>
         </div>
@@ -234,7 +234,7 @@
 {% endblock %}
 
 {% block javascript %}
-	<script src="{% static "js/jquery.datetimepicker.js" %}"></script>
+	<script src="{% static "js/bootstrap-material-datetimepicker.js" %}"></script>
 	<script src="{% static "js/jquery.dataTables.min.js" %}"></script>
 	<script src="{% static "js/dataTables.bootstrap.min.js" %}"></script>
 	<script src="{% static "js/customsearch/index.min.js" %}"></script>

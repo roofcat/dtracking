@@ -17,3 +17,16 @@ function getCookie(name) {
     };
     return cookieValue;
 };
+
+function setDateTimePicker ( selector ) {
+    $( selector ).bootstrapMaterialDatePicker({
+        time: false,
+        format: 'DD/MM/YYYY',
+        lang: 'es',
+        weekStart: 1,
+        nowButton: true,
+        nowText: 'Hoy',
+        cancelText: 'Cancelar',
+        okText: 'Ok',
+    });
+};

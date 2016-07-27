@@ -36,10 +36,11 @@ def _positive_int(integer_string, strict=False, cutoff=None):
 
 def _divide_with_ceil(a, b):
     """
-    Returns 'a' divded by 'b', with any remainder rounded up.
+    Returns 'a' divided by 'b', with any remainder rounded up.
     """
     if a % b:
         return (a // b) + 1
+
     return a // b
 
 
@@ -155,6 +156,9 @@ class BasePagination(object):
 
     def get_results(self, data):
         return data['results']
+
+    def get_fields(self, view):
+        return []
 
 
 class PageNumberPagination(BasePagination):
@@ -279,6 +283,11 @@ class PageNumberPagination(BasePagination):
         context = self.get_html_context()
         return template_render(template, context)
 
+    def get_fields(self, view):
+        if self.page_size_query_param is None:
+            return [self.page_query_param]
+        return [self.page_query_param, self.page_size_query_param]
+
 
 class LimitOffsetPagination(BasePagination):
     """
@@ -318,6 +327,7 @@ class LimitOffsetPagination(BasePagination):
             try:
                 return _positive_int(
                     request.query_params[self.limit_query_param],
+                    strict=True,
                     cutoff=self.max_limit
                 )
             except (KeyError, ValueError):
@@ -358,17 +368,24 @@ class LimitOffsetPagination(BasePagination):
 
     def get_html_context(self):
         base_url = self.request.build_absolute_uri()
-        current = _divide_with_ceil(self.offset, self.limit) + 1
-        # The number of pages is a little bit fiddly.
-        # We need to sum both the number of pages from current offset to end
-        # plus the number of pages up to the current offset.
-        # When offset is not strictly divisible by the limit then we may
-        # end up introducing an extra page as an artifact.
-        final = (
-            _divide_with_ceil(self.count - self.offset, self.limit) +
-            _divide_with_ceil(self.offset, self.limit)
-        )
-        if final < 1:
+
+        if self.limit:
+            current = _divide_with_ceil(self.offset, self.limit) + 1
+
+            # The number of pages is a little bit fiddly.
+            # We need to sum both the number of pages from current offset to end
+            # plus the number of pages up to the current offset.
+            # When offset is not strictly divisible by the limit then we may
+            # end up introducing an extra page as an artifact.
+            final = (
+                _divide_with_ceil(self.count - self.offset, self.limit) +
+                _divide_with_ceil(self.offset, self.limit)
+            )
+
+            if final < 1:
+                final = 1
+        else:
+            current = 1
             final = 1
 
         if current > final:
@@ -395,18 +412,27 @@ class LimitOffsetPagination(BasePagination):
         context = self.get_html_context()
         return template_render(template, context)
 
+    def get_fields(self, view):
+        return [self.limit_query_param, self.offset_query_param]
+
 
 class CursorPagination(BasePagination):
     """
-    The cursor pagination implementation is neccessarily complex.
+    The cursor pagination implementation is necessarily complex.
     For an overview of the position/offset style we use, see this post:
-    http://cramer.io/2011/03/08/building-cursors-for-the-disqus-api/
+    http://cramer.io/2011/03/08/building-cursors-for-the-disqus-api
     """
     cursor_query_param = 'cursor'
     page_size = api_settings.PAGE_SIZE
     invalid_cursor_message = _('Invalid cursor')
     ordering = '-created'
     template = 'rest_framework/pagination/previous_and_next.html'
+
+    # The offset in the cursor is used in situations where we have a
+    # nearly-unique index. (Eg millisecond precision creation timestamps)
+    # We guard against malicious users attempting to cause expensive database
+    # queries, by having a hard cap on the maximum possible size of the offset.
+    offset_cutoff = 1000
 
     def paginate_queryset(self, queryset, request, view=None):
         self.page_size = self.get_page_size(request)
@@ -638,18 +664,12 @@ class CursorPagination(BasePagination):
         if encoded is None:
             return None
 
-        # The offset in the cursor is used in situations where we have a
-        # nearly-unique index. (Eg millisecond precision creation timestamps)
-        # We guard against malicious users attempting to cause expensive database
-        # queries, by having a hard cap on the maximum possible size of the offset.
-        OFFSET_CUTOFF = 1000
-
         try:
             querystring = b64decode(encoded.encode('ascii')).decode('ascii')
             tokens = urlparse.parse_qs(querystring, keep_blank_values=True)
 
             offset = tokens.get('o', ['0'])[0]
-            offset = _positive_int(offset, cutoff=OFFSET_CUTOFF)
+            offset = _positive_int(offset, cutoff=self.offset_cutoff)
 
             reverse = tokens.get('r', ['0'])[0]
             reverse = bool(int(reverse))
@@ -697,3 +717,6 @@ class CursorPagination(BasePagination):
         template = loader.get_template(self.template)
         context = self.get_html_context()
         return template_render(template, context)
+
+    def get_fields(self, view):
+        return [self.cursor_query_param]

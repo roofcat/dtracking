@@ -11,13 +11,8 @@ $( document ).ready( function () {
 	baseUrl = baseUrl.join('/')
 	baseUrl = baseUrl.substring( 0, baseUrl.length - 1 );
 
-	$( '.datePicker' ).datetimepicker ({
-		'dayOfWeekStart': 1,
-		'lang': 'es',
-		'timepicker': false,
-		'format': 'd/m/Y',
-		'formatDate': 'Y/m/d',
-	});
+	setDateTimePicker( '#date_from' );
+    setDateTimePicker( '#date_to' );
 
 	setDefaultDates();
 

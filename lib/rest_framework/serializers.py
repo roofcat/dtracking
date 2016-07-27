@@ -15,12 +15,12 @@ from __future__ import unicode_literals
 import warnings
 
 from django.db import models
+from django.db.models import DurationField as ModelDurationField
 from django.db.models.fields import Field as DjangoModelField
 from django.db.models.fields import FieldDoesNotExist
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
-from rest_framework.compat import DurationField as ModelDurationField
 from rest_framework.compat import JSONField as ModelJSONField
 from rest_framework.compat import postgres_fields, unicode_to_repr
 from rest_framework.utils import model_meta
@@ -464,9 +464,13 @@ class Serializer(BaseSerializer):
             except SkipField:
                 continue
 
-            if attribute is None:
-                # We skip `to_representation` for `None` values so that
-                # fields do not have to explicitly deal with that case.
+            # We skip `to_representation` for `None` values so that fields do
+            # not have to explicitly deal with that case.
+            #
+            # For related fields with `use_pk_only_optimization` we need to
+            # resolve the pk value.
+            check_for_none = attribute.pk if isinstance(attribute, PKOnlyObject) else attribute
+            if check_for_none is None:
                 ret[field.field_name] = None
             else:
                 ret[field.field_name] = field.to_representation(attribute)
@@ -663,6 +667,28 @@ class ListSerializer(BaseSerializer):
 
         return self.instance
 
+    def is_valid(self, raise_exception=False):
+        # This implementation is the same as the default,
+        # except that we use lists, rather than dicts, as the empty case.
+        assert hasattr(self, 'initial_data'), (
+            'Cannot call `.is_valid()` as no `data=` keyword argument was '
+            'passed when instantiating the serializer instance.'
+        )
+
+        if not hasattr(self, '_validated_data'):
+            try:
+                self._validated_data = self.run_validation(self.initial_data)
+            except ValidationError as exc:
+                self._validated_data = []
+                self._errors = exc.detail
+            else:
+                self._errors = []
+
+        if self._errors and raise_exception:
+            raise ValidationError(self.errors)
+
+        return not bool(self._errors)
+
     def __repr__(self):
         return unicode_to_repr(representation.list_repr(self, indent=1))
 
@@ -715,7 +741,7 @@ def raise_errors_on_nested_writes(method_name, serializer, validated_data):
         isinstance(validated_data[key], (list, dict))
         for key, field in serializer.fields.items()
     ), (
-        'The `.{method_name}()` method does not support writable nested'
+        'The `.{method_name}()` method does not support writable nested '
         'fields by default.\nWrite an explicit `.{method_name}()` method for '
         'serializer `{module}.{class_name}`, or set `read_only=True` on '
         'nested serializer fields.'.format(
@@ -987,12 +1013,12 @@ class ModelSerializer(Serializer):
         if fields is None and exclude is None:
             warnings.warn(
                 "Creating a ModelSerializer without either the 'fields' "
-                "attribute or the 'exclude' attribute is pending deprecation "
+                "attribute or the 'exclude' attribute is deprecated "
                 "since 3.3.0. Add an explicit fields = '__all__' to the "
                 "{serializer_class} serializer.".format(
                     serializer_class=self.__class__.__name__
                 ),
-                PendingDeprecationWarning
+                DeprecationWarning
             )
 
         if fields == ALL_FIELDS:
@@ -1149,6 +1175,7 @@ class ModelSerializer(Serializer):
             class Meta:
                 model = relation_info.related_model
                 depth = nested_depth - 1
+                fields = '__all__'
 
         field_class = NestedSerializer
         field_kwargs = get_nested_relation_kwargs(relation_info)
@@ -1216,6 +1243,11 @@ class ModelSerializer(Serializer):
 
         read_only_fields = getattr(self.Meta, 'read_only_fields', None)
         if read_only_fields is not None:
+            if not isinstance(read_only_fields, (list, tuple)):
+                raise TypeError(
+                    'The `read_only_fields` option must be a list or tuple. '
+                    'Got %s.' % type(read_only_fields).__name__
+                )
             for field_name in read_only_fields:
                 kwargs = extra_kwargs.get(field_name, {})
                 kwargs['read_only'] = True
@@ -1231,6 +1263,9 @@ class ModelSerializer(Serializer):
 
         ('dict of updated extra kwargs', 'mapping of hidden fields')
         """
+        if getattr(self.Meta, 'validators', None) is not None:
+            return (extra_kwargs, {})
+
         model = getattr(self.Meta, 'model')
         model_fields = self._get_model_fields(
             field_names, declared_fields, extra_kwargs
@@ -1281,7 +1316,7 @@ class ModelSerializer(Serializer):
                 else:
                     uniqueness_extra_kwargs[unique_constraint_name] = {'default': default}
             elif default is not empty:
-                # The corresponding field is not present in the,
+                # The corresponding field is not present in the
                 # serializer. We have a default to use for it, so
                 # add in a hidden field that populates it.
                 hidden_fields[unique_constraint_name] = HiddenField(default=default)
@@ -1363,6 +1398,7 @@ class ModelSerializer(Serializer):
         field_names = {
             field.source for field in self.fields.values()
             if (field.source != '*') and ('.' not in field.source)
+            and not field.read_only
         }
 
         # Note that we make sure to check `unique_together` both on the
@@ -1465,6 +1501,7 @@ class HyperlinkedModelSerializer(ModelSerializer):
             class Meta:
                 model = relation_info.related_model
                 depth = nested_depth - 1
+                fields = '__all__'
 
         field_class = NestedSerializer
         field_kwargs = get_nested_relation_kwargs(relation_info)

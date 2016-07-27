@@ -6,9 +6,13 @@ versions of Django/Python, and compatibility wrappers around optional packages.
 # flake8: noqa
 from __future__ import unicode_literals
 
+import inspect
+
 import django
+from django.apps import apps
 from django.conf import settings
-from django.db import connection, transaction
+from django.core.exceptions import ImproperlyConfigured
+from django.db import connection, models, transaction
 from django.template import Context, RequestContext, Template
 from django.utils import six
 from django.views.generic import View
@@ -58,6 +62,72 @@ def distinct(queryset, base):
     return queryset.distinct()
 
 
+# Obtaining manager instances and names from model options differs after 1.10.
+def get_names_and_managers(options):
+    if django.VERSION >= (1, 10):
+        # Django 1.10 onwards provides a `.managers` property on the Options.
+        return [
+            (manager.name, manager)
+            for manager
+            in options.managers
+        ]
+    # For Django 1.8 and 1.9, use the three-tuple information provided
+    # by .concrete_managers and .abstract_managers
+    return [
+        (manager_info[1], manager_info[2])
+        for manager_info
+        in (options.concrete_managers + options.abstract_managers)
+    ]
+
+
+# field.rel is deprecated from 1.9 onwards
+def get_remote_field(field, **kwargs):
+    if 'default' in kwargs:
+        if django.VERSION < (1, 9):
+            return getattr(field, 'rel', kwargs['default'])
+        return getattr(field, 'remote_field', kwargs['default'])
+
+    if django.VERSION < (1, 9):
+        return field.rel
+    return field.remote_field
+
+
+def _resolve_model(obj):
+    """
+    Resolve supplied `obj` to a Django model class.
+
+    `obj` must be a Django model class itself, or a string
+    representation of one.  Useful in situations like GH #1225 where
+    Django may not have resolved a string-based reference to a model in
+    another model's foreign key definition.
+
+    String representations should have the format:
+        'appname.ModelName'
+    """
+    if isinstance(obj, six.string_types) and len(obj.split('.')) == 2:
+        app_name, model_name = obj.split('.')
+        resolved_model = apps.get_model(app_name, model_name)
+        if resolved_model is None:
+            msg = "Django did not return a model for {0}.{1}"
+            raise ImproperlyConfigured(msg.format(app_name, model_name))
+        return resolved_model
+    elif inspect.isclass(obj) and issubclass(obj, models.Model):
+        return obj
+    raise ValueError("{0} is not a Django model".format(obj))
+
+
+def get_related_model(field):
+    if django.VERSION < (1, 9):
+        return _resolve_model(field.rel.to)
+    return field.remote_field.model
+
+
+def value_from_object(field, obj):
+    if django.VERSION < (1, 9):
+        return field._get_val_from_obj(obj)
+    field.value_from_object(obj)
+
+
 # contrib.postgres only supported from 1.8 onwards.
 try:
     from django.contrib.postgres import fields as postgres_fields
@@ -86,16 +156,14 @@ except ImportError:
     crispy_forms = None
 
 
-if django.VERSION >= (1, 6):
-    def clean_manytomany_helptext(text):
-        return text
-else:
-    # Up to version 1.5 many to many fields automatically suffix
-    # the `help_text` attribute with hardcoded text.
-    def clean_manytomany_helptext(text):
-        if text.endswith(' Hold down "Control", or "Command" on a Mac, to select more than one.'):
-            text = text[:-69]
-        return text
+# coreapi is optional (Note that uritemplate is a dependancy of coreapi)
+try:
+    import coreapi
+    import uritemplate
+except (ImportError, SyntaxError):
+    # SyntaxError is possible under python 3.2
+    coreapi = None
+    uritemplate = None
 
 
 # Django-guardian is optional. Import only if guardian is in INSTALLED_APPS
@@ -107,41 +175,6 @@ try:
         import guardian.shortcuts  # Fixes #1624
 except ImportError:
     pass
-
-
-# MinValueValidator, MaxValueValidator et al. only accept `message` in 1.8+
-if django.VERSION >= (1, 8):
-    from django.core.validators import MinValueValidator, MaxValueValidator
-    from django.core.validators import MinLengthValidator, MaxLengthValidator
-else:
-    from django.core.validators import MinValueValidator as DjangoMinValueValidator
-    from django.core.validators import MaxValueValidator as DjangoMaxValueValidator
-    from django.core.validators import MinLengthValidator as DjangoMinLengthValidator
-    from django.core.validators import MaxLengthValidator as DjangoMaxLengthValidator
-
-
-    class MinValueValidator(DjangoMinValueValidator):
-        def __init__(self, *args, **kwargs):
-            self.message = kwargs.pop('message', self.message)
-            super(MinValueValidator, self).__init__(*args, **kwargs)
-
-
-    class MaxValueValidator(DjangoMaxValueValidator):
-        def __init__(self, *args, **kwargs):
-            self.message = kwargs.pop('message', self.message)
-            super(MaxValueValidator, self).__init__(*args, **kwargs)
-
-
-    class MinLengthValidator(DjangoMinLengthValidator):
-        def __init__(self, *args, **kwargs):
-            self.message = kwargs.pop('message', self.message)
-            super(MinLengthValidator, self).__init__(*args, **kwargs)
-
-
-    class MaxLengthValidator(DjangoMaxLengthValidator):
-        def __init__(self, *args, **kwargs):
-            self.message = kwargs.pop('message', self.message)
-            super(MaxLengthValidator, self).__init__(*args, **kwargs)
 
 
 # PATCH method is not implemented by Django
@@ -188,13 +221,6 @@ else:
     LONG_SEPARATORS = (b', ', b': ')
     INDENT_SEPARATORS = (b',', b': ')
 
-if django.VERSION >= (1, 8):
-    from django.db.models import DurationField
-    from django.utils.dateparse import parse_duration
-    from django.utils.duration import duration_string
-else:
-    DurationField = duration_string = parse_duration = None
-
 try:
     # DecimalValidator is unavailable in Django < 1.9
     from django.core.validators import DecimalValidator
@@ -223,14 +249,14 @@ def template_render(template, context=None, request=None):
     """
     Passing Context or RequestContext to Template.render is deprecated in 1.9+,
     see https://github.com/django/django/pull/3883 and
-    https://github.com/django/django/blob/1.9rc1/django/template/backends/django.py#L82-L84
+    https://github.com/django/django/blob/1.9/django/template/backends/django.py#L82-L84
 
     :param template: Template instance
     :param context: dict
     :param request: Request instance
     :return: rendered template as SafeText instance
     """
-    if django.VERSION < (1, 8) or isinstance(template, Template):
+    if isinstance(template, Template):
         if request:
             context = RequestContext(request, context)
         else:
@@ -239,32 +265,3 @@ def template_render(template, context=None, request=None):
     # backends template, e.g. django.template.backends.django.Template
     else:
         return template.render(context, request=request)
-
-
-def get_all_related_objects(opts):
-    """
-    Django 1.8 changed meta api, see
-    https://docs.djangoproject.com/en/1.8/ref/models/meta/#migrating-old-meta-api
-    https://code.djangoproject.com/ticket/12663
-    https://github.com/django/django/pull/3848
-
-    :param opts: Options instance
-    :return: list of relations except many-to-many ones
-    """
-    if django.VERSION < (1, 8):
-        return opts.get_all_related_objects()
-    else:
-        return [r for r in opts.related_objects if not r.field.many_to_many]
-
-
-def get_all_related_many_to_many_objects(opts):
-    """
-    Django 1.8 changed meta api, see docstr in compat.get_all_related_objects()
-
-    :param opts: Options instance
-    :return: list of many-to-many relations
-    """
-    if django.VERSION < (1, 8):
-        return opts.get_all_related_many_to_many_objects()
-    else:
-        return [r for r in opts.related_objects if r.field.many_to_many]

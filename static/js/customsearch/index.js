@@ -26,14 +26,9 @@ $( document ).ready( function () {
 	baseUrl = baseUrl.join('/')
 	baseUrl = baseUrl.substring( 0, baseUrl.length - 1 );
 	
-	$( '.datePicker' ).datetimepicker ({
-		'dayOfWeekStart': 1,
-		'lang': 'es',
-		'timepicker': false,
-		'format': 'd/m/Y',
-		'formatDate': 'Y/m/d',
-	});
-
+	setDateTimePicker( '#date_from' );
+    setDateTimePicker( '#date_to' );
+    
 	setDefaultDates();
 	$( '#menuModal' ).modal( 'show', true );
 	
@@ -282,8 +277,12 @@ $( 'div' ).on( 'mouseout', '#divPopOver', function () {
 	$( this ).popover( 'hide' );
 });
 
-function timestamp_to_date ( date ) {
+function timestamp_to_datetime ( date ) {
 	return moment.unix( date ).format( 'DD-MM-YYYY h:mm:ss a' );
+};
+
+function timestamp_to_date ( date ) {
+	return moment.unix( date ).format( 'DD-MM-YYYY' );
 };
 
 function drawJqueryTable ( urlSource ) {
@@ -310,38 +309,38 @@ function drawJqueryTable ( urlSource ) {
 					if ( row['processed_event'] ) {
 						rowBody += "<span class=\"label label-default\"> </span>&nbsp;";
 						popBody += "<p><span class=\"label label-default\"> </span>&nbsp;";
-						popBody += " Procesado el " + timestamp_to_date( row['processed_date'] ) + "</p>";
+						popBody += " Procesado el " + timestamp_to_datetime( row['processed_date'] ) + "</p>";
 					};
 					if ( row['delivered_event'] ) {
 						rowBody += "<span class=\"label label-primary\"> </span>&nbsp;";
 						popBody += "<p><span class=\"label label-primary\"> </span>&nbsp;";
-						popBody += " Enviado el " + timestamp_to_date( row['delivered_date'] ) + "</p>";
+						popBody += " Enviado el " + timestamp_to_datetime( row['delivered_date'] ) + "</p>";
 					};
 					if ( row['opened_event'] ) {
 						rowBody += "<span class=\"label label-success\"> </span>&nbsp;";
 						popBody += "<p><span class=\"label label-success\"> </span>&nbsp;";
 						popBody += " Leído la primera vez el  ";
-						popBody += timestamp_to_date( row['opened_first_date'] ) + "<br>";
+						popBody += timestamp_to_datetime( row['opened_first_date'] ) + "<br>";
 						popBody += " Leído por última vez el ";
-						popBody += timestamp_to_date( row['opened_last_date'] ) + "<br>";
+						popBody += timestamp_to_datetime( row['opened_last_date'] ) + "<br>";
 						popBody += " IP " + row['opened_ip'] + " " + row['opened_count'] + " veces.</p>";
 					};
 					if ( row['dropped_event'] ) {
 						rowBody += "<span class=\"label label-warning\"> </span>&nbsp;";
 						popBody += "<p><span class=\"label label-warning\"> </span>&nbsp;";
-						popBody += " Rechazado el " + timestamp_to_date( row['dropped_date'] ) + "<br> ";
+						popBody += " Rechazado el " + timestamp_to_datetime( row['dropped_date'] ) + "<br> ";
 						popBody += " Motivo: " + (row['dropped_reason']).replace( "'", " ") + "</p>";
 					};
 					if ( row['bounce_event'] ) {
 						rowBody += "<span class=\"label label-danger\"> </span>&nbsp;";
 						popBody += "<p><span class=\"label label-danger\"> </span>&nbsp;";
-						popBody += " Rebotado el " + timestamp_to_date( row['bounce_date'] ) + "<br> ";
+						popBody += " Rebotado el " + timestamp_to_datetime( row['bounce_date'] ) + "<br> ";
 						popBody += " Motivo: " + (row['bounce_reason']).replace( "'", " ") + "</p>";
 					};
 					if ( row['unsubscribe_event'] ) {
 						rowBody += "<span class=\"label label-info\"> </span>&nbsp;";
 						popBody += "<p><span class=\"label label-info\"> </span>&nbsp;";
-						popBody += " Desuscrito el " + timestamp_to_date( row['dropped_date'] ) + "</p>";
+						popBody += " Desuscrito el " + timestamp_to_datetime( row['dropped_date'] ) + "</p>";
 					};
 					popBody += '</article>';
 
@@ -482,39 +481,49 @@ function drawEmailDetailModal ( data ) {
 	var htmlBody = '<div><br>';
 	htmlBody += '<label>Empresa</label> ' + data.empresa + ' ';
 	htmlBody += '<label>Rut emisor</label> ' + data.rut_emisor + ' ';
-	htmlBody += '<label>Rut receptor</label> ' + data.rut_receptor + ' ';
-	htmlBody += '<label>Tipo envío</label> ' + data.tipo_envio + '<br>';
+	htmlBody += '<label>Rut receptor</label> ' + data.rut_receptor + ' <br>';
+	htmlBody += '<label>Tipo envío</label> ' + data.tipo_envio + ' ';
 	htmlBody += '<label>Folio</label> ' + data.numero_folio + ' ';
 	htmlBody += '<label>Tipo doc. trib.</label> ' + data.tipo_dte + '<br>';
+	
 	htmlBody += '<label>Resolución receptor</label>';
 	if ( data.resolucion_receptor ) {
 		htmlBody += ' aaa' + data.resolucion_receptor + ' ';
 	} else { 
 		htmlBody += '---';
 	};
+	
+	htmlBody += ' ';
+	
 	htmlBody += '<label>Resolución emisor</label> ';
 	if ( data.resolucion_emisor ) {
 		htmlBody += ' ' + data.resolucion_emisor + ' ';
 	} else { 
 		htmlBody += '---';
 	};
+	
 	htmlBody += '<br>';
+	
 	htmlBody += '<label>Monto</label> ' + data.monto + '<br>';
-	htmlBody += '<label>Fecha emisión</label> ';
 
+	htmlBody += '<label>Fecha emisión</label> ';
 	if ( data.fecha_emision ) {
 		htmlBody += ' ' + timestamp_to_date( data.fecha_emision ) + ' ';
 	} else { 
 		htmlBody += '---';
 	};
-	htmlBody += '<br>';
+
+	htmlBody += ' ';
+	
 	htmlBody += '<label>Fecha recepción</label> ';
 	if ( data.fecha_recepcion ) {
 		htmlBody += ' ' + timestamp_to_date( data.fecha_recepcion ) + ' ';
 	} else { 
 		htmlBody += '---';
 	};
+
 	htmlBody += '<br>';
+	
 	htmlBody += '<label>Estado del documento</label> ';
 	if ( data.estado_documento ) {
 		htmlBody += ' ' + data.estado_documento + ' ';
@@ -522,20 +531,25 @@ function drawEmailDetailModal ( data ) {
 		htmlBody += '---';
 	};
 	htmlBody += '<br>';
+
 	htmlBody += '<label>Tipo operación</label>';
 	if ( data.tipo_operacion ) {
 		htmlBody += ' ' + data.tipo_operacion + ' ';
 	} else {
 		htmlBody += '---';
 	};
-	htmlBody += '<br>';
+	
+	htmlBody += ' ';
+	
 	htmlBody += '<label>Tipo receptor</label>';
 	if ( data.tipo_receptor ) {
 		htmlBody += ' ' + data.tipo_receptor + ' ';
 	} else {
 		htmlBody += '---';
 	};
+	
 	htmlBody += '<br>';
+	
 	if ( data.adjunto1 ) {
 		htmlBody += '<label>Adjunto</label> ';
 		htmlBody += '<a href="' + attachUrl + data.adjunto1 + '" target="_blank">Ver documento adjunto</a><br>';
@@ -545,25 +559,25 @@ function drawEmailDetailModal ( data ) {
 	htmlBody += '<label>Tracking del correo:</label><br>';
 	if ( data.processed_event ) {
 		htmlBody += '<label class="label label-default">Procesado</label> ';
-		htmlBody += 'el ' + timestamp_to_date( data.processed_date ) + '<br>'; 
+		htmlBody += 'el ' + timestamp_to_datetime( data.processed_date ) + '<br>'; 
 	};
 
 	if ( data.delivered_event ) {
 		htmlBody += '<label class="label label-primary">Enviado</label> ';
-		htmlBody += ' el ' + timestamp_to_date( data.delivered_date ) + '<br>';
+		htmlBody += ' el ' + timestamp_to_datetime( data.delivered_date ) + '<br>';
 	};
 
 	if ( data.opened_event ) {
 		htmlBody += '<label class="label label-success">Leído</label> ';
-		htmlBody += 'primera vez el ' + timestamp_to_date( data.opened_first_date ) + ' ';
-		htmlBody += 'y fue leído por ultima vez el ' + timestamp_to_date( data.opened_last_date ) + ' ';
+		htmlBody += 'primera vez el ' + timestamp_to_datetime( data.opened_first_date ) + ' ';
+		htmlBody += 'y fue leído por ultima vez el ' + timestamp_to_datetime( data.opened_last_date ) + ' ';
 		htmlBody += 'y ha sido leído ' + data.opened_count + ' vez/veces.<br>';
 		htmlBody += 'IP lectura ' + data.opened_ip + ' Navegador web utilizado ' + data.opened_user_agent + '<br>';
 	};
 
 	if ( data.bounce_event ) {
 		htmlBody +='<label class="label label-warning">Rebotado</label> ';
-		htmlBody += 'el ' + timestamp_to_date( data.bounce_date ) + '<br>';
+		htmlBody += 'el ' + timestamp_to_datetime( data.bounce_date ) + '<br>';
 		htmlBody +='Tipo rebote ' + data.bounce_type + ' status ' + data.bounce_status + '<br>';
 		htmlBody +='Razón del rebote ' + data.bounce_reason + '<br>';
 	};
@@ -571,7 +585,7 @@ function drawEmailDetailModal ( data ) {
 
 	if ( data.dropped_event ) {
 		htmlBody += '<label class="label label-danger">Rechazado</label> ';
-		htmlBody += 'el ' + timestamp_to_date( data.dropped_date ) + ' ';
+		htmlBody += 'el ' + timestamp_to_datetime( data.dropped_date ) + ' ';
 		htmlBody += '<b>Motivo</b> ' + data.dropped_reason + '<br>';
 	};
 

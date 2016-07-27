@@ -5,6 +5,23 @@ body {
 * {
   box-sizing: border-box;
 }
+.second-navbar {
+  top: 50px;
+}
+@media (min-width: 768px) {
+  .navbar-nav,
+  text-align center,
+  width 100%,
+  .navbar-nav > li {
+    display: inline-block;
+    float: none;
+    position: relative;
+    top: 0%;
+  }
+  .navbar-nav > li.navbar-right {
+    float: right !important;
+  }
+}
 .header-panel {
   background-color: #009587;
   height: 144px;
@@ -171,7 +188,7 @@ body {
   padding: 10px;
 }
 .fondo-azurian {
-  background-color: #2b3fb1;
+  background-color: #fff;
 }
 .amarillo-azurian {
   color: #ffe61f;
@@ -309,4 +326,67 @@ margin-left 2px,
 .body-table {
   font-size: 11px;
   font-family: Roboto;
+}
+.btn-material-green {
+  background-color: #7fbf10 !important;
+}
+.btn-material-green:hover {
+  background-color: #50780a !important;
+}
+.btn-material-teal {
+  background-color: #50780a !important;
+}
+.btn-material-teal:hover {
+  background-color: #7fbf10 !important;
+}
+.form-group-material-green {
+  color: #7fbf10 !important;
+}
+.carousel-caption {
+  background: rgba(0,0,0,0.75);
+  bottom: 0;
+  display: block;
+  left: 0;
+  padding: 15px;
+  position: absolute;
+  right: 0;
+}
+.well-login {
+  background-color: #ebebeb !important;
+  color: #57575b !important;
+}
+.well-login h4 {
+  color: #57575b;
+}
+.well-login a {
+  color: #57575b !important;
+}
+.link-verde {
+  color: #50780a !important;
+}
+.link-verde a {
+  color: #50780a !important;
+}
+.link-verde:hover {
+  color: #7fbf10 !important;
+}
+.link-verde:focus {
+  color: #7fbf10 !important;
+}
+@media (max-width: 979px) {
+  .well-login a {
+    font-size: 10px;
+  }
+  .well-login h2 {
+    font-size: 22px;
+  }
+  .link-verde {
+    font-size: 11px;
+  }
+}
+.main {
+  padding-top: 20px;
+}
+.table-hover > tbody > tr:hover {
+  background-color: #a8ff0f;
 }

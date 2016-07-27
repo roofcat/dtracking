@@ -16,8 +16,6 @@ from debug_toolbar import settings as dt_settings
 from debug_toolbar.toolbar import DebugToolbar
 
 _HTML_TYPES = ('text/html', 'application/xhtml+xml')
-# Handles python threading module bug - http://bugs.python.org/issue14308
-threading._DummyThread._Thread__stop = lambda x: 1
 
 
 def show_toolbar(request):
@@ -43,7 +41,7 @@ class DebugToolbarMiddleware(object):
     def __init__(self):
         # If SHOW_TOOLBAR_CALLBACK is a string, which is the recommended
         # setup, resolve it to the corresponding callable.
-        func_or_path = dt_settings.CONFIG['SHOW_TOOLBAR_CALLBACK']
+        func_or_path = dt_settings.get_config()['SHOW_TOOLBAR_CALLBACK']
         if isinstance(func_or_path, six.string_types):
             self.show_toolbar = import_string(func_or_path)
         else:
@@ -113,16 +111,9 @@ class DebugToolbarMiddleware(object):
 
         # Insert the toolbar in the response.
         content = force_text(response.content, encoding=settings.DEFAULT_CHARSET)
-        insert_before = dt_settings.CONFIG['INSERT_BEFORE']
-        try:                    # Python >= 2.7
-            pattern = re.escape(insert_before)
-            bits = re.split(pattern, content, flags=re.IGNORECASE)
-        except TypeError:       # Python < 2.7
-            pattern = '(.+?)(%s|$)' % re.escape(insert_before)
-            matches = re.findall(pattern, content, flags=re.DOTALL | re.IGNORECASE)
-            bits = [m[0] for m in matches if m[1] == insert_before]
-            # When the body ends with a newline, there's two trailing groups.
-            bits.append(''.join(m[0] for m in matches if m[1] == ''))
+        insert_before = dt_settings.get_config()['INSERT_BEFORE']
+        pattern = re.escape(insert_before)
+        bits = re.split(pattern, content, flags=re.IGNORECASE)
         if len(bits) > 1:
             # When the toolbar will be inserted for sure, generate the stats.
             for panel in reversed(toolbar.enabled_panels):

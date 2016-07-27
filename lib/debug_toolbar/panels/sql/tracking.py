@@ -102,7 +102,7 @@ class NormalCursorWrapper(object):
         finally:
             stop_time = time()
             duration = (stop_time - start_time) * 1000
-            if dt_settings.CONFIG['ENABLE_STACKTRACES']:
+            if dt_settings.get_config()['ENABLE_STACKTRACES']:
                 stacktrace = tidy_stacktrace(reversed(get_stack()))
             else:
                 stacktrace = []
@@ -129,7 +129,7 @@ class NormalCursorWrapper(object):
                 'stacktrace': stacktrace,
                 'start_time': start_time,
                 'stop_time': stop_time,
-                'is_slow': duration > dt_settings.CONFIG['SQL_WARNING_THRESHOLD'],
+                'is_slow': duration > dt_settings.get_config()['SQL_WARNING_THRESHOLD'],
                 'is_select': sql.lower().strip().startswith('select'),
                 'template_info': template_info,
             }
@@ -152,10 +152,10 @@ class NormalCursorWrapper(object):
             # We keep `sql` to maintain backwards compatibility
             self.logger.record(**params)
 
-    def callproc(self, procname, params=()):
+    def callproc(self, procname, params=None):
         return self._record(self.cursor.callproc, procname, params)
 
-    def execute(self, sql, params=()):
+    def execute(self, sql, params=None):
         return self._record(self.cursor.execute, sql, params)
 
     def executemany(self, sql, param_list):
