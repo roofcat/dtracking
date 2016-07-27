@@ -76,8 +76,8 @@ $( 'button' ).on( 'click', function () {
 	var btn = $( this );
 	var btnId = $( this ).attr( 'id' );
 
-	var title = "Reporte Tracking";
-	var body = "Se ha iniciado el proceso de generar un reporte Excel ";
+	var title = "Reporte Azurian Track";
+	var body = "Se ha iniciado el proceso de generar una planilla reporte ";
 	body += "cuando este proceso finalice recibirás un email con el archivo adjunto, ";
 	body += "por favor espere unos minutos...";
 
