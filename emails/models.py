@@ -28,9 +28,13 @@ TIPOS_RECEPTORES = (
 )
 TIPOS_ENVIOS = (
     ('aceptacion', 'aceptacion'),
+    ('Aceptacion', 'Aceptacion'),
     ('envio dte', 'envio dte'),
+    ('Envio DTE', 'Envio DTE'),
     ('notificacion', 'notificacion'),
+    ('Notificacion', 'Notificacion'),
     ('rechazo', 'rechazo'),
+    ('Rechazo', 'Rechazo'),
     ('rems', 'rems'),
 )
 TIPOS_ESTADOS_DOCUMENTOS = (
@@ -38,6 +42,7 @@ TIPOS_ESTADOS_DOCUMENTOS = (
     ('no recepcionado', 'no recepcionado'),
     ('aceptado', 'aceptado'),
     ('rechazado', 'rechazado'),
+    ('aprovado con reparo sii', 'aprovado con reparo sii'),
 )
 TIPOS_OPERACIONES = (
     ('compra', 'compra'),
@@ -48,9 +53,9 @@ MAX_QUERY_LENGTH = 10000
 
 
 class FileQuerySet(models.QuerySet):
-    """ Clase encargada de eliminar los adjuntos en casos de
-        DELETE's masivos
-    """
+    ''' Clase encargada de eliminar los adjuntos en casos de
+        DELETEs masivos
+    '''
 
     def delete(self, *args, **kwargs):
         try:
@@ -284,16 +289,16 @@ class Email(models.Model):
     # funcion utilizada desde el webhook api
     @classmethod
     def get_email(self, correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor, id_envio):
-        
+
         if isinstance(numero_folio, (str, basestring)):
             numero_folio = int(numero_folio, base=10)
 
         if isinstance(tipo_dte, (str, basestring)):
             tipo_dte = int(tipo_dte, base=10)
-        
+
         if isinstance(resolucion_emisor, (str, basestring)):
             resolucion_emisor = int(resolucion_emisor, base=10)
-        
+
         if isinstance(id_envio, (str, basestring)):
             id_envio = int(id_envio, base=10)
 
@@ -309,7 +314,7 @@ class Email(models.Model):
             logging.info(email)
             logging.info(len(email))
             logging.info(email.query)
-            
+
             if email:
                 return email[0]
             else:
@@ -320,107 +325,61 @@ class Email(models.Model):
 
     # MÉTODOS DE CONSULTAS (para no repetir código)
     @classmethod
-    def get_statistics_count_by_dates(self, date_from, date_to, empresa='all', options='all'):
-        # Primero validar si se debe filtrar o no por empresa
-        if empresa == 'all':
-            # si se consulta por todas las empresas se evalúa el tipo de receptor
-            if options == 'all':
-                count_total = Email.objects.filter(
-                    input_date__range=(date_from, date_to)).count()
-                count_processed = Email.objects.filter(
-                    input_date__range=(date_from, date_to),
-                    processed_event='processed').count()
-                count_delivered = Email.objects.filter(
-                    input_date__range=(date_from, date_to),
-                    delivered_event='delivered').count()
-                count_opened = Email.objects.filter(
-                    input_date__range=(date_from, date_to),
-                    opened_event='open').count()
-                count_dropped = Email.objects.filter(
-                    input_date__range=(date_from, date_to),
-                    dropped_event='dropped').count()
-                count_bounce = Email.objects.filter(
-                    input_date__range=(date_from, date_to),
-                    bounce_event='bounce').count()
-            else:
-                count_total = Email.objects.filter(
-                    input_date__range=(date_from, date_to), 
-                    tipo_receptor=options).count()
-                count_processed = Email.objects.filter(
-                    input_date__range=(date_from, date_to),
-                    processed_event='processed',
-                    tipo_receptor=options).count()
-                count_delivered = Email.objects.filter(
-                    input_date__range=(date_from, date_to),
-                    delivered_event='delivered',
-                    tipo_receptor=options).count()
-                count_opened = Email.objects.filter(
-                    input_date__range=(date_from, date_to),
-                    opened_event='open',
-                    tipo_receptor=options).count()
-                count_dropped = Email.objects.filter(
-                    input_date__range=(date_from, date_to),
-                    dropped_event='dropped',
-                    tipo_receptor=options).count()
-                count_bounce = Email.objects.filter(
-                    input_date__range=(date_from, date_to),
-                    bounce_event='bounce',
-                    tipo_receptor=options).count()
+    def get_statistics_count_by_dates(self, date_from, date_to, empresa, options='all'):
+        if options == 'all':
+            count_total = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                empresa=empresa).count()
+            count_processed = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                processed_event='processed',
+                empresa=empresa).count()
+            count_delivered = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                delivered_event='delivered',
+                empresa=empresa).count()
+            count_opened = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                opened_event='open',
+                empresa=empresa).count()
+            count_dropped = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                dropped_event='dropped',
+                empresa=empresa).count()
+            count_bounce = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                bounce_event='bounce',
+                empresa=empresa).count()
         else:
-            if options == 'all':
-                count_total = Email.objects.filter(
-                    input_date__range=(date_from, date_to),
-                    empresa=empresa).count()
-                count_processed = Email.objects.filter(
-                    input_date__range=(date_from, date_to),
-                    processed_event='processed',
-                    empresa=empresa).count()
-                count_delivered = Email.objects.filter(
-                    input_date__range=(date_from, date_to),
-                    delivered_event='delivered',
-                    empresa=empresa).count()
-                count_opened = Email.objects.filter(
-                    input_date__range=(date_from, date_to),
-                    opened_event='open',
-                    empresa=empresa).count()
-                count_dropped = Email.objects.filter(
-                    input_date__range=(date_from, date_to),
-                    dropped_event='dropped',
-                    empresa=empresa).count()
-                count_bounce = Email.objects.filter(
-                    input_date__range=(date_from, date_to),
-                    bounce_event='bounce',
-                    empresa=empresa).count()
-            else:
-                count_total = Email.objects.filter(
-                    input_date__range=(date_from, date_to), 
-                    tipo_receptor=options,
-                    empresa=empresa).count()
-                count_processed = Email.objects.filter(
-                    input_date__range=(date_from, date_to),
-                    processed_event='processed',
-                    tipo_receptor=options,
-                    empresa=empresa).count()
-                count_delivered = Email.objects.filter(
-                    input_date__range=(date_from, date_to),
-                    delivered_event='delivered',
-                    tipo_receptor=options,
-                    empresa=empresa).count()
-                count_opened = Email.objects.filter(
-                    input_date__range=(date_from, date_to),
-                    opened_event='open',
-                    tipo_receptor=options,
-                    empresa=empresa).count()
-                count_dropped = Email.objects.filter(
-                    input_date__range=(date_from, date_to),
-                    dropped_event='dropped',
-                    tipo_receptor=options,
-                    empresa=empresa).count()
-                count_bounce = Email.objects.filter(
-                    input_date__range=(date_from, date_to),
-                    bounce_event='bounce',
-                    tipo_receptor=options,
-                    empresa=empresa).count()
+            count_total = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                tipo_receptor=options,
+                empresa=empresa).count()
+            count_processed = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                processed_event='processed',
+                tipo_receptor=options,
+                empresa=empresa).count()
+            count_delivered = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                delivered_event='delivered',
+                tipo_receptor=options,
+                empresa=empresa).count()
+            count_opened = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                opened_event='open',
+                tipo_receptor=options,
+                empresa=empresa).count()
+            count_dropped = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                dropped_event='dropped',
+                tipo_receptor=options,
+                empresa=empresa).count()
+            count_bounce = Email.objects.filter(
+                input_date__range=(date_from, date_to),
+                bounce_event='bounce',
+                tipo_receptor=options,
+                empresa=empresa).count()
         return {
             'total': count_total,
             'processed': count_processed,
@@ -431,37 +390,21 @@ class Email(models.Model):
         }
 
     @classmethod
-    def get_statistics_range_by_dates(self, date_from, date_to, empresa='all', options='all'):
-        if empresa == 'all':
-            if options == 'all':
-                emails = Email.objects.filter(input_date__range=(
-                    date_from, date_to)).values('input_date').annotate(
-                    total=Count('input_date'), processed=Count('processed_event'),
-                    delivered=Count('delivered_event'), opened=Count('opened_event'),
-                    dropped=Count('dropped_event'), bounced=Count('bounce_event')
-                ).order_by('input_date')
-            else:
-                emails = Email.objects.filter(input_date__range=(
-                    date_from, date_to), tipo_receptor=options).values('input_date').annotate(
-                    total=Count('input_date'), processed=Count('processed_event'),
-                    delivered=Count('delivered_event'), opened=Count('opened_event'),
-                    dropped=Count('dropped_event'), bounced=Count('bounce_event')
-                ).order_by('input_date')
+    def get_statistics_range_by_dates(self, date_from, date_to, empresa, options='all'):
+        if options == 'all':
+            emails = Email.objects.filter(input_date__range=(
+                date_from, date_to), empresa=empresa).values('input_date').annotate(
+                total=Count('input_date'), processed=Count('processed_event'),
+                delivered=Count('delivered_event'), opened=Count('opened_event'),
+                dropped=Count('dropped_event'), bounced=Count('bounce_event')
+            ).order_by('input_date')
         else:
-            if options == 'all':
-                emails = Email.objects.filter(input_date__range=(
-                    date_from, date_to), empresa=empresa).values('input_date').annotate(
-                    total=Count('input_date'), processed=Count('processed_event'),
-                    delivered=Count('delivered_event'), opened=Count('opened_event'),
-                    dropped=Count('dropped_event'), bounced=Count('bounce_event')
-                ).order_by('input_date')
-            else:
-                emails = Email.objects.filter(input_date__range=(
-                    date_from, date_to), tipo_receptor=options, empresa=empresa).values('input_date').annotate(
-                    total=Count('input_date'), processed=Count('processed_event'),
-                    delivered=Count('delivered_event'), opened=Count('opened_event'),
-                    dropped=Count('dropped_event'), bounced=Count('bounce_event')
-                ).order_by('input_date')
+            emails = Email.objects.filter(input_date__range=(
+                date_from, date_to), tipo_receptor=options, empresa=empresa).values('input_date').annotate(
+                total=Count('input_date'), processed=Count('processed_event'),
+                delivered=Count('delivered_event'), opened=Count('opened_event'),
+                dropped=Count('dropped_event'), bounced=Count('bounce_event')
+            ).order_by('input_date')
         data = []
         for email in emails:
             email = json.dumps(email, cls=DjangoJSONEncoder)
@@ -469,14 +412,17 @@ class Email(models.Model):
         return data
 
     @classmethod
-    def delete_old_emails_by_date(self, date_to_delete):
+    def delete_old_emails_by_date(self, date_to_delete, empresa):
         try:
-            emails = Email.objects.filter(input_date__lt=date_to_delete).delete()
+            emails = Email.objects.filter(
+                input_date__lt=date_to_delete,
+                empresa=empresa,
+            ).delete()
         except Exception, e:
             logging.error(e)
 
     @classmethod
-    def get_emails_by_dynamic_query(self, date_from, date_to, empresa, correo, 
+    def get_emails_by_dynamic_query(self, date_from, date_to, empresa, correo,
                                     folio, rut, mount_from, mount_to, fallidos,
                                     display_start, display_length):
         if folio is not None:
@@ -543,7 +489,7 @@ class Email(models.Model):
         display_length
 
     @classmethod
-    def get_emails_by_dynamic_query_async(self, date_from, date_to, empresa, correo, 
+    def get_emails_by_dynamic_query_async(self, date_from, date_to, empresa, correo,
                                         folio, rut, mount_from, mount_to, fallidos):
 
         date_from = timestamp_to_date(date_from)
@@ -610,7 +556,7 @@ class Email(models.Model):
     def get_delayed_emails_only_processed(self):
         emails = Email.objects.filter(
             Q(processed_event__isnull=False) & Q(delivered_event__isnull=True) &
-            Q(opened_event__isnull=True ) & Q(dropped_event__isnull=True) & 
+            Q(opened_event__isnull=True ) & Q(dropped_event__isnull=True) &
             Q(bounce_event__isnull=True)).order_by('input_date')
         if emails:
             logging.info("se encontraron la siguente cantidad de emails pendientes")
@@ -649,7 +595,7 @@ class Email(models.Model):
     def get_emails_by_correo_async(self, date_from, date_to, correo, **kwargs):
         emails = Email.objects.filter(
             input_date__range=(date_from, date_to),
-            correo=correo).order_by('-input_date')[:self.get_max_query_length()]
+            correo=correo).order_by('-input_date')[:self.get_max_query_length(empresa)]
         if emails:
             return emails
         else:
@@ -663,7 +609,7 @@ class Email(models.Model):
             params['empresa'] = empresa
         if options != 'all':
             params['tipo_receptor'] = options
-        emails = Email.objects.filter(**params).order_by('input_date')[:self.get_max_query_length()]
+        emails = Email.objects.filter(**params).order_by('input_date')[:self.get_max_query_length(empresa)]
         if emails:
             return emails
         else:
@@ -691,7 +637,7 @@ class Email(models.Model):
             params['empresa'] = empresa
         if options != 'all':
             params['tipo_receptor'] = options
-        emails = Email.objects.filter(**params).order_by('input_date')[:self.get_max_query_length()]
+        emails = Email.objects.filter(**params).order_by('input_date')[:self.get_max_query_length(empresa)]
         if emails:
             return emails
         else:
@@ -727,7 +673,7 @@ class Email(models.Model):
     def get_emails_by_folio_async(self, folio, **kwargs):
         if folio:
             emails = Email.objects.filter(
-                numero_folio=folio).order_by('-input_date')[:self.get_max_query_length()]
+                numero_folio=folio).order_by('-input_date')[:self.get_max_query_length(empresa)]
             if emails:
                 return emails
             else:
@@ -765,7 +711,7 @@ class Email(models.Model):
         if date_from and date_to and rut:
             emails = Email.objects.filter(
                 input_date__range=(date_from, date_to),
-                rut_receptor=rut).order_by('-input_date')[:self.get_max_query_length()]
+                rut_receptor=rut).order_by('-input_date')[:self.get_max_query_length(empresa)]
             if emails:
                 return emails
             else:
@@ -799,32 +745,19 @@ class Email(models.Model):
 
     @classmethod
     def get_failure_emails_by_dates_async(self, date_from, date_to, empresa, options):
-        if empresa == 'all':
-            if options == 'all':
-                emails = Email.objects.filter(
-                    Q(input_date__range=(date_from, date_to)),
-                    Q(bounce_event='bounce') | Q(dropped_event='dropped')
-                )
-            else:
-                emails = Email.objects.filter(
-                    Q(input_date__range=(date_from, date_to)),
-                    Q(tipo_receptor=options),
-                    Q(bounce_event='bounce') | Q(dropped_event='dropped')
-                )
+        if options == 'all':
+            emails = Email.objects.filter(
+                Q(input_date__range=(date_from, date_to)),
+                Q(empresa=empresa),
+                Q(bounce_event='bounce') | Q(dropped_event='dropped')
+            )
         else:
-            if options == 'all':
-                emails = Email.objects.filter(
-                    Q(input_date__range=(date_from, date_to)),
-                    Q(empresa=empresa),
-                    Q(bounce_event='bounce') | Q(dropped_event='dropped')
-                )
-            else:
-                emails = Email.objects.filter(
-                    Q(input_date__range=(date_from, date_to)),
-                    Q(tipo_receptor=options), Q(empresa=empresa),
-                    Q(bounce_event='bounce') | Q(dropped_event='dropped')
-                )
-        emails = emails.order_by('input_date')[:self.get_max_query_length()]
+            emails = Email.objects.filter(
+                Q(input_date__range=(date_from, date_to)),
+                Q(tipo_receptor=options), Q(empresa=empresa),
+                Q(bounce_event='bounce') | Q(dropped_event='dropped')
+            )
+        emails = emails.order_by('input_date')[:self.get_max_query_length(empresa)]
         logging.info(emails.query)
         if emails:
             return emails
@@ -862,15 +795,15 @@ class Email(models.Model):
     def get_emails_by_mount_and_dates_async(self, date_from, date_to, mount_from, mount_to, **kwargs):
         emails = Email.objects.filter(
             input_date__range=(date_from, date_to),
-            monto__range=(mount_from, mount_to)).order_by('-input_date')[:self.get_max_query_length()]
+            monto__range=(mount_from, mount_to)).order_by('-input_date')[:self.get_max_query_length(empresa)]
         if emails:
             return emails
         else:
             return None
 
     @classmethod
-    def get_max_query_length(self):
-        conf = GeneralConfiguration.get_configuration()
+    def get_max_query_length(self, empresa):
+        conf = GeneralConfiguration.get_configuration(empresa)
         if conf is not None:
             return conf.report_row_max_length
         else:

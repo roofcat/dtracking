@@ -31,10 +31,10 @@
 
 <!-- BOTON MATERIAL EXPORT -->
 <div class="csv-download-btn">
-	<button class="btn btn-fab btn-raised btn-material-blue mdi-content-send" style="display:none;" 
-	id="btnGenerateReport" type="button" rel="popover" data-animation="true" data-trigger="hover" 
-	data-html="true" data-placement="left" data-container="body" data-toggle="popover" 
-	data-content="<p>Generar Reporte y enviármelo como correo electrónico adjunto. 
+	<button class="btn btn-fab btn-raised btn-material-blue mdi-content-send" style="display:none;"
+	id="btnGenerateReport" type="button" rel="popover" data-animation="true" data-trigger="hover"
+	data-html="true" data-placement="left" data-container="body" data-toggle="popover"
+	data-content="<p>Generar Reporte y enviármelo como correo electrónico adjunto.
 	<b>Nota:</b> máximo de 35 mil celdas.</p>">
 		<div class="ripple-wrapper"></div>
 	</button>
@@ -42,9 +42,9 @@
 
 <!-- BOTON MATERIAL MENU -->
 <div class="search-btn" align="right">
-	<button class="btn btn-fab btn-raised btn-material-green mdi-action-search" id="showMenu" 
-	type="button" rel="popover" data-animation="true" data-trigger="hover" 
-	data-html="true" data-placement="left" data-container="body" data-toggle="popover" 
+	<button class="btn btn-fab btn-raised btn-material-green mdi-action-search" id="showMenu"
+	type="button" rel="popover" data-animation="true" data-trigger="hover"
+	data-html="true" data-placement="left" data-container="body" data-toggle="popover"
 	data-content="<p>Click para abrir panel de filtro por fechas de período.</p>">
 		<div class="ripple-wrapper"></div>
 	</button>
@@ -84,13 +84,9 @@
             				<div class="form-group form-group-material-green has-feedback">
 								<label class="control-label">Empresa</label>
 								<select name="empresas" id="empresas" class="form-control">
-									{% if es_admin %}
-										<option value="all">Todas</option>
-									{% else %}
-										{% for empresa in empresas %}
-											<option value="{{ empresa.rut }}">{{ empresa.empresa }}</option>
-										{% endfor %}
-									{% endif %}
+									{% for empresa in empresas %}
+										<option value="{{ empresa.rut }}">{{ empresa.empresa }}</option>
+									{% endfor %}
 								</select>
 							</div>
             			</div>
@@ -170,7 +166,7 @@
                 <p id="emailDetailBody" style="font-size:12px;"></p>
             </div>
             <div class="modal-footer">
-            	<button class="btn btn-material-green" data-dismiss="modal">Cerrar</button>            	
+            	<button class="btn btn-material-green" data-dismiss="modal">Cerrar</button>
             </div>
         </div>
     </div>

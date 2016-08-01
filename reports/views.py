@@ -36,8 +36,8 @@ from utils.tablib_export import create_tablib
 REPORT_FILE_FORMAT = 'xlsx'
 
 
-def get_report_file_format():
-	conf = GeneralConfiguration.get_configuration()
+def get_report_file_format(empresa_id):
+	conf = GeneralConfiguration.get_configuration(empresa_id)
 	if conf is not None:
 		return conf.report_file_format
 	else:
@@ -45,10 +45,10 @@ def get_report_file_format():
 
 
 class ReporteConsolidadoTemplateView(LoginRequiredMixin, TemplateView):
-	""" Esta vista esta creada para extraer reportes consoliados
+	''' Esta vista esta creada para extraer reportes consoliados
 		dentro de algun periodo de tiempo en base a un rango de fechas
 		desde - hasta
-	"""
+	'''
 
 	def get(self, request, *args, **kwargs):
 		perfil = Perfil.get_perfil(request.user)
@@ -69,20 +69,22 @@ class ReporteConsolidadoTemplateView(LoginRequiredMixin, TemplateView):
 		data = Email.get_emails_by_dates(date_from, date_to, empresa)
 		report_file = create_tablib(data)
 
-		if get_report_file_format() == 'xlsx':
+		report_file_format = get_report_file_format(empresa)
+
+		if report_file_format == 'xlsx':
 			response_file = report_file.xlsx
-			response_filename = 'consolidado' + get_date_to_string() + get_report_file_format()
+			response_filename = 'consolidado' + get_date_to_string() + report_file_format
 			response_filetype = 'application/vnd.ms-excel'
-		elif get_report_file_format() == 'tsv':
+		elif report_file_format == 'tsv':
 			response_file = report_file.tsv
-			response_filename = 'consolidado' + get_date_to_string() + get_report_file_format()
+			response_filename = 'consolidado' + get_date_to_string() + report_file_format
 			response_filetype = 'text/tsv'
 		else:
 			response_file = report_file.csv
-			response_filename = 'consolidado' + get_date_to_string() + get_report_file_format()
+			response_filename = 'consolidado' + get_date_to_string() + report_file_format
 			response_filetype = 'text/csv'
 
-		general_conf = GeneralConfiguration.get_configuration()
+		general_conf = GeneralConfiguration.get_configuration(empresa)
 
 		if general_conf is not None and general_conf.report_file_zipped:
 			# ejecutar proceso de comprimir reporte
@@ -90,7 +92,7 @@ class ReporteConsolidadoTemplateView(LoginRequiredMixin, TemplateView):
 
 			with ZipFile(in_memory, 'w') as archive:
 				archive.writestr(response_filename, str(response_file), ZIP_DEFLATED)
-			
+
 			response = HttpResponse(in_memory.getvalue(), content_type="application/x-zip-compressed")
 			response['Content-Disposition'] = 'attachment; filename="reporte.zip"'
 			return response
@@ -103,7 +105,7 @@ class ReporteConsolidadoTemplateView(LoginRequiredMixin, TemplateView):
 
 class DynamicReportTemplateView(LoginRequiredMixin, TemplateView):
 
-	def get(self, request, date_from, date_to, empresa, correo, folio, 
+	def get(self, request, date_from, date_to, empresa, correo, folio,
 			rut, mount_from, mount_to, fallidos, *args, **kwargs):
 		parameters = {}
 		# preparación de parámetros
@@ -140,9 +142,11 @@ class DynamicReportTemplateView(LoginRequiredMixin, TemplateView):
 		else:
 		    parameters['fallidos'] = False
 
+		report_file_format = get_report_file_format(empresa)
+
 		context = dict()
 		context['user_email'] = request.user.email
-		context['file_name'] = 'reporte_dinamico' + get_date_to_string() + get_report_file_format()
+		context['file_name'] = 'reporte_dinamico' + get_date_to_string() + report_file_format
 		context['export_type'] = 'export_dynamic_emails'
 		context['params'] = json.dumps(parameters)
 		report_queue(context)
@@ -161,7 +165,7 @@ class GeneralReportTemplateView(LoginRequiredMixin, TemplateView):
                     'empresa': str(empresa),
                     'options': options,
                     'user_email': request.user.email,
-                    'file_name': 'reporte_general' + get_date_to_string() + get_report_file_format(),
+                    'file_name': 'reporte_general' + get_date_to_string() + get_report_file_format(empresa),
                     'export_type': 'export_general_email',
                 }
                 report_queue(context)
@@ -182,7 +186,7 @@ class SendedReportTemplateView(LoginRequiredMixin, TemplateView):
                     'empresa': str(empresa),
                     'options': options,
                     'user_email': request.user.email,
-                    'file_name': 'reporte_enviados' + get_date_to_string() + get_report_file_format(),
+                    'file_name': 'reporte_enviados' + get_date_to_string() + get_report_file_format(empresa),
                     'export_type': 'export_sended_email',
                 }
             report_queue(context)
@@ -203,7 +207,7 @@ class FailureReportTemplateView(LoginRequiredMixin, TemplateView):
                     'empresa': str(empresa),
                     'options': options,
                     'user_email': request.user.email,
-                    'file_name': 'reporte_fallidos' + get_date_to_string() + get_report_file_format(),
+                    'file_name': 'reporte_fallidos' + get_date_to_string() + get_report_file_format(empresa),
                     'export_type': 'export_failure_email',
                 }
             report_queue(context)
@@ -223,7 +227,7 @@ class ByEmailReportTemplateView(LoginRequiredMixin, TemplateView):
                     'date_to': int(date_to, base=10),
                     'email': str(correo).lower(),
                     'user_email': request.user.email,
-                    'file_name': 'reporte_por_email' + get_date_to_string() + get_report_file_format(),
+                    'file_name': 'reporte_por_email' + get_date_to_string() + get_report_file_format(empresa),
                     'export_type': 'export_search_by_email',
                 }
             report_queue(context)
@@ -241,7 +245,7 @@ class ByFolioReportTemplateView(LoginRequiredMixin, TemplateView):
                 context = {
                     'folio': int(folio, base=10),
                     'user_email': request.user.email,
-                    'file_name': 'reporte_por_folio' + get_date_to_string() + get_report_file_format(),
+                    'file_name': 'reporte_por_folio' + get_date_to_string() + get_report_file_format(empresa),
                     'export_type': 'export_search_by_folio',
                 }
                 report_queue(context)
@@ -261,7 +265,7 @@ class ByRutReportTemplateView(LoginRequiredMixin, TemplateView):
                     'date_to': int(date_to, base=10),
                     'rut': str(rut).upper(),
                     'user_email': request.user.email,
-                    'file_name': 'reporte_por_rut' + get_date_to_string() + get_report_file_format(),
+                    'file_name': 'reporte_por_rut' + get_date_to_string() + get_report_file_format(empresa),
                     'export_type': 'export_search_by_rut',
                 }
             report_queue(context)
@@ -282,7 +286,7 @@ class ByMountReportTemplateView(LoginRequiredMixin, TemplateView):
                     'mount_from': mount_from,
                     'mount_to': mount_to,
                     'user_email': request.user.email,
-                    'file_name': 'reporte_por_monto' + get_date_to_string() + get_report_file_format(),
+                    'file_name': 'reporte_por_monto' + get_date_to_string() + get_report_file_format(empresa),
                     'export_type': 'export_search_by_mount',
                 }
             report_queue(context)
@@ -293,9 +297,9 @@ class ByMountReportTemplateView(LoginRequiredMixin, TemplateView):
 
 
 class QueueExportView(TemplateView):
-	""" Controlador principal para generar 
+	''' Controlador principal para generar
 	    los reportes y enviarlos por correo
-	"""
+	'''
 
 	@method_decorator(csrf_exempt)
 	def dispatch(self, request, *args, **kwargs):
@@ -413,15 +417,16 @@ class QueueExportView(TemplateView):
 			params = json.loads(params)
 			logging.info(params)
 			data = Email.get_emails_by_dynamic_query_async(**params)
-		
+
 		# Creación del documento
 		report_file = create_tablib(data)
 
 		# evaluacion del formato del archivo reporte
-		if get_report_file_format() == 'xlsx':
+		report_file_format = get_report_file_format(empresa)
+		if report_file_format == 'xlsx':
 			response_file = report_file.xlsx
 			response_filename = file_name
-		elif get_report_file_format() == 'tsv':
+		elif report_file_format == 'tsv':
 			response_file = report_file.tsv
 			response_filename = file_name
 		else:
@@ -429,7 +434,7 @@ class QueueExportView(TemplateView):
 			response_filename = file_name
 
 		# evaluar si el archivo es comprimido en zip
-		general_conf = GeneralConfiguration.get_configuration()
+		general_conf = GeneralConfiguration.get_configuration(empresa)
 
 		if general_conf is not None and general_conf.report_file_zipped:
 			# ejecutar proceso de comprimir reporte
@@ -445,9 +450,9 @@ class QueueExportView(TemplateView):
 		data = dict()
 		data['name'] = response_filename
 		data['report'] = response_file
-		
+
 		# preparación de parametros
-		mail = EmailClient()
+		mail = EmailClient(empresa)
 		mail.send_report_to_user_with_attach(user_email, data)
 		data = {"status": "ok"}
 		return HttpResponse(json.dumps(data), content_type="application/json")

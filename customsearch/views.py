@@ -20,7 +20,7 @@ from utils.generics import timestamp_to_date
 
 class DynamicQueryTemplateView(LoginRequiredMixin, TemplateView):
 
-    def get(self, request, date_from, date_to, empresa, correo, folio, 
+    def get(self, request, date_from, date_to, empresa, correo, folio,
                 rut, mount_from, mount_to, fallidos, *args, **kwargs):
         parameters = {}
         # preparación de parámetros
@@ -75,7 +75,7 @@ class DynamicQueryTemplateView(LoginRequiredMixin, TemplateView):
 
 
 class EmailDetailTemplateView(LoginRequiredMixin, TemplateView):
-    
+
     def get(self, request, *args, **kwargs):
         try:
             pk = request.GET['pk']
@@ -241,7 +241,6 @@ class IndexTemplateView(LoginRequiredMixin, TemplateView):
         perfil = Perfil.get_perfil(request.user)
         logging.info(perfil)
         data = {
-            'es_admin': perfil.es_admin,
             'empresas': perfil.empresas.all(),
         }
         return render(request, self.template_name, data)

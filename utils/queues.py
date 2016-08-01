@@ -4,10 +4,11 @@
 from google.appengine.api import taskqueue
 
 
-def input_queue(email_id):
+def input_queue(email_id, empresa_id):
     if email_id is not None:
         context = {
             "email_id": email_id,
+            "empresa_id": empresa_id,
         }
         q = taskqueue.Queue("InputQueue")
         t = taskqueue.Task(url="/emails/inputqueue/", params=context)

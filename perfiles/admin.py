@@ -8,8 +8,8 @@ from .models import Perfil
 
 
 class PerfilAdmin(admin.ModelAdmin):
-	list_display = ('usuario', 'es_admin',)
-	list_filter = ('es_admin', 'empresas', 'usuario',)
+	list_display = ('usuario',)
+	list_filter = ('empresas', 'usuario',)
 
 
 admin.site.register(Perfil, PerfilAdmin)

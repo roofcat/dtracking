@@ -6,7 +6,7 @@
 
     Pasos:
         1.- Validar si existe una URL del WebService,
-        2.- 
+        2.-
 """
 
 
@@ -26,7 +26,7 @@ class SoapMiddleware(object):
     def __init__(self, email_id, event):
         self.email_id = email_id
         self.event = event
-        self.soap_conf = SoapWebService.get_ws_conf()
+        self.soap_conf = SoapWebService.get_ws_conf(self.email_id)
 
     def evaluate(self):
         if self.soap_conf is not None:
@@ -34,7 +34,10 @@ class SoapMiddleware(object):
                 'email_id': self.email_id,
                 'event': self.event,
             }
+            logging.info('Email id {0} paso a cola de SoapWS'.format(self.email_id))
             soap_ws_queue(context)
+        else:
+            logging.info('Email id {0} no tiene conf de SoapWS'.format(self.email_id))
 
     def execute(self):
         """ Validar si la URL para el servicio web esta
@@ -65,7 +68,7 @@ class SoapMiddleware(object):
 
                     for att, field in map(None, doc_attr, doc_field):
                         documento[att] = email[field]
-                    
+
                     logging.info("imprimiendo documento")
                     logging.info(documento)
 
@@ -104,7 +107,7 @@ class SoapMiddleware(object):
 
                                 elif field.endswith('_date') and email[field] is None:
                                     body[param] = datetime.now()
-                                
+
                                 else:
                                     body[param] = email[field]
 
@@ -123,16 +126,16 @@ class SoapMiddleware(object):
 
                                 elif field.endswith('_date') and email[field] is None:
                                     data[param] = datetime.now()
-                                
+
                                 else:
                                     data[param] = email[field]
 
                                 if documento is not None:
                                     data[self.soap_conf.nombre_parametro_documento] = documento
-                                
+
                                 logging.info("imprimiendo resultado del WS")
                                 logging.info(client(**data))
-                    
+
                     elif self.event == 'delivered':
                         logging.info("ws enviados")
                         data = dict()
@@ -159,7 +162,7 @@ class SoapMiddleware(object):
 
                                 if documento is not None:
                                     body[self.soap_conf.nombre_parametro_documento] = documento
-                                
+
                                 logging.info("imprimiendo resultado del WS")
                                 logging.info(client(body))
 
@@ -178,10 +181,10 @@ class SoapMiddleware(object):
 
                                 if documento is not None:
                                     data[self.soap_conf.nombre_parametro_documento] = documento
-                                
+
                                 logging.info("imprimiendo resultado del WS")
                                 logging.info(client(**data))
-                    
+
                     elif self.event == 'open':
                         logging.info("ws leidos")
                         data = dict()
@@ -229,7 +232,7 @@ class SoapMiddleware(object):
 
                                 logging.info("imprimiendo resultado del WS")
                                 logging.info(client(**data))
-                    
+
                     elif self.event == 'dropped':
                         logging.info("ws rechazados")
                         data = dict()
@@ -255,7 +258,7 @@ class SoapMiddleware(object):
 
                                 if documento is not None:
                                     body[self.soap_conf.nombre_parametro_documento] = documento
-                                
+
                                 logging.info("imprimiendo resultado del WS")
                                 logging.info(client(body))
 
@@ -274,10 +277,10 @@ class SoapMiddleware(object):
 
                                 if documento is not None:
                                     data[self.soap_conf.nombre_parametro_documento] = documento
-                                
+
                                 logging.info("imprimiendo resultado del WS")
                                 logging.info(client(**data))
-                    
+
                     elif self.event == 'bounce':
                         logging.info("ws rebotados")
                         data = dict()
@@ -303,7 +306,7 @@ class SoapMiddleware(object):
 
                                 if documento is not None:
                                     body[self.soap_conf.nombre_parametro_documento] = documento
-                                
+
                                 logging.info("imprimiendo resultado del WS")
                                 logging.info(client(body))
 
@@ -322,7 +325,7 @@ class SoapMiddleware(object):
 
                                 if documento is not None:
                                     data[self.soap_conf.nombre_parametro_documento] = documento
-                                
+
                                 logging.info("imprimiendo resultado del WS")
                                 logging.info(client(**data))
 

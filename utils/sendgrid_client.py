@@ -15,9 +15,9 @@ from utils.generics import get_file_name_from_storage
 
 class EmailClient(object):
 
-    def __init__(self):
+    def __init__(self, empresa_id):
         # llamar las configuraciones en la DB
-        self.email_config = SendgridConf.objects.all()[:1].get()
+        self.email_config = SendgridConf.get_sg_config(empresa_id)
         # crear los atributos de la instancia de SendGrid
         self.sg = SendGridClient(self.email_config.api_key)
         self.message = Mail()
@@ -53,7 +53,7 @@ class EmailClient(object):
         logging.info(correo)
         if correo.adjunto1:
             self.message.add_attachment_stream(
-                get_file_name_from_storage(correo.adjunto1.name), 
+                get_file_name_from_storage(correo.adjunto1.name),
                 correo.adjunto1.file.read())
         self.message.set_unique_args(unique_args)
         # enviando el mail

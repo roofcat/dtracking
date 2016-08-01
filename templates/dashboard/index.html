@@ -10,18 +10,18 @@
 
 {% block content %}
 <div class="row">
-		
+
 	<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
 
 		<div class="row">
-			
+
 			<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
 				<h4>Resumen solicitados</h4>
 				<div class="panel panel-success">
 					<div class="panel-body">
 						<div align="right">
-							<span id="spanTooltip" rel="popover" data-animation="true" data-toggle="popover" 
-								data-html="true" data-trigger="hover" data-placement="bottom" 
+							<span id="spanTooltip" rel="popover" data-animation="true" data-toggle="popover"
+								data-html="true" data-trigger="hover" data-placement="bottom"
 								data-container="body" class="mdi-alert-error" style="color:#7FBF10;"
 								data-content="<p>Este gráfico indica los porcentajes de correos enviados y fallidos
 								del universo de correos facturados.</p>">
@@ -31,9 +31,9 @@
 						<p class="legend-status" id="divResumeGeneral"><label>Sin datos en este período</label></p>
 						<div align="right" style="margin-top:-50px;">
 							<button type="button" class="btn btn-sm btn-material-teal" id="btnGeneralExport"
-							rel="popover" data-animation="true" data-trigger="hover" data-html="true" 
-							data-placement="top" data-container="body" data-toggle="popover" 
-							data-content="<p>Generar Reporte y enviármelo como correo electrónico adjunto. 
+							rel="popover" data-animation="true" data-trigger="hover" data-html="true"
+							data-placement="top" data-container="body" data-toggle="popover"
+							data-content="<p>Generar Reporte y enviármelo como correo electrónico adjunto.
 								<b>Nota:</b> máximo de 35 mil celdas.</p>">Generar Reporte</button>
 						</div>
 					</div>
@@ -45,8 +45,8 @@
 				<div class="panel panel-success">
 					<div class="panel-body">
 						<div align="right">
-							<span id="spanTooltip" rel="popover" data-animation="true" data-toggle="popover" 
-								data-html="true" data-trigger="hover" data-placement="bottom" 
+							<span id="spanTooltip" rel="popover" data-animation="true" data-toggle="popover"
+								data-html="true" data-trigger="hover" data-placement="bottom"
 								data-container="body" class="mdi-alert-error" style="color:#7FBF10;"
 								data-content="<p>Este gráfico indica del universo de correos enviados
 								los porcentajes de correos leídos y no leídos.</p>">
@@ -56,9 +56,9 @@
 						<p class="legend-status" id="divResumeOpened"><label>Sin datos en este período</label></p>
 						<div align="right" style="margin-top:-50px;">
 							<button type="button" class="btn btn-sm btn-material-teal" id="btnSendedExport"
-							rel="popover" data-animation="true" data-trigger="hover" data-html="true" 
-							data-placement="top" data-container="body" data-toggle="popover" 
-							data-content="<p>Generar Reporte y enviármelo como correo electrónico adjunto. 
+							rel="popover" data-animation="true" data-trigger="hover" data-html="true"
+							data-placement="top" data-container="body" data-toggle="popover"
+							data-content="<p>Generar Reporte y enviármelo como correo electrónico adjunto.
 								<b>Nota:</b> máximo de 35 mil celdas.</p>">Generar Reporte</button>
 						</div>
 					</div>
@@ -70,8 +70,8 @@
 				<div class="panel panel-success">
 					<div class="panel-body">
 						<div align="right">
-							<span id="spanTooltip" rel="popover" data-animation="true" data-toggle="popover" 
-								data-html="true" data-trigger="hover" data-placement="bottom" 
+							<span id="spanTooltip" rel="popover" data-animation="true" data-toggle="popover"
+								data-html="true" data-trigger="hover" data-placement="bottom"
 								data-container="body" class="mdi-alert-error" style="color:#7FBF10;"
 								data-content="<p>Este gráfico indica del universo de correos fallidos:<br>
 								<b>Correos Rechazados:</b> Son aquellos que podrían ser detectados como spam, cliente sesuscrito,
@@ -84,9 +84,9 @@
 						<p class="legend-status" id="divResumeFailure"><label>Sin datos en este período</label></p>
 						<div align="right" style="margin-top:-50px;">
 							<button class="btn btn-sm btn-material-teal" id="btnFailedExport"
-							rel="popover" data-animation="true" data-trigger="hover" data-html="true" 
-							data-placement="top" data-container="body" data-toggle="popover" 
-							data-content="<p>Generar Reporte y enviármelo como correo electrónico adjunto. 
+							rel="popover" data-animation="true" data-trigger="hover" data-html="true"
+							data-placement="top" data-container="body" data-toggle="popover"
+							data-content="<p>Generar Reporte y enviármelo como correo electrónico adjunto.
 								<b>Nota:</b> máximo de 35 mil celdas.</p>">Generar Reporte</button>
 						</div>
 					</div>
@@ -103,15 +103,15 @@
 				</div>
 			</div>
 		</div>
-		
+
 	</div>
 
 </div>
-	
+
 <div class="search-btn" align="right">
 	<button class="btn btn-fab btn-raised btn-material-green mdi-action-search" id="showMenu" type="button"
-	rel="popover" data-animation="true" data-trigger="hover" data-html="true" data-placement="left" 
-	data-container="body" data-toggle="popover" 
+	rel="popover" data-animation="true" data-trigger="hover" data-html="true" data-placement="left"
+	data-container="body" data-toggle="popover"
 	data-content="<p>Click para abrir panel de búsquedas personalizadas.</p>">
 		<div class="ripple-wrapper"></div>
 	</button>
@@ -140,13 +140,9 @@
 					<div class="form-group form-group-material-green">
 						<label class="control-label">Empresa</label>
 						<select name="empresas" id="empresas" class="form-control">
-							{% if es_admin %}
-								<option value="all">Todas</option>
-							{% else %}
-								{% for empresa in empresas %}
-									<option value="{{ empresa.rut }}">{{ empresa.empresa }}</option>
-								{% endfor %}
-							{% endif %}
+							{% for empresa in empresas %}
+								<option value="{{ empresa.rut }}">{{ empresa.empresa }}</option>
+							{% endfor %}
 						</select>
 					</div>
 					<div class="form-group form-group-material-green">

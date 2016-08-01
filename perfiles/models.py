@@ -16,11 +16,10 @@ from empresas.models import Empresa
 
 class Perfil(models.Model):
 	usuario = models.ForeignKey(User)
-	es_admin = models.BooleanField(default=False)
 	empresas = models.ManyToManyField(Empresa)
 
 	def __unicode__(self):
-		return u'{0}'.format(self.usuario)
+		return u'{0}'.format(self.empresas, self.usuario)
 
 	@classmethod
 	def get_perfil(self, user):

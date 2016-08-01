@@ -53,7 +53,6 @@ class IndexView(LoginRequiredMixin, TemplateView):
         perfil = Perfil.get_perfil(request.user)
         logging.info(perfil)
         data = {
-            'es_admin': perfil.es_admin,
             'empresas': perfil.empresas.all(),
         }
         return render(request, self.template_name, data)

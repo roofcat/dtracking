@@ -4,6 +4,9 @@
 from django.db import models
 
 
+from empresas.models import Holding, Empresa
+
+
 REPORT_FILE_FORMAT = (
     ('xlsx', 'xlsx'),
     ('csv', 'csv'),
@@ -12,6 +15,8 @@ REPORT_FILE_FORMAT = (
 
 
 class GeneralConfiguration(models.Model):
+    # configuración a nivel de holding de empresas
+    holding = models.ForeignKey(Holding, null=True)
     # seccion reportes
     report_row_max_length = models.IntegerField()
     report_file_format = models.CharField(max_length=100, choices=REPORT_FILE_FORMAT)
@@ -21,14 +26,16 @@ class GeneralConfiguration(models.Model):
     events_to_register = models.CharField(max_length=255, default='processed')
 
     @classmethod
-    def get_configuration(self):
+    def get_configuration(self, empresa_id):
         try:
-            return GeneralConfiguration.objects.all()[:1].get()
+            empresa = Empresa.objects.get(pk=empresa_id)
+            return GeneralConfiguration.objects.filter(holding=empresa.holding_id)[:1].get()
         except GeneralConfiguration.DoesNotExist:
             return None
 
 
 class SendgridConf(models.Model):
+    holding = models.ForeignKey(Holding, null=True)
     api_key = models.CharField(max_length=200, db_index=True)
     api_user = models.CharField(max_length=200, db_index=True)
     api_pass = models.CharField(max_length=200, db_index=True)
@@ -38,35 +45,42 @@ class SendgridConf(models.Model):
     nombre_email_reporte = models.CharField(max_length=240, db_index=True)
 
     def __unicode__(self):
-        return u'{0}'.format(self.api_user)
+        return u'{0} - {1}'.format(self.holding, self.api_user)
+
+    @classmethod
+    def get_sg_config(self, empresa_id):
+        empresa = Empresa.objects.get(pk=empresa_id)
+        sg = SendgridConf.objects.filter(holding=empresa.holding_id)[:1].get()
+        if sg is not None:
+            return sg
+        else:
+            return None
 
 
 class TemplateReporte(models.Model):
+    holding = models.ForeignKey(Holding, null=True)
     reporte_url = models.URLField(max_length=200, db_index=True, blank=True)
     asunto_reporte = models.CharField(max_length=240, db_index=True)
     template_html = models.TextField()
 
     def __unicode__(self):
-        return u'{0}'.format(self.reporte_url)
+        return u'{0} - {1}'.format(self.holding, self.reporte_url)
 
 
 class EliminacionHistorico(models.Model):
+    holding = models.ForeignKey(Holding, null=True)
     activo = models.BooleanField(default=False)
     dias_a_eliminar = models.IntegerField(null=True, blank=True)
+    # indicará que sera configuración a nivel de holding
 
     def __unicode__(self):
-        return u'{0} - {1}'.format(self.activo, self.dias_a_eliminar)
-
-    @classmethod
-    def get_configuration(self):
-        conf = EliminacionHistorico.objects.all()[:1]
-        if conf is not None:
-            return conf
-        else:
-            return None
+        return u'{0} - {1} - {2}'.format(self.holding, self.activo, self.dias_a_eliminar)
 
 
 class SoapWebService(models.Model):
+    # nombre del holding para la configuración del WebService Soap
+    holding = models.ForeignKey(Holding, null=True)
+    # lista de campos
     url = models.URLField(max_length=255)
     con_autenticacion = models.BooleanField(default=False, blank=True)
     usuario_autenticacion = models.CharField(max_length=200, null=True, blank=True)
@@ -116,11 +130,13 @@ class SoapWebService(models.Model):
     campos_rechazado = models.CharField(max_length=255, null=True, blank=True)
 
     def __unicode__(self):
-        return u'{0}'.format(self.url)
+        return u'{0} - {1}'.format(self.holding, self.url)
 
     @classmethod
-    def get_ws_conf(self):
+    def get_ws_conf(self, email_id):
         try:
-            return SoapWebService.objects.all()[:1].get()
+            email = Email.get_email_by_id(email_id)
+            empresa = Empresa.objects.get(pk=email.empresa_id)
+            return SoapWebService.objects.filter(Holding=empresa.holding_id)
         except Exception, e:
             return None

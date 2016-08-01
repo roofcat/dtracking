@@ -29,7 +29,7 @@ class EmailLogEvent(models.Model):
     @classmethod
     def write_event(self, event, body):
         logging.info("Entrando a write_event de EmailLogEvent")
-        config = GeneralConfiguration.get_configuration()
+        config = GeneralConfiguration.get_configuration(body['empresa'])
 
         if config is not None and config.events_register:
             events = (config.events_to_register).split(';')
