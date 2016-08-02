@@ -16,8 +16,9 @@ from utils.generics import get_file_name_from_storage
 class EmailClient(object):
 
     def __init__(self, empresa_id):
+        self.empresa_id = empresa_id
         # llamar las configuraciones en la DB
-        self.email_config = SendgridConf.get_sg_config(empresa_id)
+        self.email_config = SendgridConf.get_sg_config(self.empresa_id)
         # crear los atributos de la instancia de SendGrid
         self.sg = SendGridClient(self.email_config.api_key)
         self.message = Mail()
@@ -67,7 +68,7 @@ class EmailClient(object):
         self.message.set_from(self.email_config.asunto_email_reporte)
         self.message.set_from_name(self.email_config.nombre_email_reporte)
         # buscar usuario
-        template_config = TemplateReporte.objects.all()[:1].get()
+        template_config = TemplateReporte.get_configuration(self.empresa_id)
         # preparar template del correo reporte
         user = User.objects.get(email=user_email)
         html = str(template_config.template_html).format(

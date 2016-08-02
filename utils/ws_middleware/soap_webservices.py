@@ -26,7 +26,9 @@ class SoapMiddleware(object):
     def __init__(self, email_id, event):
         self.email_id = email_id
         self.event = event
-        self.soap_conf = SoapWebService.get_ws_conf(self.email_id)
+        holding = Email.get_email_by_id(email_id).empresa.holding
+        self.soap_conf = SoapWebService.get_ws_conf(holding)
+        logging.info("Objeto SoapMiddleware creado")
 
     def evaluate(self):
         if self.soap_conf is not None:
@@ -37,7 +39,7 @@ class SoapMiddleware(object):
             logging.info('Email id {0} paso a cola de SoapWS'.format(self.email_id))
             soap_ws_queue(context)
         else:
-            logging.info('Email id {0} no tiene conf de SoapWS'.format(self.email_id))
+            logging.info('Email no tiene conf de SoapWS')
 
     def execute(self):
         """ Validar si la URL para el servicio web esta

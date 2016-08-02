@@ -261,10 +261,12 @@ class Email(models.Model):
         nombre_cliente = body['nombre_cliente']
         correo = str(body['email']).decode('utf-8')
         id_envio = str(body['id_envio']).decode('utf-8')
+
         if id_envio == '' or None:
             id_envio = 0
         else:
             id_envio = int(id_envio, base=10)
+
         email = Email.objects.create(
             empresa_id=empresa_id,
             rut_receptor=rut_receptor,

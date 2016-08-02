@@ -143,7 +143,7 @@ class SendGridRestWebhookView(TemplateView):
                             soap_ws.evaluate()
                             # proceso de registrar eventos en tabla log
                             EmailLogEvent.write_event(evento_sendgrid, body)
-                    
+
                     elif evento_sendgrid == 'click':
                         email = Email.get_email_by_id(email_id)
 

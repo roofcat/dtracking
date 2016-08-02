@@ -28,8 +28,8 @@ class GeneralConfiguration(models.Model):
     @classmethod
     def get_configuration(self, empresa_id):
         try:
-            empresa = Empresa.objects.get(pk=empresa_id)
-            return GeneralConfiguration.objects.filter(holding=empresa.holding_id)[:1].get()
+            holding = Empresa.objects.get(pk=empresa_id).holding
+            return GeneralConfiguration.objects.get(holding=holding)
         except GeneralConfiguration.DoesNotExist:
             return None
 
@@ -49,11 +49,10 @@ class SendgridConf(models.Model):
 
     @classmethod
     def get_sg_config(self, empresa_id):
-        empresa = Empresa.objects.get(pk=empresa_id)
-        sg = SendgridConf.objects.filter(holding=empresa.holding_id)[:1].get()
-        if sg is not None:
-            return sg
-        else:
+        try:
+            holding = Empresa.objects.get(pk=empresa_id).holding
+            return SendgridConf.objects.get(holding=holding)
+        except SendgridConf.DoesNotExist:
             return None
 
 
@@ -65,6 +64,14 @@ class TemplateReporte(models.Model):
 
     def __unicode__(self):
         return u'{0} - {1}'.format(self.holding, self.reporte_url)
+
+    @classmethod
+    def get_configuration(self, empresa_id):
+        try:
+            holding = Empresa.objects.get(pk=empresa_id).holding
+            return TemplateReporte.objects.get(holding=holding)
+        except TemplateReporte.DoesNotExist:
+            return None
 
 
 class EliminacionHistorico(models.Model):
@@ -133,10 +140,8 @@ class SoapWebService(models.Model):
         return u'{0} - {1}'.format(self.holding, self.url)
 
     @classmethod
-    def get_ws_conf(self, email_id):
+    def get_ws_conf(self, holding):
         try:
-            email = Email.get_email_by_id(email_id)
-            empresa = Empresa.objects.get(pk=email.empresa_id)
-            return SoapWebService.objects.filter(Holding=empresa.holding_id)
-        except Exception, e:
+            return SoapWebService.objects.get(holding=holding)
+        except SoapWebService.DoesNotExist:
             return None
