@@ -239,7 +239,7 @@ class IndexTemplateView(LoginRequiredMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
         perfil = Perfil.get_perfil(request.user)
-        logging.info(perfil)
+        logging.info(perfil.usuario)
         data = {
             'empresas': perfil.empresas.all(),
         }
