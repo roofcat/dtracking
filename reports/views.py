@@ -148,6 +148,7 @@ class DynamicReportTemplateView(LoginRequiredMixin, TemplateView):
 		context['user_email'] = request.user.email
 		context['file_name'] = 'reporte_dinamico' + get_date_to_string() + report_file_format
 		context['export_type'] = 'export_dynamic_emails'
+		context['empresa'] = empresa
 		context['params'] = json.dumps(parameters)
 		report_queue(context)
 		data = {"status": "ok"}
@@ -365,6 +366,7 @@ class QueueExportView(TemplateView):
 		elif export_type == 'export_search_by_email':
 			correo = request.POST.get('email')
 			user_email = request.POST.get('user_email')
+			empresa = request.POST.get('empresa')
 			file_name = request.POST.get('file_name')
 			date_from = request.POST.get('date_from')
 			date_to = request.POST.get('date_to')
@@ -378,12 +380,14 @@ class QueueExportView(TemplateView):
 		elif export_type == 'export_search_by_folio':
 			folio = request.POST.get('folio')
 			user_email = request.POST.get('user_email')
+			empresa = request.POST.get('empresa')
 			file_name = request.POST.get('file_name')
 			# Consulta
 			data = Email.get_emails_by_folio_async(folio)
 		elif export_type == 'export_search_by_rut':
 			rut = request.POST.get('rut')
 			user_email = request.POST.get('user_email')
+			empresa = request.POST.get('empresa')
 			file_name = request.POST.get('file_name')
 			date_from = request.POST.get('date_from')
 			date_to = request.POST.get('date_to')
@@ -400,6 +404,7 @@ class QueueExportView(TemplateView):
 			mount_from = int(mount_from, base=10)
 			mount_to = int(mount_to, base=10)
 			user_email = request.POST.get('user_email')
+			empresa = request.POST.get('empresa')
 			file_name = request.POST.get('file_name')
 			date_from = request.POST.get('date_from')
 			date_to = request.POST.get('date_to')
@@ -412,6 +417,7 @@ class QueueExportView(TemplateView):
 				date_from, date_to, mount_from, mount_to)
 		elif export_type == 'export_dynamic_emails':
 			user_email = request.POST.get('user_email')
+			empresa = request.POST.get('empresa')
 			file_name = request.POST.get('file_name')
 			params = request.POST.get('params')
 			params = json.loads(params)
