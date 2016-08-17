@@ -17,7 +17,6 @@ from django.views.generic import TemplateView
 from rest_framework import authentication, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
 
 
 from .models import Email
@@ -29,21 +28,44 @@ from utils.sendgrid_client import EmailClient
 
 
 class EmailDteInputView(APIView):
-    ''' Vista encargada de recibir los request vía json post
-        para crear nuevos email y enviarlos por correo
-    '''
+    """
+    Vista encargada de recibir los request vía post
+    para crear nuevos email y enviarlos por correo
+    utilizando SendGrid
+    """
     serializer_class = EmailDteInputSerializer
     # authentication_classes = (authentication.TokenAuthentication,)
     permission_classes = (permissions.AllowAny,)
 
-    def get(self, request, id=None, format=None):
-        if id is not None:
-            email = get_object_or_404(Email, pk=id)
+    def get(self, request, *args, **kwargs):
+        """
+        Método que permite consultar el estado de un correo
+        """
+        logging.info(request.query_params)
+        query_params = request.query_params
+        params = dict()
+
+        try:
+            # Validar si vienen parametros en el GET
+            params['correo'] = query_params['correo']
+            params['numero_folio'] = query_params['numero_folio']
+            params['tipo_dte'] = query_params['tipo_dte']
+            params['rut_emisor'] = query_params['rut_emisor']
+            params['resolucion_emisor'] = query_params['resolucion_emisor']
+            params['id_envio'] = query_params['id_envio']
+            # imprimiendo parametros
+            logging.info(params)
+            # consulta
+            email = Email.get_email(**params)
+            # imprimir resultado de la consulta
+            logging.info(email)
+            # serializar
             response = self.serializer_class(email, many=False)
-        else:
-            emails = Email.objects.all().order_by('-id')[:5]
-            response = self.serializer_class(emails, many=True)
-        return Response(response.data)
+            # responder
+            return Response(response.data)
+
+        except Exception, e:
+            return Response({"mensaje": "Error en parametros enviados."})
 
     def post(self, request, format=None):
         email = self.serializer_class(data=request.data)
@@ -85,10 +107,11 @@ class QueueSendEmailView(TemplateView):
 
 
 class CronCleanEmailsHistoryView(TemplateView):
-    ''' Método que si tiene habilitada la opción de eliminar correos antiguos
-        antiguos (parametrizado en app configuraciones) lista los correos
-        desde el numero de meses máximo a retener en la DB.
-    '''
+    """
+    Método que si tiene habilitada la opción de eliminar correos antiguos
+    antiguos (parametrizado en app configuraciones) lista los correos
+    desde el numero de meses máximo a retener en la DB.
+    """
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -119,10 +142,11 @@ class CronCleanEmailsHistoryView(TemplateView):
 
 
 class CronSendDelayedEmailView(TemplateView):
-    ''' Evalúa los correos que no se han podido enviar,
-        los correos que caen en este proceso son aquellos que son
-        ingresados vía json post en el servicio rest publicado
-    '''
+    """
+    Evalúa los correos que no se han podido enviar,
+    los correos que caen en este proceso son aquellos que son
+    ingresados vía json post en el servicio rest publicado
+    """
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -139,6 +163,11 @@ class CronSendDelayedEmailView(TemplateView):
 
 
 class CronSendDelayedProcessedEmailView(TemplateView):
+    """
+    Esta es la vista que reintenta envíos de correos
+    cuando se utiliza la api de tracking para enviar
+    correos de los DTEs
+    """
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -155,6 +184,11 @@ class CronSendDelayedProcessedEmailView(TemplateView):
 
 
 class DeleteEmailFileView(TemplateView):
+    """
+    Vista que se encarga de encolar los registros
+    que contentan archivos para ser eliminados
+    """
+
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
         return super(DeleteEmailFileView, self).dispatch(request, *args, **kwargs)

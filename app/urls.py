@@ -24,8 +24,6 @@ from webhooks.views import SendGridRestWebhookView, SendGridApiWebhookView
 
 # sección de registro de apis rest con django-rest-framework
 router = routers.DefaultRouter()
-# router.register(r'^emails', EmailViewSet)
-# router.register(r'^empresas', EmpresaViewSet)
 
 
 urlpatterns = [
@@ -33,12 +31,12 @@ urlpatterns = [
     url(r'^api/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api-token/', obtain_auth_token),
-    
+
     # rutas api rest heredadas de APIView
     # en esta ruta entran las peticiones de correo desde un DTE
-    url(r'^api/input/', EmailDteInputView.as_view()),
-    
-    # luego el tracking lo pasa a esta cola para 
+    url(r'^api/email/', EmailDteInputView.as_view()),
+
+    # luego el tracking lo pasa a esta cola para
     # luego enviar el correo por sendgrid
     url(r'^emails/inputqueue/', QueueSendEmailView.as_view()),
 
@@ -70,7 +68,7 @@ urlpatterns = [
     url(r'^login/', log_in, name='login'),
     url(r'^logout/', log_out, name='logout'),
     url(r'^profile/', ProfileTemplateView.as_view(), name='profile'),
-    
+
     # modulo Administrador Azurian
     url(r'^admin/', include(admin.site.urls)),
 
