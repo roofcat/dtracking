@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 
-from datetime import datetime
 import json
 import logging
 
@@ -15,6 +14,7 @@ from django.views.generic import TemplateView
 from autenticacion.views import LoginRequiredMixin
 from emails.models import Email
 from perfiles.models import Perfil
+from tipodocumentos.models import TipoDocumento
 from utils.generics import timestamp_to_date
 
 
@@ -83,6 +83,14 @@ class EmailDetailTemplateView(LoginRequiredMixin, TemplateView):
                 pk = int(pk, base=10)
                 email = get_object_or_404(Email, pk=pk)
                 email = model_to_dict(email)
+                try:
+                    # Intenta obtener el tipo de documento
+                    tipo_dte = get_object_or_404(TipoDocumento, pk=email['tipo_dte'])
+                    email['tipo_dte'] = str(email['tipo_dte']) + ' - ' + tipo_dte.nombre_documento
+                except Exception, e:
+                    logging.info(e)
+                email['xml'] = email['xml'].name
+                email['pdf'] = email['pdf'].name
                 email['adjunto1'] = email['adjunto1'].name
                 return HttpResponse(json.dumps(email), content_type='application/json')
         except Exception, e:

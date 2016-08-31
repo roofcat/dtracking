@@ -52,6 +52,14 @@ class EmailClient(object):
             'tipo_receptor': correo.tipo_receptor,
         }
         logging.info(correo)
+        if correo.xml:
+            self.message.add_attachment_stream(
+                get_file_name_from_storage(correo.xml.name),
+                correo.xml.file.read())
+        if correo.pdf:
+            self.message.add_attachment_stream(
+                get_file_name_from_storage(correo.pdf.name),
+                correo.pdf.file.read())
         if correo.adjunto1:
             self.message.add_attachment_stream(
                 get_file_name_from_storage(correo.adjunto1.name),

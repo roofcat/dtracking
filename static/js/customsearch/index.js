@@ -356,8 +356,9 @@ function drawJqueryTable ( urlSource ) {
 				'title': 'Detalle',
 				'render': function ( data, type, row, meta ) {
 					if ( data != null ) {
-						var html = '';
-						html += '<span style="font-size:16px;color:#2196f3;align:center;cursor:pointer;" title="Click para ver más detalle." class="glyphicon glyphicon-info-sign" id="spanDetail" data-pk="' + data + '"></span>';
+						var html = "<span style=\"font-size:16px;color:#2196f3;align:center;cursor:pointer;\" "
+						    + "title=\"Click para ver más detalle.\" class=\"material-icons\" "
+						    + "id=\"spanDetail\" data-pk=\"" + data + "\">email</span>";
 						return html;
 					} else {
 						return "";
@@ -365,17 +366,34 @@ function drawJqueryTable ( urlSource ) {
 				},
 			},
 			{
-				'data': 'adjunto1',
 				'title': 'Adjuntos',
 				'render': function ( data, type, row, meta ) {
-					if ( data ) {
-						var html = '<div style="font-size:11px;">';
-						html += '<a href="' + attachUrl + data + '" title="Ver archivo adjunto" target="_blank"><span class="mdi-editor-attach-file"></span></a>';
-						html += '</div>';
-						return html;
-					} else {
-						return " ";
+
+				    var htmlRow = "<div style=\"font-size:11px;\">";
+
+				    if ( row['xml'] ) {
+				        var html = "<a href=\"" + attachUrl + row['xml'] +
+						    "\" title=\"Ver XML\" target=\"_blank\"><i style=\"font-size:16px;\" " +
+						    "class=\"material-icons\">insert_drive_file</i></a> ";
+				        htmlRow += html;
+				    };
+
+				    if ( row['pdf'] ) {
+				        var html = "<a href=\"" + attachUrl + row['pdf'] +
+						    "\" title=\"Ver PDF\" target=\"_blank\"><i style=\"font-size:16px;\" " +
+						    "class=\"material-icons\">library_books</i></a> ";
+				        htmlRow += html;
+				    };
+
+					if ( row['adjunto1'] ) {
+						var html = "<a href=\"" + attachUrl + row['adjunto1'] +
+						    "\" title=\"Ver Adjunto\" target=\"_blank\"><i style=\"font-size:16px;\" " +
+						    "class=\"material-icons\">class</i></a> ";
+						htmlRow += html;
 					};
+
+					htmlRow += '</div>';
+					return htmlRow;
 				},
 			},
 			{
@@ -436,8 +454,9 @@ function drawJqueryTable ( urlSource ) {
             "zeroRecords": "No se encontraron registros.",
         },
 	});
-	table.removeClass('display');
-	table.addClass('table table-hover table-striped table-condensed table-responsive');
+	table.removeClass( 'display' );
+	table.addClass( 'table table-hover table-striped table-condensed table-responsive' );
+
 };
 
 /*
@@ -488,7 +507,7 @@ function drawEmailDetailModal ( data ) {
 	
 	htmlBody += '<label>Resolución receptor</label>';
 	if ( data.resolucion_receptor ) {
-		htmlBody += ' aaa' + data.resolucion_receptor + ' ';
+		htmlBody += ' ' + data.resolucion_receptor + ' ';
 	} else { 
 		htmlBody += '---';
 	};
@@ -504,7 +523,7 @@ function drawEmailDetailModal ( data ) {
 	
 	htmlBody += '<br>';
 	
-	htmlBody += '<label>Monto</label> ' + data.monto + '<br>';
+	htmlBody += '<label>Monto</label> ' + ( !data.monto ) ? '' : '$' + data.monto + '<br>';
 
 	htmlBody += '<label>Fecha emisión</label> ';
 	if ( data.fecha_emision ) {
@@ -549,11 +568,22 @@ function drawEmailDetailModal ( data ) {
 	};
 	
 	htmlBody += '<br>';
-	
+
+	if ( data.xml ) {
+	    htmlBody += '<label>XML Adjunto</label> ';
+	    htmlBody += '<a href="' + attachUrl + data.xml + '" target="_blank">Ver XML</a><br>';
+	};
+
+	if ( data.pdf ) {
+	    htmlBody += '<label>PDF Adjunto</label> ';
+	    htmlBody += '<a href="' + attachUrl + data.pdf + '" target="_blank">Ver PDF</a><br>';
+	};
+
 	if ( data.adjunto1 ) {
 		htmlBody += '<label>Adjunto</label> ';
-		htmlBody += '<a href="' + attachUrl + data.adjunto1 + '" target="_blank">Ver documento adjunto</a><br>';
+		htmlBody += '<a href="' + attachUrl + data.adjunto1 + '" target="_blank">Ver Adjunto</a><br>';
 	};
+
 	htmlBody += '<label>Nombre cliente</label> ' + data.nombre_cliente + '<br>';
 
 	htmlBody += '<label>Tracking del correo:</label><br>';

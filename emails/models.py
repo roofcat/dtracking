@@ -21,34 +21,6 @@ from utils.generics import timestamp_to_date, to_unix_timestamp
 from utils.queues import delete_file_queue
 
 
-TIPOS_RECEPTORES = (
-    ('electronico', 'electronico'),
-    ('manual', 'manual'),
-    ('ambos', 'ambos'),
-)
-TIPOS_ENVIOS = (
-    ('aceptacion', 'aceptacion'),
-    ('Aceptacion', 'Aceptacion'),
-    ('envio dte', 'envio dte'),
-    ('Envio DTE', 'Envio DTE'),
-    ('notificacion', 'notificacion'),
-    ('Notificacion', 'Notificacion'),
-    ('rechazo', 'rechazo'),
-    ('Rechazo', 'Rechazo'),
-    ('rems', 'rems'),
-)
-TIPOS_ESTADOS_DOCUMENTOS = (
-    ('recepcionado', 'recepcionado'),
-    ('no recepcionado', 'no recepcionado'),
-    ('aceptado', 'aceptado'),
-    ('rechazado', 'rechazado'),
-    ('aprovado con reparo sii', 'aprovado con reparo sii'),
-)
-TIPOS_OPERACIONES = (
-    ('compra', 'compra'),
-    ('venta', 'venta'),
-)
-
 MAX_QUERY_LENGTH = 10000
 
 
@@ -78,9 +50,7 @@ class Email(models.Model):
     empresa = models.ForeignKey(Empresa)
     rut_receptor = models.CharField(max_length=20, db_index=True)
     rut_emisor = models.CharField(max_length=20, db_index=True)
-    tipo_envio = models.CharField(max_length=20,
-                                  choices=TIPOS_ENVIOS,
-                                  db_index=True)
+    tipo_envio = models.CharField(max_length=20, db_index=True)
     tipo_dte = models.ForeignKey(TipoDocumento)
     numero_folio = models.BigIntegerField(db_index=True)
     resolucion_receptor = models.IntegerField(null=True, blank=True)
@@ -88,18 +58,9 @@ class Email(models.Model):
     monto = models.BigIntegerField(default=0, db_index=True)
     fecha_emision = models.BigIntegerField(null=True, blank=True)
     fecha_recepcion = models.BigIntegerField(null=True, blank=True)
-    estado_documento = models.CharField(max_length=100,
-                                        choices=TIPOS_ESTADOS_DOCUMENTOS,
-                                        null=True,
-                                        blank=True)
-    tipo_operacion = models.CharField(max_length=100,
-                                      choices=TIPOS_OPERACIONES,
-                                      null=True,
-                                      blank=True)
-    tipo_receptor = models.CharField(max_length=100,
-                                     choices=TIPOS_RECEPTORES,
-                                     null=True,
-                                     blank=True)
+    estado_documento = models.CharField(max_length=100, null=True, blank=True)
+    tipo_operacion = models.CharField(max_length=100, null=True, blank=True)
+    tipo_receptor = models.CharField(max_length=100, null=True, blank=True)
     id_envio = models.BigIntegerField(blank=True, null=True)
     # campos correo
     nombre_cliente = models.CharField(max_length=200)
@@ -107,10 +68,21 @@ class Email(models.Model):
     asunto = models.CharField(max_length=200, blank=True, null=True)
     html = models.TextField(blank=True, null=True)
     # adjuntos
-    adjunto1 = models.FileField(
-        upload_to='adjuntos/%Y/%m/%d/{0}'.format(
+    xml = models.FileField(
+        upload_to='adjuntos/xml/%Y/%m/%d/{0}'.format(
             calendar.timegm(datetime.utcnow().utctimetuple())),
         default='', null=True, blank=True)
+
+    pdf = models.FileField(
+        upload_to='adjuntos/pdf/%Y/%m/%d/{0}'.format(
+            calendar.timegm(datetime.utcnow().utctimetuple())),
+        default='', null=True, blank=True)
+    
+    adjunto1 = models.FileField(
+        upload_to='adjuntos/ad1/%Y/%m/%d/{0}'.format(
+            calendar.timegm(datetime.utcnow().utctimetuple())),
+        default='', null=True, blank=True)
+    
     # campos de processed
     smtp_id = models.CharField(max_length=200, null=True, blank=True)
     processed_date = models.BigIntegerField(null=True, blank=True)

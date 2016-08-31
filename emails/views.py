@@ -8,7 +8,6 @@ import logging
 
 
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
@@ -20,7 +19,7 @@ from rest_framework.views import APIView
 
 
 from .models import Email
-from .serializers import EmailDteInputSerializer
+from .serializers import EmailDteInputSerializer, EmailTrackDTESerializer
 from configuraciones.models import EliminacionHistorico
 from empresas.models import Empresa
 from utils.queues import input_queue
@@ -29,17 +28,16 @@ from utils.sendgrid_client import EmailClient
 
 class EmailDteInputView(APIView):
     """
-    Vista encargada de recibir los request vía post
-    para crear nuevos email y enviarlos por correo
-    utilizando SendGrid
+    Vista encargada de recibir los request vía post para crear nuevos email
+    y enviarlos por correo utilizando SendGrid
     """
+    #authentication_classes = (authentication.TokenAuthentication, )
     serializer_class = EmailDteInputSerializer
-    # authentication_classes = (authentication.TokenAuthentication,)
-    permission_classes = (permissions.AllowAny,)
+    permission_classes = (permissions.AllowAny, )
 
     def get(self, request, *args, **kwargs):
         """
-        Método que permite consultar el estado de un correo
+        Método que permite consultar el estado de un correo.
         """
         logging.info(request.query_params)
         query_params = request.query_params
@@ -60,7 +58,7 @@ class EmailDteInputView(APIView):
             # imprimir resultado de la consulta
             logging.info(email)
             # serializar
-            response = self.serializer_class(email, many=False)
+            response = self.EmailTrackDTESerializer(email, many=False)
             # responder
             return Response(response.data)
 
@@ -68,13 +66,16 @@ class EmailDteInputView(APIView):
             return Response({"mensaje": "Error en parametros enviados."})
 
     def post(self, request, format=None):
-        email = self.serializer_class(data=request.data)
+        """
+        Método que permite el input de un correo para ser
+        gestionado por el Track.
+        """
+        email = EmailDteInputSerializer(data=request.data)
+
         if email.is_valid():
             email.save()
             logging.info(email.data)
             input_queue(email.data['id'], email.data['empresa'])
-            #email_client = EmailClient()
-            #email_client.enviar_correo_dte(email.data['id'])
             return Response({'status': 200})
         else:
             logging.error(email.errors)
