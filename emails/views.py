@@ -58,7 +58,7 @@ class EmailDteInputView(APIView):
             # imprimir resultado de la consulta
             logging.info(email)
             # serializar
-            response = self.EmailTrackDTESerializer(email, many=False)
+            response = EmailTrackDTESerializer(email, many=False)
             # responder
             return Response(response.data)
 
