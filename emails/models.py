@@ -77,12 +77,12 @@ class Email(models.Model):
         upload_to='adjuntos/pdf/%Y/%m/%d/{0}'.format(
             calendar.timegm(datetime.utcnow().utctimetuple())),
         default='', null=True, blank=True)
-    
+
     adjunto1 = models.FileField(
         upload_to='adjuntos/ad1/%Y/%m/%d/{0}'.format(
             calendar.timegm(datetime.utcnow().utctimetuple())),
         default='', null=True, blank=True)
-    
+
     # campos de processed
     smtp_id = models.CharField(max_length=200, null=True, blank=True)
     processed_date = models.BigIntegerField(null=True, blank=True)
@@ -289,7 +289,7 @@ class Email(models.Model):
             logging.info(len(email))
             logging.info(email.query)
 
-            if email:
+            if len(email) > 0:
                 return email[0]
             else:
                 return None

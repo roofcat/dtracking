@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import TemplateView
 
 
-from rest_framework import authentication, permissions
+from rest_framework import authentication, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -57,10 +57,15 @@ class EmailDteInputView(APIView):
             email = Email.get_email(**params)
             # imprimir resultado de la consulta
             logging.info(email)
-            # serializar
-            response = EmailTrackDTESerializer(email, many=False)
-            # responder
-            return Response(response.data)
+            if email is not None:
+                logging.info("no es vacio")
+                # serializar
+                response = EmailTrackDTESerializer(email, many=False)
+                # responder
+                return Response(response.data)
+            else:
+                logging.info("es vacio")
+                return Response([], status=status.HTTP_204_NO_CONTENT)
 
         except Exception, e:
             return Response({"mensaje": "Error en parametros enviados."})
