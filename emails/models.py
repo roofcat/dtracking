@@ -216,17 +216,32 @@ class Email(models.Model):
         tipo_envio = str(body['tipo_envio']).decode('utf-8')
         tipo_dte_id = body['tipo_dte']
         numero_folio = body['numero_folio']
-        resolucion_receptor = body['resolucion_receptor']
-        if resolucion_receptor == '' or None:
-            resolucion_receptor = 0
+
+        try:
+            resolucion_receptor = body['resolucion_receptor']
+            if resolucion_receptor == '' or None:
+                resolucion_receptor = None
+        except:
+            resolucion_receptor = None
+        
         resolucion_emisor = body['resolucion_emisor']
         monto = body['monto']
-        fecha_emision = to_unix_timestamp(body['fecha_emision'])
+        
+        fecha_emision = body['fecha_emision']
         if fecha_emision == '' or None:
             fecha_emision = 0
-        fecha_recepcion = to_unix_timestamp(body['fecha_recepcion'])
-        if fecha_recepcion == '' or None:
-            fecha_recepcion = 0
+        else:
+            fecha_emision = to_unix_timestamp(fecha_emision)
+        
+        try:
+            fecha_recepcion = body['fecha_recepcion']
+            if fecha_recepcion == '' or None:
+                fecha_recepcion = None
+            else:
+                fecha_recepcion = to_unix_timestamp(fecha_recepcion)
+        except:
+            fecha_recepcion = None
+
         estado_documento = str(body['estado_documento']).decode('utf-8')
         tipo_operacion = str(body['tipo_operacion']).decode('utf-8')
         tipo_receptor = str(body['tipo_receptor']).decode('utf-8')
@@ -235,7 +250,7 @@ class Email(models.Model):
         id_envio = str(body['id_envio']).decode('utf-8')
 
         if id_envio == '' or None:
-            id_envio = 0
+            id_envio = None
         else:
             id_envio = int(id_envio, base=10)
 
