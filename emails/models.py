@@ -299,7 +299,7 @@ class Email(models.Model):
                 rut_emisor=rut_emisor,
                 resolucion_emisor=resolucion_emisor,
                 id_envio=id_envio,
-            )
+            ).order_by('-input_date')[:1]
             logging.info(email)
             logging.info(len(email))
             logging.info(email.query)
