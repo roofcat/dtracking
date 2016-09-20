@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 
 
+import base64
 import logging
-from sendgrid import SendGridClient, Mail
+
+
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers import mail
 
 
 from django.contrib.auth.models import User
@@ -20,61 +24,68 @@ class EmailClient(object):
         # llamar las configuraciones en la DB
         self.email_config = SendgridConf.get_sg_config(self.empresa_id)
         # crear los atributos de la instancia de SendGrid
-        self.sg = SendGridClient(self.email_config.api_key)
-        self.message = Mail()
-        self.message.set_from(self.email_config.asunto_email_dte)
-        self.message.set_from_name(self.email_config.nombre_email_dte)
+        self.sg = SendGridAPIClient(api_key=self.email_config.api_key)
+        self.message = mail.Mail()
+        self.message.set_from(
+            mail.Email(self.email_config.asunto_email_dte,
+                  self.email_config.nombre_email_dte))
+        self.personalization = mail.Personalization()
 
     def enviar_correo_dte(self, id):
         # cargar el objecto de id
         correo = Email.objects.get(pk=id)
         # valores de envío
-        self.message.add_to(correo.correo)
-        self.message.add_to_name(correo.nombre_cliente)
+        self.personalization.add_to(mail.Email(correo.correo, correo.nombre_cliente))
         self.message.set_subject(correo.asunto)
-        self.message.set_html(correo.html)
+        self.message.add_content(mail.Content(type="text/html", value=correo.html))
         # valores personalizados
-        unique_args = {
-            'email_id': correo.id,
-            'empresa': correo.empresa.rut,
-            'rut_receptor': correo.rut_receptor,
-            'rut_emisor': correo.rut_emisor,
-            'tipo_envio': correo.tipo_envio,
-            'tipo_dte': correo.tipo_dte.id_documento,
-            'numero_folio': correo.numero_folio,
-            'resolucion_receptor': correo.resolucion_receptor,
-            'resolucion_emisor': correo.resolucion_emisor,
-            'monto': correo.monto,
-            'fecha_emision': correo.fecha_emision,
-            'fecha_recepcion': correo.fecha_recepcion,
-            'estado_documento': correo.estado_documento,
-            'tipo_operacion': correo.tipo_operacion,
-            'tipo_receptor': correo.tipo_receptor,
-        }
+        self.personalization.add_custom_arg(mail.CustomArg('email_id', str(correo.id)))
+        self.personalization.add_custom_arg(mail.CustomArg('empresa', correo.empresa.rut))
+        self.personalization.add_custom_arg(mail.CustomArg('rut_receptor', correo.rut_receptor))
+        self.personalization.add_custom_arg(mail.CustomArg('rut_emisor', correo.rut_emisor))
+        self.personalization.add_custom_arg(mail.CustomArg('tipo_envio', correo.tipo_envio))
+        self.personalization.add_custom_arg(mail.CustomArg('tipo_dte', str(correo.tipo_dte.id_documento)))
+        self.personalization.add_custom_arg(mail.CustomArg('numero_folio', str(correo.numero_folio)))
+        self.personalization.add_custom_arg(mail.CustomArg('resolucion_receptor', str(correo.resolucion_receptor)))
+        self.personalization.add_custom_arg(mail.CustomArg('resolucion_emisor', str(correo.resolucion_emisor)))
+        self.personalization.add_custom_arg(mail.CustomArg('monto', str(correo.monto)))
+        self.personalization.add_custom_arg(mail.CustomArg('fecha_emision', str(correo.fecha_emision)))
+        self.personalization.add_custom_arg(mail.CustomArg('fecha_recepcion', str(correo.fecha_recepcion)))
+        self.personalization.add_custom_arg(mail.CustomArg('estado_documento', correo.estado_documento))
+        self.personalization.add_custom_arg(mail.CustomArg('tipo_operacion', correo.tipo_operacion))
+        self.personalization.add_custom_arg(mail.CustomArg('tipo_receptor', correo.tipo_receptor))
+        self.personalization.add_custom_arg(mail.CustomArg('id_envio', str(correo.id_envio)))
+
         logging.info(correo)
+        
         if correo.xml:
-            self.message.add_attachment_stream(
-                get_file_name_from_storage(correo.xml.name),
-                correo.xml.file.read())
+            attach = mail.Attachment()
+            attach.set_filename(get_file_name_from_storage(correo.xml.name))
+            attach.set_content(base64.b64encode(correo.xml.file.read()))
+            self.message.add_attachment(attach)
         if correo.pdf:
-            self.message.add_attachment_stream(
-                get_file_name_from_storage(correo.pdf.name),
-                correo.pdf.file.read())
+            attach = mail.Attachment()
+            attach.set_filename(get_file_name_from_storage(correo.pdf.name))
+            attach.set_content(base64.b64encode(correo.pdf.file.read()))
+            self.message.add_attachment(attach)
         if correo.adjunto1:
-            self.message.add_attachment_stream(
-                get_file_name_from_storage(correo.adjunto1.name),
-                correo.adjunto1.file.read())
-        self.message.set_unique_args(unique_args)
+            attach = mail.Attachment()
+            attach.set_filename(get_file_name_from_storage(correo.adjunto1.name))
+            attach.set_content(base64.b64encode(correo.adjunto1.file.read()))
+            self.message.add_attachment(attach)
+        self.message.add_personalization(self.personalization)
         # enviando el mail
-        status, msg = self.sg.send(self.message)
+        response = self.sg.client.mail.send.post(request_body=self.message.get())
         # imprimiendo respuesta
-        logging.info(status)
-        logging.info(msg)
+        logging.info(response.status_code)
+        logging.info(response.headers)
+        logging.info(response.body)
 
     def send_report_to_user_with_attach(self, user_email, report):
         # parametros de correo reporte
-        self.message.set_from(self.email_config.asunto_email_reporte)
-        self.message.set_from_name(self.email_config.nombre_email_reporte)
+        self.message.set_from(
+            mail.Email(self.email_config.asunto_email_reporte,
+                  self.email_config.nombre_email_reporte))
         # buscar usuario
         template_config = TemplateReporte.get_configuration(self.empresa_id)
         # preparar template del correo reporte
@@ -82,16 +93,19 @@ class EmailClient(object):
         html = str(template_config.template_html).format(
             user_name=user.first_name)
         # valores de envío
-        self.message.add_to(user_email)
-        self.message.add_to_name(user.first_name)
+        self.personalization.add_to(mail.Email(user_email, user.first_name))
         self.message.set_subject(template_config.asunto_reporte)
-        self.message.set_html(html)
+        self.message.add_content(mail.Content(type="text/html", value=html))
         # adjuntar excel si esta
         if report['report']:
-            self.message.add_attachment_stream(
-                report['name'], report['report'])
+            attach = mail.Attachment()
+            attach.set_content(base64.b64encode(report['report']))
+            attach.set_filename(report['name'])
+            self.message.add_attachment(attach)
+        self.message.add_personalization(self.personalization)
         # enviando el correo
-        status, msg = self.sg.send(self.message)
+        response = self.sg.client.mail.send.post(request_body=self.message.get())
         # imprimiendo respuesta
-        logging.info(status)
-        logging.info(msg)
+        logging.info(response.status_code)
+        logging.info(response.headers)
+        logging.info(response.body)

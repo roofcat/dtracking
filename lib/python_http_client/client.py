@@ -98,7 +98,7 @@ class Client(object):
             url += '/{0}'.format(self._url_path[count])
             count += 1
         if query_params:
-            url_values = urlencode(sorted(query_params.items()))
+            url_values = urlencode(sorted(query_params.items()), True)
             url = '{0}?{1}'.format(url, url_values)
         url = self._build_versioned_url(url) if self._version else self.host + url
         return url
@@ -173,7 +173,7 @@ class Client(object):
         if name in self.methods:
             method = name.upper()
 
-            def http_request(*args, **kwargs):
+            def http_request(*_, **kwargs):
                 """Make the API call
                 :param args: unused
                 :param kwargs:
@@ -181,16 +181,24 @@ class Client(object):
                 """
                 if 'request_headers' in kwargs:
                     self._update_headers(kwargs['request_headers'])
-                data = json.dumps(kwargs['request_body']).encode('utf-8')\
-                    if 'request_body' in kwargs else None
-                params = kwargs['query_params']\
-                    if 'query_params' in kwargs else None
+                if not 'request_body' in kwargs:
+                    data = None
+                else:
+                    # Don't serialize to a JSON formatted str if we don't have a JSON Content-Type
+                    if 'Content-Type' in self.request_headers:
+                        if self.request_headers['Content-Type'] != 'application/json':
+                            data = kwargs['request_body'].encode('utf-8')
+                        else:
+                            data = json.dumps(kwargs['request_body']).encode('utf-8')
+                    else:
+                        data = json.dumps(kwargs['request_body']).encode('utf-8')
+                params = kwargs['query_params'] if 'query_params' in kwargs else None
                 opener = urllib.build_opener()
                 request = urllib.Request(self._build_url(params), data=data)
                 if self.request_headers:
                     for key, value in self.request_headers.items():
                         request.add_header(key, value)
-                if data:
+                if data and not ('Content-Type' in self.request_headers):
                     request.add_header('Content-Type', 'application/json')
                 request.get_method = lambda: method
                 return Response(self._make_request(opener, request))
