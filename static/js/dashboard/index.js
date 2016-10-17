@@ -179,6 +179,7 @@ function drawJsonData () {
 		drawSendedStatusPieChart( jsonData.statistic );
 		drawFailureStatusPieChart( jsonData.statistic );
 	};
+
 	if ( jsonData.results ) {
 		drawLineGraph( jsonData.results );
 	};
@@ -257,19 +258,7 @@ function getPercentage3( val1, val2, val3 ) {
 
 function drawLineGraph ( results ) {
 
-	var arrayDataTable = new Array();
-	arrayDataTable.push(
-		[ "Fecha", "Solicitudes", "Procesados", "Enviados", "Leídos", "Rechazados", "Rebotados" ]
-	);
-
-	for ( var i = 0; i < results.length; i++ ) {
-		var row = results[i];
-		arrayDataTable.push(
-			[ row.input_date, row.total, row.processed, row.delivered, row.opened, row.dropped, row.bounced ]
-		);
-	};
-
-	var data = new google.visualization.arrayToDataTable( arrayDataTable );
+	// opciones del grafico.
 	var options = {
 		'width': '87%',
 		'height': '90%',
@@ -298,8 +287,38 @@ function drawLineGraph ( results ) {
 			'keepInBounds': true,
 		},
 	};
+
+	// instancia del grafico
 	var chart = new google.visualization.LineChart( document.getElementById( 'divLineChart' ) );
-	chart.draw( data, options );
+	
+	var arrayDataTable = new Array();
+	arrayDataTable.push(
+		[ "Fecha", "Solicitudes", "Procesados", "Enviados", "Leídos", "Rechazados", "Rebotados" ]
+	);
+
+	if ( results.length == 0 ) {
+
+		arrayDataTable.push([0,0,0,0,0,0,0]);
+		var data = new google.visualization.arrayToDataTable( arrayDataTable );
+		chart.draw( data, options );
+		chart.clearChart();
+
+	} else {
+
+		for ( var i = 0; i < results.length; i++ ) {
+			var row = results[i];
+			arrayDataTable.push([
+				row.input_date, row.total, 
+				row.processed, row.delivered, 
+				row.opened, row.dropped, row.bounced
+			]);
+		};
+
+		var data = new google.visualization.arrayToDataTable( arrayDataTable );
+		chart.draw( data, options );
+
+	};
+	
 };
 
 function drawGeneralStatusPieGraph ( data ) {
