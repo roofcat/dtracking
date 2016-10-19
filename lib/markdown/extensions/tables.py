@@ -45,6 +45,7 @@ class TableProcessor(BlockProcessor):
         # Get alignment of columns
         align = []
         for c in self._split_row(seperator, border):
+            c = c.strip()
             if c.startswith(':') and c.endswith(':'):
                 align.append('center')
             elif c.startswith(':'):
@@ -73,11 +74,7 @@ class TableProcessor(BlockProcessor):
         for i, a in enumerate(align):
             c = etree.SubElement(tr, tag)
             try:
-                if isinstance(cells[i], str) or isinstance(cells[i], unicode):
-                    c.text = cells[i].strip()
-                else:
-                    # we've already inserted a code element
-                    c.append(cells[i])
+                c.text = cells[i].strip()
             except IndexError:  # pragma: no cover
                 c.text = ""
             if a:

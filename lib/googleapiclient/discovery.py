@@ -61,6 +61,8 @@ from googleapiclient.errors import UnacceptableMimeTypeError
 from googleapiclient.errors import UnknownApiNameOrVersion
 from googleapiclient.errors import UnknownFileType
 from googleapiclient.http import BatchHttpRequest
+from googleapiclient.http import HttpMock
+from googleapiclient.http import HttpMockSequence
 from googleapiclient.http import HttpRequest
 from googleapiclient.http import MediaFileUpload
 from googleapiclient.http import MediaUpload
@@ -69,8 +71,15 @@ from googleapiclient.model import MediaModel
 from googleapiclient.model import RawModel
 from googleapiclient.schema import Schemas
 from oauth2client.client import GoogleCredentials
-from oauth2client.util import _add_query_parameter
-from oauth2client.util import positional
+
+# Oauth2client < 3 has the positional helper in 'util', >= 3 has it
+# in '_helpers'.
+try:
+  from oauth2client.util import _add_query_parameter
+  from oauth2client.util import positional
+except ImportError:
+  from oauth2client._helpers import _add_query_parameter
+  from oauth2client._helpers import positional
 
 
 # The client library requires a version of httplib2 that supports RETRIES.
@@ -82,6 +91,9 @@ URITEMPLATE = re.compile('{[^}]*}')
 VARNAME = re.compile('[a-zA-Z0-9_-]+')
 DISCOVERY_URI = ('https://www.googleapis.com/discovery/v1/apis/'
                  '{api}/{apiVersion}/rest')
+V1_DISCOVERY_URI = DISCOVERY_URI
+V2_DISCOVERY_URI = ('https://{api}.googleapis.com/$discovery/rest?'
+                    'version={apiVersion}')
 DEFAULT_METHOD_DOC = 'A description of how to use this function'
 HTTP_PAYLOAD_METHODS = frozenset(['PUT', 'POST', 'PATCH'])
 _MEDIA_SIZE_BIT_SHIFTS = {'KB': 10, 'MB': 20, 'GB': 30, 'TB': 40}
@@ -196,21 +208,23 @@ def build(serviceName,
   if http is None:
     http = httplib2.Http()
 
-  requested_url = uritemplate.expand(discoveryServiceUrl, params)
+  for discovery_url in (discoveryServiceUrl, V2_DISCOVERY_URI,):
+    requested_url = uritemplate.expand(discovery_url, params)
 
-  try:
-    content = _retrieve_discovery_doc(requested_url, http, cache_discovery,
-                                      cache)
-  except HttpError as e:
-    if e.resp.status == http_client.NOT_FOUND:
-      raise UnknownApiNameOrVersion("name: %s  version: %s" % (serviceName,
-                                                               version))
-    else:
-      raise e
+    try:
+      content = _retrieve_discovery_doc(requested_url, http, cache_discovery,
+                                        cache)
+      return build_from_document(content, base=discovery_url, http=http,
+          developerKey=developerKey, model=model, requestBuilder=requestBuilder,
+          credentials=credentials)
+    except HttpError as e:
+      if e.resp.status == http_client.NOT_FOUND:
+        continue
+      else:
+        raise e
 
-  return build_from_document(content, base=discoveryServiceUrl, http=http,
-      developerKey=developerKey, model=model, requestBuilder=requestBuilder,
-      credentials=credentials)
+  raise UnknownApiNameOrVersion(
+        "name: %s  version: %s" % (serviceName, version))
 
 
 def _retrieve_discovery_doc(url, http, cache_discovery, cache=None):
@@ -310,6 +324,15 @@ def build_from_document(
 
   if isinstance(service, six.string_types):
     service = json.loads(service)
+
+  if  'rootUrl' not in service and (isinstance(http, (HttpMock,
+                                                      HttpMockSequence))):
+      logger.error("You are using HttpMock or HttpMockSequence without" +
+                   "having the service discovery doc in cache. Try calling " +
+                   "build() without mocking once first to populate the " +
+                   "cache.")
+      raise InvalidJsonError()
+
   base = urljoin(service['rootUrl'], service['servicePath'])
   schema = Schemas(service)
 

@@ -10,7 +10,7 @@ from django.core.urlresolvers import (
 from django.db.models import Manager
 from django.db.models.query import QuerySet
 from django.utils import six
-from django.utils.encoding import smart_text
+from django.utils.encoding import python_2_unicode_compatible, smart_text
 from django.utils.six.moves.urllib import parse as urlparse
 from django.utils.translation import ugettext_lazy as _
 
@@ -47,6 +47,7 @@ class Hyperlink(six.text_type):
     is_hyperlink = True
 
 
+@python_2_unicode_compatible
 class PKOnlyObject(object):
     """
     This is a mock object, used for when we only need the pk of the object
@@ -55,6 +56,9 @@ class PKOnlyObject(object):
     """
     def __init__(self, pk):
         self.pk = pk
+
+    def __str__(self):
+        return "%s" % self.pk
 
 
 # We assume that 'validators' are intended for the child serializer,
@@ -156,21 +160,27 @@ class RelatedField(Field):
         # Standard case, return the object instance.
         return get_attribute(instance, self.source_attrs)
 
-    @property
-    def choices(self):
+    def get_choices(self, cutoff=None):
         queryset = self.get_queryset()
         if queryset is None:
             # Ensure that field.choices returns something sensible
             # even when accessed with a read-only field.
             return {}
 
+        if cutoff is not None:
+            queryset = queryset[:cutoff]
+
         return OrderedDict([
             (
-                six.text_type(self.to_representation(item)),
+                self.to_representation(item),
                 self.display_value(item)
             )
             for item in queryset
         ])
+
+    @property
+    def choices(self):
+        return self.get_choices()
 
     @property
     def grouped_choices(self):
@@ -178,7 +188,7 @@ class RelatedField(Field):
 
     def iter_options(self):
         return iter_options(
-            self.grouped_choices,
+            self.get_choices(cutoff=self.html_cutoff),
             cutoff=self.html_cutoff,
             cutoff_text=self.html_cutoff_text
         )
@@ -487,9 +497,12 @@ class ManyRelatedField(Field):
             for value in iterable
         ]
 
+    def get_choices(self, cutoff=None):
+        return self.child_relation.get_choices(cutoff)
+
     @property
     def choices(self):
-        return self.child_relation.choices
+        return self.get_choices()
 
     @property
     def grouped_choices(self):
@@ -497,7 +510,7 @@ class ManyRelatedField(Field):
 
     def iter_options(self):
         return iter_options(
-            self.grouped_choices,
+            self.get_choices(cutoff=self.html_cutoff),
             cutoff=self.html_cutoff,
             cutoff_text=self.html_cutoff_text
         )

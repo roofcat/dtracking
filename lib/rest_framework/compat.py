@@ -23,6 +23,12 @@ except ImportError:
     from django.utils import importlib  # Will be removed in Django 1.9
 
 
+try:
+    import urlparse  # Python 2.x
+except ImportError:
+    import urllib.parse as urlparse
+
+
 def unicode_repr(instance):
     # Get the repr of an instance, but ensure it is a unicode string
     # on both python 3 (already the case) and 2 (not the case).
@@ -116,6 +122,12 @@ def _resolve_model(obj):
     raise ValueError("{0} is not a Django model".format(obj))
 
 
+def is_authenticated(user):
+    if django.VERSION < (1, 10):
+        return user.is_authenticated()
+    return user.is_authenticated
+
+
 def get_related_model(field):
     if django.VERSION < (1, 9):
         return _resolve_model(field.rel.to)
@@ -125,7 +137,7 @@ def get_related_model(field):
 def value_from_object(field, obj):
     if django.VERSION < (1, 9):
         return field._get_val_from_obj(obj)
-    field.value_from_object(obj)
+    return field.value_from_object(obj)
 
 
 # contrib.postgres only supported from 1.8 onwards.
@@ -156,7 +168,7 @@ except ImportError:
     crispy_forms = None
 
 
-# coreapi is optional (Note that uritemplate is a dependancy of coreapi)
+# coreapi is optional (Note that uritemplate is a dependency of coreapi)
 try:
     import coreapi
     import uritemplate

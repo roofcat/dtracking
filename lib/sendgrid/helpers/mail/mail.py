@@ -117,7 +117,11 @@ class Mail(object):
     def add_header(self, header):
         if self.headers is None:
             self.headers = []
-        self.headers.append(header)
+        if isinstance(header, dict):
+            (k,v) = list(header.items())[0]
+            self.headers.append(Header(k,v))
+        else:
+            self.headers.append(header)
 
     def add_category(self, category):
         if self.categories is None:
@@ -215,14 +219,14 @@ class Header(object):
 
 class Substitution(object):
     def __init__(self, key=None, value=None):
-        self.key = key if key != None else None
-        self.value = value if value != None else None
+        self.key = str(key) if key != None else None
+        self.value = str(value) if value != None else None
 
     def set_key(self, key):
-        self.key = key
+        self.key = str(key) if key != None else None
 
     def set_value(self, value):
-        self.value = value
+        self.value = str(value) if value != None else None
 
     def get(self):
         substitution = {}

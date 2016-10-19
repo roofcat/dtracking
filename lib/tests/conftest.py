@@ -1,31 +1,31 @@
-# -*- coding: utf-8 -*-
-
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the (LGPL) GNU Lesser General Public License as published by the
-# Free Software Foundation; either version 3 of the License, or (at your
-# option) any later version.
+# Copyright 2016 Google Inc. All rights reserved.
 #
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE. See the GNU Library Lesser General Public License
-# for more details at ( http://www.gnu.org/licenses/lgpl.html ).
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
 #
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program; if not, write to the Free Software Foundation, Inc.,
-# 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
-# written by: Jurko Gospodnetić ( jurko.gospodnetic@pke.hr )
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-"""
-pytest configuration file for the suds test suite.
+"""Py.test hooks."""
 
-"""
+from oauth2client import _helpers
 
-# Make pytest load custom plugins expected to be loaded in our test suite.
-#TODO: pytest (tested up to version 2.5.1) will not display our plugin marker
-# information in its --markers list if called from a folder other than the one
-# containing the tests folder or if the tests folder is not on the current
-# Python path, e.g. if using pytest in the Python 3 implementation 'build'
-# folder constructed by 'setup.py build' using 'py.test build --markers'. The
-# plugin will still get loaded correctly when actually running the tests. This
-# has already been reported as a pytest issue.
-pytest_plugins = "tests.indirect_parametrize"
+
+def pytest_addoption(parser):
+    """Adds the --gae-sdk option to py.test.
+
+    This is used to enable the GAE tests. This has to be in this conftest.py
+    due to the way py.test collects conftest files."""
+    parser.addoption('--gae-sdk')
+
+
+def pytest_configure(config):
+    """Py.test hook called before loading tests."""
+    # Default of POSITIONAL_WARNING is too verbose for testing
+    _helpers.positional_parameters_enforcement = _helpers.POSITIONAL_EXCEPTION

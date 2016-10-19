@@ -12,6 +12,7 @@ response content is handled by parsers and renderers.
 """
 from __future__ import unicode_literals
 
+import traceback
 import warnings
 
 from django.db import models
@@ -870,19 +871,20 @@ class ModelSerializer(Serializer):
 
         try:
             instance = ModelClass.objects.create(**validated_data)
-        except TypeError as exc:
+        except TypeError:
+            tb = traceback.format_exc()
             msg = (
                 'Got a `TypeError` when calling `%s.objects.create()`. '
                 'This may be because you have a writable field on the '
                 'serializer class that is not a valid argument to '
                 '`%s.objects.create()`. You may need to make the field '
                 'read-only, or override the %s.create() method to handle '
-                'this correctly.\nOriginal exception text was: %s.' %
+                'this correctly.\nOriginal exception was:\n %s' %
                 (
                     ModelClass.__name__,
                     ModelClass.__name__,
                     self.__class__.__name__,
-                    exc
+                    tb
                 )
             )
             raise TypeError(msg)
@@ -1324,9 +1326,8 @@ class ModelSerializer(Serializer):
         # Update `extra_kwargs` with any new options.
         for key, value in uniqueness_extra_kwargs.items():
             if key in extra_kwargs:
-                extra_kwargs[key].update(value)
-            else:
-                extra_kwargs[key] = value
+                value.update(extra_kwargs[key])
+            extra_kwargs[key] = value
 
         return extra_kwargs, hidden_fields
 
@@ -1384,7 +1385,7 @@ class ModelSerializer(Serializer):
 
     def get_unique_together_validators(self):
         """
-        Determine a default set of validators for any unique_together contraints.
+        Determine a default set of validators for any unique_together constraints.
         """
         model_class_inheritance_tree = (
             [self.Meta.model] +
@@ -1396,9 +1397,8 @@ class ModelSerializer(Serializer):
         # cannot map to a field, and must be a traversal, so we're not
         # including those.
         field_names = {
-            field.source for field in self.fields.values()
+            field.source for field in self._writable_fields
             if (field.source != '*') and ('.' not in field.source)
-            and not field.read_only
         }
 
         # Note that we make sure to check `unique_together` both on the
@@ -1416,7 +1416,7 @@ class ModelSerializer(Serializer):
 
     def get_unique_for_date_validators(self):
         """
-        Determine a default set of validators for the following contraints:
+        Determine a default set of validators for the following constraints:
 
         * unique_for_date
         * unique_for_month

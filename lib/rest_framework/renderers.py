@@ -166,13 +166,18 @@ class TemplateHTMLRenderer(BaseRenderer):
             template_names = self.get_template_names(response, view)
             template = self.resolve_template(template_names)
 
-        context = self.resolve_context(data, request, response)
+        if hasattr(self, 'resolve_context'):
+            # Fallback for older versions.
+            context = self.resolve_context(data, request, response)
+        else:
+            context = self.get_template_context(data, renderer_context)
         return template_render(template, context, request=request)
 
     def resolve_template(self, template_names):
         return loader.select_template(template_names)
 
-    def resolve_context(self, data, request, response):
+    def get_template_context(self, data, renderer_context):
+        response = renderer_context['response']
         if response.exception:
             data['status_code'] = response.status_code
         return data
@@ -228,7 +233,10 @@ class StaticHTMLRenderer(TemplateHTMLRenderer):
         if response and response.exception:
             request = renderer_context['request']
             template = self.get_exception_template(response)
-            context = self.resolve_context(data, request, response)
+            if hasattr(self, 'resolve_context'):
+                context = self.resolve_context(data, request, response)
+            else:
+                context = self.get_template_context(data, renderer_context)
             return template_render(template, context, request=request)
 
         return data
@@ -637,6 +645,12 @@ class BrowsableAPIRenderer(BaseRenderer):
         else:
             paginator = None
 
+        csrf_cookie_name = settings.CSRF_COOKIE_NAME
+        csrf_header_name = getattr(settings, 'CSRF_HEADER_NAME', 'HTTP_X_CSRFToken')  # Fallback for Django 1.8
+        if csrf_header_name.startswith('HTTP_'):
+            csrf_header_name = csrf_header_name[5:]
+        csrf_header_name = csrf_header_name.replace('_', '-')
+
         context = {
             'content': self.get_content(renderer, data, accepted_media_type, renderer_context),
             'view': view,
@@ -667,7 +681,8 @@ class BrowsableAPIRenderer(BaseRenderer):
             'display_edit_forms': bool(response.status_code != 403),
 
             'api_settings': api_settings,
-            'csrf_cookie_name': settings.CSRF_COOKIE_NAME,
+            'csrf_cookie_name': csrf_cookie_name,
+            'csrf_header_name': csrf_header_name
         }
         return context
 

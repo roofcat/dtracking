@@ -162,14 +162,11 @@ available outside of a request context, you will need to implement your own
 :class:`oauth2client.Storage`.
 """
 
+from functools import wraps
 import hashlib
 import json
 import os
 import pickle
-from functools import wraps
-
-import six.moves.http_client as httplib
-import httplib2
 
 try:
     from flask import Blueprint
@@ -182,13 +179,13 @@ try:
 except ImportError:  # pragma: NO COVER
     raise ImportError('The flask utilities require flask 0.9 or newer.')
 
-from oauth2client.client import FlowExchangeError
-from oauth2client.client import OAuth2WebServerFlow
-from oauth2client.contrib.dictionary_storage import DictionaryStorage
+import six.moves.http_client as httplib
+
+from oauth2client import client
 from oauth2client import clientsecrets
+from oauth2client import transport
+from oauth2client.contrib import dictionary_storage
 
-
-__author__ = 'jonwayne@google.com (Jon Wayne Parrott)'
 
 _DEFAULT_SCOPES = ('email',)
 _CREDENTIALS_KEY = 'google_oauth2_credentials'
@@ -263,7 +260,8 @@ class UserOAuth2(object):
         self.flow_kwargs = kwargs
 
         if storage is None:
-            storage = DictionaryStorage(session, key=_CREDENTIALS_KEY)
+            storage = dictionary_storage.DictionaryStorage(
+                session, key=_CREDENTIALS_KEY)
         self.storage = storage
 
         if scopes is None:
@@ -341,7 +339,7 @@ class UserOAuth2(object):
         extra_scopes = kw.pop('scopes', [])
         scopes = set(self.scopes).union(set(extra_scopes))
 
-        flow = OAuth2WebServerFlow(
+        flow = client.OAuth2WebServerFlow(
             client_id=self.client_id,
             client_secret=self.client_secret,
             scope=scopes,
@@ -418,7 +416,7 @@ class UserOAuth2(object):
         # Exchange the auth code for credentials.
         try:
             credentials = flow.step2_exchange(code)
-        except FlowExchangeError as exchange_error:
+        except client.FlowExchangeError as exchange_error:
             current_app.logger.exception(exchange_error)
             content = 'An error occurred: {0}'.format(exchange_error)
             return content, httplib.BAD_REQUEST
@@ -446,8 +444,8 @@ class UserOAuth2(object):
         if not self.credentials:
             return False
         # Is the access token expired? If so, do we have an refresh token?
-        elif (self.credentials.access_token_expired
-                and not self.credentials.refresh_token):
+        elif (self.credentials.access_token_expired and
+                not self.credentials.refresh_token):
             return False
         else:
             return True
@@ -553,4 +551,5 @@ class UserOAuth2(object):
         """
         if not self.credentials:
             raise ValueError('No credentials available.')
-        return self.credentials.authorize(httplib2.Http(*args, **kwargs))
+        return self.credentials.authorize(
+            transport.get_http_object(*args, **kwargs))
