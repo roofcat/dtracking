@@ -4,7 +4,7 @@
 from django.contrib import admin
 
 
-from .models import Empresa, Holding
+from .models import Empresa, Holding, CamposOpcionalesEmail
 
 
 class HoldingAdmin(admin.ModelAdmin):
@@ -17,5 +17,11 @@ class EmpresaAdmin(admin.ModelAdmin):
 	search_fields = ('rut', 'empresa',)
 
 
+class CamposOpcionalesEmailAdmin(admin.ModelAdmin):
+	list_filter = ('empresa',)
+	search_fields = ('empresa',)
+
+
 admin.site.register(Holding, HoldingAdmin)
 admin.site.register(Empresa, EmpresaAdmin)
+admin.site.register(CamposOpcionalesEmail, CamposOpcionalesEmailAdmin)

@@ -1,8 +1,17 @@
 'use strict';
 
 var baseUrl = document.location.href;
+
+// carga de perfil
+var perfilUrl = 'perfiles/';
+var UserProfile = null;
+
 // urls busquedas
 var queryUrl = 'search/';
+
+// url para obtener campos personalizados si es que estan configurados
+var fieldsUrl = 'empresas/optional-fields/';
+var CamposOpcionales = new Object();
 
 // urls exportar reportes
 var exportUrl = 'reports/export/';
@@ -20,19 +29,42 @@ var exportLink = '';
 var expr = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,4})+$/;
 
 $( document ).ready( function () {
+
 	baseUrl = baseUrl.split('/');
 	delete baseUrl[4];
 	delete baseUrl[3];
 	baseUrl = baseUrl.join('/')
 	baseUrl = baseUrl.substring( 0, baseUrl.length - 1 );
+
+	// obtener el perfil de usuario
+    $.ajax({
+        url: baseUrl + perfilUrl,
+        type: 'GET',
+        dataType: 'json',
+        success: function ( data ) {
+            UserProfile = data;
+            inicializar();
+        },
+        error: function ( jqXHR, textStatus, errorThrown ) {
+            console.log( errorThrown );
+            inicializar();
+        },
+    });
 	
-	setDateTimePicker( '#date_from' );
-    setDateTimePicker( '#date_to' );
-    
-	setDefaultDates();
-	$( '#menuModal' ).modal( 'show', true );
+	
 	
 });
+
+function inicializar () {
+
+	setDateTimePicker( '#date_from' );
+	setDateTimePicker( '#date_to' );
+	setDefaultDates();
+	setupPageByUserProfile();
+	getOptionalFields();
+	$( '#menuModal' ).modal( 'show', true );
+
+};
 
 $( '#run_search' ).on( 'click', function () {
 
@@ -56,6 +88,10 @@ $( '#run_search' ).on( 'click', function () {
 	var mount_from = $( '#mount_from' ).val();
 	var mount_to = $( '#mount_to' ).val();
 	var checkFallidos = $( '#checkFallidos' ).is( ':checked' );
+	var opcional1 = $( '#opcional1' ).val();
+	var opcional2 = $( '#opcional2' ).val();
+	var opcional3 = $( '#opcional3' ).val();
+
 
 	if ( rutReceptor ) {
 		if ( !validaRut( rutReceptor ) ) {
@@ -86,56 +122,186 @@ $( '#run_search' ).on( 'click', function () {
 		numeroFolio = '-';
 	};
 
+	if ( !opcional1 ) {
+		opcional1 = '-';
+	};
+
+	if ( !opcional2 ) {
+		opcional2 = '-';
+	};
+
+	if ( !opcional3 ) {
+		opcional3 = '-';
+	};
+
 	var link = queryUrl + date_from + '/' + date_to + '/' + empresas + '/' + correo + '/';
-	link += numeroFolio + '/' + rutReceptor + '/' + mount_from + '/' + mount_to + '/' + checkFallidos + '/';
+	link += numeroFolio + '/' + rutReceptor + '/' + mount_from + '/' + mount_to + '/';
+	link += checkFallidos + '/' + opcional1 + '/' + opcional2 + '/' + opcional3 + '/';
 
 	$( '#closeLoadingModal' ).click();
 	drawJqueryTable( link );
 
-	exportLink = baseUrl + exportUrl + date_from + '/' + date_to + '/' + empresas + '/' + correo + '/';
-	exportLink += numeroFolio + '/' + rutReceptor + '/' + mount_from + '/' + mount_to + '/' + checkFallidos + '/';
-	$( '#btnGenerateReport' ).show();
+	if ( UserProfile.enable_report === true ) {
+
+		exportLink = baseUrl + exportUrl + date_from + '/' + date_to + '/';
+		exportLink += empresas + '/' + correo + '/' + numeroFolio + '/';
+		exportLink +=  rutReceptor + '/' + mount_from + '/' + mount_to + '/';
+		exportLink += checkFallidos + '/' + opcional1 + '/' + opcional2 + '/' + opcional3 + '/';
+		$( '#btnGenerateReport' ).show();
+
+	} else {
+
+		exportLink = '';
+
+	};
+
 });
 
 $( '#btnGenerateReport' ).on( 'click', function () {
-	var btn = $( this );
-	btn.removeClass( 'mdi-content-send' );
-	btn.addClass( 'mdi-action-cached' );
-	btn.attr( 'disabled', true );
-	sendUrlToReportQueue ( exportLink, btn );
-	var title = "Reporte Azurian Track";
-	var body = "Se ha iniciado el proceso de generar una planilla reporte ";
-	body += "cuando este proceso finalice recibirás un email con el archivo adjunto, ";
-	body += "por favor espere unos minutos...";
-	notificationModal ( title, body );
+
+	if ( UserProfile.enable_report ) {
+
+		var btn = $( this );
+		btn.removeClass( 'mdi-content-send' );
+		btn.addClass( 'mdi-action-cached' );
+		btn.attr( 'disabled', true );
+		sendUrlToReportQueue ( exportLink, btn );
+		var title = "Reporte Azurian Track";
+		var body = "Se ha iniciado el proceso de generar una planilla reporte ";
+		body += "cuando este proceso finalice recibirás un email con el archivo adjunto, ";
+		body += "por favor espere unos minutos...";
+		notificationModal ( title, body );
+
+	};
+
+});
+
+$( '#empresas' ).on( 'change', function () {
+
+	getOptionalFields();
+
 });
 
 function notificationModal ( t, b ) {
+
 	var title = $( '#notificationTitle' );
 	var body = $( '#notificationBody' );
 	title.empty().append( t );
 	body.empty().append( b );
 	$( '#notificationModal' ).modal( 'show', true );
+
 };
 
-function sendUrlToReportQueue ( link, btn ) {
+function setupPageByUserProfile () {
+	// función para configurar la pagina dependiendo del perfil
+};
+
+function getOptionalFields () {
+
+	var empresa = $( '#empresas' ).val();
+	var run_search = $( '#run_search' );
+	run_search.attr( 'disabled', true );
+
 	$.ajax({
-		url: link,
+		url: baseUrl + fieldsUrl + empresa,
 		type: 'GET',
 		dataType: 'json',
 		success: function ( data ) {
-			btn.removeClass( 'mdi-action-cached' );
-			btn.addClass( 'mdi-content-send' );
-			btn.attr( 'disabled', false );
-			console.log( data );
+
+			if ( data.opcional1 ) {
+				CamposOpcionales.opcional1 = data.opcional1;
+			} else {
+				CamposOpcionales.opcional1 = null;
+			};
+			if ( data.opcional2 ) {
+				CamposOpcionales.opcional2 = data.opcional2;
+			} else {
+				CamposOpcionales.opcional2 = null;
+			};
+			if ( data.opcional3 ) {
+				CamposOpcionales.opcional3 = data.opcional3;
+			} else {
+				CamposOpcionales.opcional3 = null;
+			};
+			searchModalOptionalFieldsConfig();
+			run_search.attr( 'disabled', false );
+
 		},
 		error: function ( jqXHR, textStatus, errorThrown ) {
-			btn.removeClass( 'mdi-action-cached' );
-			btn.addClass( 'mdi-content-send' );
-			btn.attr( 'disabled', false );
-			console.log( errorThrown );
+
+			vaciarObjetoCamposOpcionales();
+			searchModalOptionalFieldsConfig();
+			run_search.attr( 'disabled', false );
+
 		},
 	});
+
+};
+
+function searchModalOptionalFieldsConfig () {
+
+	if ( CamposOpcionales.opcional1 === null  ) {
+		$( '#divOpcional1' ).hide();
+		$( '#labelOpcional1' ).empty().append( CamposOpcionales.opcional1 );
+		$( '#opcional1' ).empty();
+	} else {
+		$( '#divOpcional1' ).show();
+		$( '#labelOpcional1' ).empty().append( CamposOpcionales.opcional1 );
+		$( '#opcional1' ).empty();
+	};
+	if ( CamposOpcionales.opcional2 === null  ) {
+		$( '#divOpcional2' ).hide();
+		$( '#labelOpcional2' ).empty().append( CamposOpcionales.opcional2 );
+		$( '#opcional2' ).empty();
+	} else {
+		$( '#divOpcional2' ).show();
+		$( '#labelOpcional2' ).empty().append( CamposOpcionales.opcional2 );
+		$( '#opcional2' ).empty();
+	};
+	if ( CamposOpcionales.opcional3 === null  ) {
+		$( '#divOpcional3' ).hide();
+		$( '#labelOpcional3' ).empty().append( CamposOpcionales.opcional3 );
+		$( '#opcional3' ).empty();
+	} else {
+		$( '#divOpcional3' ).show();
+		$( '#labelOpcional3' ).empty().append( CamposOpcionales.opcional3 );
+		$( '#opcional3' ).empty();
+	};
+
+};
+
+function vaciarObjetoCamposOpcionales() {
+
+	CamposOpcionales.opcional1 = null;
+	CamposOpcionales.opcional2 = null;
+	CamposOpcionales.opcional3 = null;
+
+};
+
+function sendUrlToReportQueue ( link, btn ) {
+
+	if ( link != '' || link != null ) {
+
+		$.ajax({
+			url: link,
+			type: 'GET',
+			dataType: 'json',
+			success: function ( data ) {
+				btn.removeClass( 'mdi-action-cached' );
+				btn.addClass( 'mdi-content-send' );
+				btn.attr( 'disabled', false );
+				console.log( data );
+			},
+			error: function ( jqXHR, textStatus, errorThrown ) {
+				btn.removeClass( 'mdi-action-cached' );
+				btn.addClass( 'mdi-content-send' );
+				btn.attr( 'disabled', false );
+				console.log( errorThrown );
+			},
+		});
+
+	};
+
 };
 
 function formValidate () {
@@ -167,19 +333,27 @@ function formValidate () {
 };
 
 function clearForm () {
+
 	$( '#correoDestinatario' ).val( '' );
 	$( '#mount_from' ).val( '' );
 	$( '#mount_to' ).val( '' );
 	$( '#numeroFolio' ).val( '' );
 	$( '#rutReceptor' ).val( '' );
+	$( '#opcional1' ).val( '' );
+	$( '#opcional2' ).val( '' );
+	$( '#opcional3' ).val( '' );
 	setDefaultDates();
+
 };
 
 $( '#showMenu' ).on( 'click', function () {
+
 	$( '#menuModal' ).modal( 'show', true );
+
 });
 
 $( '.datePicker' ).on( 'change', function () {
+
 	var date_from = $( '#date_from' ).val();
 	var date_to = $( '#date_to' ).val();
 
@@ -189,6 +363,7 @@ $( '.datePicker' ).on( 'change', function () {
 	if ( date_from > date_to ) {
 		setDefaultDates();
 	};
+
 });
 
 $( '.nav-pills' ).on('click', 'a', function () {
@@ -213,7 +388,9 @@ $( '.datePicker' ).on( 'change', function () {
 });
 
 function getDateAsTimestamp ( date ) {
+
 	return moment( date, 'DD/MM/YYYY' ).unix();
+
 };
 
 function setDefaultDates () {
@@ -262,30 +439,43 @@ function validaRut ( rut ) {
 };
 
 $( 'button' ).on( "mouseover", function () {
+
 	$( this ).popover( 'show' );
+
 });
 
 $( 'button' ).on( "mouseout", function () {
+
 	$( this ).popover( 'hide' );
+
 });
 
 $( 'div' ).on( 'mouseover', '#divPopOver', function () {
+
 	$( this ).popover( 'show' );
+
 });
 
 $( 'div' ).on( 'mouseout', '#divPopOver', function () {
+
 	$( this ).popover( 'hide' );
+
 });
 
 function timestamp_to_datetime ( date ) {
+
 	return moment.unix( date ).format( 'DD-MM-YYYY h:mm:ss a' );
+
 };
 
 function timestamp_to_date ( date ) {
+
 	return moment.unix( date ).format( 'DD-MM-YYYY' );
+
 };
 
 function drawJqueryTable ( urlSource ) {
+
 	var table = $( '#tableCards' ).dataTable({
 		"ajaxSource": urlSource,
 		"destroy": true,
@@ -352,13 +542,13 @@ function drawJqueryTable ( urlSource ) {
 				},
 			},
 			{
-				'data': 'pk',
+				'data': 'id',
 				'title': 'Detalle',
 				'render': function ( data, type, row, meta ) {
 					if ( data != null ) {
-						var html = "<span style=\"font-size:16px;color:#2196f3;align:center;cursor:pointer;\" "
-						    + "title=\"Click para ver más detalle.\" class=\"material-icons\" "
-						    + "id=\"spanDetail\" data-pk=\"" + data + "\">email</span>";
+						var html = "<span style=\"font-size:16px;color:#2196f3;align:center;cursor:pointer;\" ";
+					    html += "title=\"Click para ver más detalle.\" class=\"material-icons\" ";
+						html += "id=\"spanDetail\" data-pk=\"" + data + "\">email</span>";
 						return html;
 					} else {
 						return "";
@@ -372,24 +562,21 @@ function drawJqueryTable ( urlSource ) {
 				    var htmlRow = "<div style=\"font-size:11px;\">";
 
 				    if ( row['xml'] ) {
-				        var html = "<a href=\"" + attachUrl + row['xml'] +
-						    "\" title=\"Ver XML\" target=\"_blank\"><i style=\"font-size:16px;\" " +
-						    "class=\"material-icons\">insert_drive_file</i></a> ";
-				        htmlRow += html;
+				        htmlRow += "<a href=\"" + attachUrl + row['xml'] + "\" ";
+				        htmlRow += "title=\"Ver XML\" target=\"_blank\"><i style=\"font-size:16px;\" ";
+				        htmlRow += "class=\"fa fa-file-code-o icon-2xx\"></i></a> ";
 				    };
 
 				    if ( row['pdf'] ) {
-				        var html = "<a href=\"" + attachUrl + row['pdf'] +
-						    "\" title=\"Ver PDF\" target=\"_blank\"><i style=\"font-size:16px;\" " +
-						    "class=\"material-icons\">library_books</i></a> ";
-				        htmlRow += html;
+				        htmlRow += "<a href=\"" + attachUrl + row['pdf'] + "\" ";
+				        htmlRow += "title=\"Ver PDF\" target=\"_blank\"><i style=\"font-size:16px;\" ";
+				        htmlRow += "class=\"fa fa-file-pdf-o icon-2xx\"></i></a> ";
 				    };
 
 					if ( row['adjunto1'] ) {
-						var html = "<a href=\"" + attachUrl + row['adjunto1'] +
-						    "\" title=\"Ver Adjunto\" target=\"_blank\"><i style=\"font-size:16px;\" " +
-						    "class=\"material-icons\">class</i></a> ";
-						htmlRow += html;
+						htmlRow += "<a href=\"" + attachUrl + row['adjunto1'] + "\" ";
+						htmlRow += "title=\"Ver Adjunto\" target=\"_blank\"><i style=\"font-size:16px;\" ";
+						htmlRow += "class=\"fa fa-file-text-o icon-2xx\"></i></a> ";
 					};
 
 					htmlRow += '</div>';
@@ -424,12 +611,47 @@ function drawJqueryTable ( urlSource ) {
 				'title': 'Rut emisor',
 			},
 			{ 
-				'data': 'tipo_envio',
-				'title': 'Tipo envío',
+				'data': 'tipo_receptor',
+				'title': 'Tipo receptor',
+				'render': function ( data, type, row, meta ) {
+					var html = "<div>";
+
+					switch ( data.toLowerCase() ) {
+						
+						case 'manual':
+							html += "<i style=\"font-size:16px;\" ";
+							html += "title=\"Manual (PDF).\" ";
+							html += "class=\"fa fa-file-pdf-o icon-2xx\" ";
+							html += "aria-hidden=\"true\"></i> ";
+							break;
+						case 'electronico':
+							html += "<i style=\"font-size:16px;\" ";
+							html += "title=\"Electrónico (XML).\" ";
+							html += "class=\"fa fa-file-code-o icon-2xx\" ";
+							html += "aria-hidden=\"true\"></i> ";
+							break;
+						case 'ambos':
+							html += "<p title=\"Manual y Electrónico (XML y PDF).\">";
+							html += "<i style=\"font-size:16px;\" ";
+							html += "class=\"fa fa-file-code-o icon-2xx\" ";
+							html += "aria-hidden=\"true\"></i> - ";
+							html += "<i style=\"font-size:16px;\" ";
+							html += "class=\"fa fa-file-pdf-o icon-2xx\" ";
+							html += "aria-hidden=\"true\"></i>";
+							html += "</p>";
+							break;
+					};
+
+					html += "</div>";
+					return html;
+				},
 			},
 			{ 
 				'data': 'tipo_dte',
 				'title': 'Tipo DTE',
+				'render': function ( data, type, row, meta ) {
+					return data.nombre_documento;
+				},
 			},
 			{ 
 				'data': 'monto',
@@ -454,6 +676,7 @@ function drawJqueryTable ( urlSource ) {
             "zeroRecords": "No se encontraron registros.",
         },
 	});
+	
 	table.removeClass( 'display' );
 	table.addClass( 'table table-hover table-striped table-condensed table-responsive' );
 
@@ -463,15 +686,18 @@ function drawJqueryTable ( urlSource ) {
 * Funciones para detalle de email y mostrarlos en el modal
 */
 $( "#tableCards" ).on( "click", "td", function () {
+
 	var span = $( this ).find( "#spanDetail" );
 	var pk = span.data( "pk" );
 	if ( pk ) {
 		$( '#loadingModal' ).modal( 'show', true );
 		getEmailDetailAjax( pk );
 	};
+
 });
 
 function getEmailDetailAjax ( pk ) {
+
 	$.ajax({
 		url: emailDetailUrl,
 		type: 'GET',
@@ -487,144 +713,182 @@ function getEmailDetailAjax ( pk ) {
 			console.log( errorThrown );
 		},
 	});
+
 };
 
 function drawEmailDetailModal ( data ) {
+
 	var title = $( '#emailDetailTitle' );
 	var body = $( '#emailDetailBody' );
 	title.empty();
 	body.empty();
 	
-	var htmlTitle = 'Detalle de ' + data.correo + " Folio Nº " + data.numero_folio;
+	var htmlTitle = "Detalle de " + data.correo + " Folio Nº " + data.numero_folio;
 	
-	var htmlBody = '<div><br>';
-	htmlBody += '<label>Empresa</label> ' + data.empresa + ' ';
-	htmlBody += '<label>Rut emisor</label> ' + data.rut_emisor + ' ';
-	htmlBody += '<label>Rut receptor</label> ' + data.rut_receptor + ' <br>';
-	htmlBody += '<label>Tipo envío</label> ' + data.tipo_envio + ' ';
-	htmlBody += '<label>Folio</label> ' + data.numero_folio + ' ';
-	htmlBody += '<label>Tipo doc. trib.</label> ' + data.tipo_dte + '<br>';
-	
-	htmlBody += '<label>Resolución receptor</label>';
-	if ( data.resolucion_receptor ) {
-		htmlBody += ' ' + data.resolucion_receptor + ' ';
-	} else { 
-		htmlBody += '---';
-	};
-	
-	htmlBody += ' ';
-	
-	htmlBody += '<label>Resolución emisor</label> ';
-	if ( data.resolucion_emisor ) {
-		htmlBody += ' ' + data.resolucion_emisor + ' ';
-	} else { 
-		htmlBody += '---';
-	};
-	
-	htmlBody += '<br>';
-	
-	htmlBody += '<label>Monto</label> ' + ( !data.monto ) ? '' : '$' + data.monto + '<br>';
+	var htmlBody = "<div><br>";
+	htmlBody += "<label>Empresa</label> " + data.empresa.empresa + ' ';
+	htmlBody += "<label>Rut emisor</label> " + data.rut_emisor + ' ';
+	htmlBody += "<label>Rut receptor</label> " + data.rut_receptor + " <br>";
+	htmlBody += "<label>Tipo envío</label> " + data.tipo_envio + ' ';
+	htmlBody += "<label>Folio</label> " + data.numero_folio + ' ';
+	htmlBody += "<label>Tipo doc. trib.</label> " + data.tipo_dte.nombre_documento + "<br>";
 
-	htmlBody += '<label>Fecha emisión</label> ';
+	htmlBody += "<label>Fecha emisión</label> ";
 	if ( data.fecha_emision ) {
-		htmlBody += ' ' + timestamp_to_date( data.fecha_emision ) + ' ';
+		htmlBody += " " + timestamp_to_date( data.fecha_emision ) + " ";
 	} else { 
-		htmlBody += '---';
+		htmlBody += "---";
+	};
+	
+	htmlBody += " ";
+
+	htmlBody += "<label>Resolución emisor</label> ";
+	if ( data.resolucion_emisor ) {
+		htmlBody += " " + data.resolucion_emisor + " ";
+	} else { 
+		htmlBody += "---";
 	};
 
-	htmlBody += ' ';
-	
-	htmlBody += '<label>Fecha recepción</label> ';
+	htmlBody += "<br>";
+
+	htmlBody += "<label>Fecha recepción</label> ";
 	if ( data.fecha_recepcion ) {
-		htmlBody += ' ' + timestamp_to_date( data.fecha_recepcion ) + ' ';
+		htmlBody += " " + timestamp_to_date( data.fecha_recepcion ) + " ";
 	} else { 
-		htmlBody += '---';
+		htmlBody += "---";
 	};
 
-	htmlBody += '<br>';
+	htmlBody += " ";
+
+	htmlBody += "<label>Resolución receptor</label> ";
+	if ( data.resolucion_receptor ) {
+		htmlBody += " " + data.resolucion_receptor + " ";
+	} else { 
+		htmlBody += "---";
+	};
 	
-	htmlBody += '<label>Estado del documento</label> ';
+	htmlBody += "<br>";
+	
+	htmlBody += "<label>Monto</label> ";
+	if ( data.monto > 0 ) {
+		htmlBody += "$" + data.monto + ".-";
+	} else {
+		htmlBody += " ";
+	};
+
+	htmlBody += " ";
+
+	htmlBody += "<label>Estado del documento</label> ";
 	if ( data.estado_documento ) {
-		htmlBody += ' ' + data.estado_documento + ' ';
+		htmlBody += " " + data.estado_documento + " ";
 	} else {
-		htmlBody += '---';
+		htmlBody += "---";
 	};
-	htmlBody += '<br>';
 
-	htmlBody += '<label>Tipo operación</label>';
+	htmlBody += "<br>";
+
+	htmlBody += "<label>Tipo operación</label>";
 	if ( data.tipo_operacion ) {
-		htmlBody += ' ' + data.tipo_operacion + ' ';
+		htmlBody += " " + data.tipo_operacion + " ";
 	} else {
-		htmlBody += '---';
+		htmlBody += "---";
 	};
 	
-	htmlBody += ' ';
+	htmlBody += " ";
 	
-	htmlBody += '<label>Tipo receptor</label>';
+	htmlBody += "<label>Tipo receptor</label> ";
 	if ( data.tipo_receptor ) {
-		htmlBody += ' ' + data.tipo_receptor + ' ';
+
+		switch ( data.tipo_receptor.toLowerCase() ) {
+			
+			case 'manual':
+				htmlBody += "Manual (PDF) ";
+				break;
+			case 'electronico':
+				htmlBody += "Electrónico (XML) ";
+				break;
+			case 'ambos':
+				htmlBody += "Manual y Electrónico (XML y PDF) ";
+				break;
+		};
+
+		htmlBody += " ";
 	} else {
-		htmlBody += '---';
+		htmlBody += "---";
 	};
-	
-	htmlBody += '<br>';
+
+	htmlBody += " ";
+
+	if ( data.xml || data.pdf || data.adjunto1 ) {
+		htmlBody += "<label>Adjuntos</label> ";
+	};
 
 	if ( data.xml ) {
-	    htmlBody += '<label>XML Adjunto</label> ';
-	    htmlBody += '<a href="' + attachUrl + data.xml + '" target="_blank">Ver XML</a><br>';
+		htmlBody += " <a href=\"" + attachUrl + data.xml + "\" ";
+		htmlBody += "target=\"_blank\"><i style=\"font-size:16px;\" ";
+		htmlBody += "title=\"Ver XML\" class=\"fa fa-file-code-o icon-2xx\" ";
+		htmlBody += "aria-hidden=\"true\"></i></a> ";
 	};
 
 	if ( data.pdf ) {
-	    htmlBody += '<label>PDF Adjunto</label> ';
-	    htmlBody += '<a href="' + attachUrl + data.pdf + '" target="_blank">Ver PDF</a><br>';
+		htmlBody += " <a href=\"" + attachUrl + data.pdf + "\" ";
+		htmlBody += "target=\"_blank\"><i style=\"font-size:16px;\" ";
+		htmlBody += "title=\"Ver PDF\" class=\"fa fa-file-pdf-o icon-2xx\" ";
+		htmlBody += "aria-hidden=\"true\"></i></a> ";
 	};
 
 	if ( data.adjunto1 ) {
-		htmlBody += '<label>Adjunto</label> ';
-		htmlBody += '<a href="' + attachUrl + data.adjunto1 + '" target="_blank">Ver Adjunto</a><br>';
+		htmlBody += " <a href=\"" + attachUrl + data.adjunto1 + "\" ";
+		htmlBody += "target=\"_blank\"><i style=\"font-size:16px;\" ";
+		htmlBody += "title=\"Ver Adjunto\" class=\"fa fa-file-text-o icon-2xx\" ";
+		htmlBody += "aria-hidden=\"true\"></i></a> ";
 	};
 
-	htmlBody += '<label>Nombre cliente</label> ' + data.nombre_cliente + '<br>';
+	htmlBody += "<br>";
 
-	htmlBody += '<label>Tracking del correo:</label><br>';
+	htmlBody += "<label>Nombre cliente</label> " + data.nombre_cliente + "<br>";
+
+	htmlBody += "<label>Track del correo:</label><br>";
 	if ( data.processed_event ) {
-		htmlBody += '<label class="label label-default">Procesado</label> ';
-		htmlBody += 'el ' + timestamp_to_datetime( data.processed_date ) + '<br>'; 
+		htmlBody += "<label class=\"label label-default\">Procesado</label> ";
+		htmlBody += "el " + timestamp_to_datetime( data.processed_date ) + "<br>";
 	};
 
 	if ( data.delivered_event ) {
-		htmlBody += '<label class="label label-primary">Enviado</label> ';
-		htmlBody += ' el ' + timestamp_to_datetime( data.delivered_date ) + '<br>';
+		htmlBody += "<label class=\"label label-primary\">Enviado</label> ";
+		htmlBody += " el " + timestamp_to_datetime( data.delivered_date ) + "<br>";
 	};
 
 	if ( data.opened_event ) {
-		htmlBody += '<label class="label label-success">Leído</label> ';
-		htmlBody += 'primera vez el ' + timestamp_to_datetime( data.opened_first_date ) + ' ';
-		htmlBody += 'y fue leído por ultima vez el ' + timestamp_to_datetime( data.opened_last_date ) + ' ';
-		htmlBody += 'y ha sido leído ' + data.opened_count + ' vez/veces.<br>';
-		htmlBody += 'IP lectura ' + data.opened_ip + ' Navegador web utilizado ' + data.opened_user_agent + '<br>';
+		htmlBody += "<label class=\"label label-success\">Leído</label> ";
+		htmlBody += "primera vez el " + timestamp_to_datetime( data.opened_first_date ) + " ";
+		htmlBody += "y fue leído por ultima vez el " + timestamp_to_datetime( data.opened_last_date ) + " ";
+		htmlBody += "y ha sido leído " + data.opened_count + " vez/veces.<br>";
+		htmlBody += "IP lectura " + data.opened_ip + " Navegador web utilizado ";
+		htmlBody +=  data.opened_user_agent + "<br>";
 	};
 
 	if ( data.bounce_event ) {
-		htmlBody +='<label class="label label-warning">Rebotado</label> ';
-		htmlBody += 'el ' + timestamp_to_datetime( data.bounce_date ) + '<br>';
-		htmlBody +='Tipo rebote ' + data.bounce_type + ' status ' + data.bounce_status + '<br>';
-		htmlBody +='Razón del rebote ' + data.bounce_reason + '<br>';
+		htmlBody +="<label class=\"label label-warning\">Rebotado</label> ";
+		htmlBody += "el " + timestamp_to_datetime( data.bounce_date ) + "<br>";
+		htmlBody +="Tipo rebote " + data.bounce_type + " status " + data.bounce_status + "<br>";
+		htmlBody +="Razón del rebote " + data.bounce_reason + "<br>";
 	};
 	
 
 	if ( data.dropped_event ) {
-		htmlBody += '<label class="label label-danger">Rechazado</label> ';
-		htmlBody += 'el ' + timestamp_to_datetime( data.dropped_date ) + ' ';
-		htmlBody += '<b>Motivo</b> ' + data.dropped_reason + '<br>';
+		htmlBody += "<label class=\"label label-danger\">Rechazado</label> ";
+		htmlBody += "el " + timestamp_to_datetime( data.dropped_date ) + " ";
+		htmlBody += "<b>Motivo</b> " + data.dropped_reason + "<br>";
 	};
 
-	htmlBody += '';
-	htmlBody += '</div>';
+	htmlBody += " ";
+	htmlBody += "</div>";
 
 	title.append( htmlTitle );
 	body.append( htmlBody );
 
 	$( '#emailDetailModal' ).modal( 'show', true );
 	$( '#closeLoadingModal' ).click();
+
 };

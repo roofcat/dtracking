@@ -9,9 +9,7 @@ import logging
 
 from django.db import models
 from django.db.models import Count, Q
-from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
-from django.forms import model_to_dict
 
 
 from configuraciones.models import GeneralConfiguration
@@ -25,9 +23,9 @@ MAX_QUERY_LENGTH = 10000
 
 
 class FileQuerySet(models.QuerySet):
-    ''' Clase encargada de eliminar los adjuntos en casos de
+    """ Clase encargada de eliminar los adjuntos en casos de
         DELETEs masivos
-    '''
+    """
 
     def delete(self, *args, **kwargs):
         try:
@@ -61,12 +59,16 @@ class Email(models.Model):
     estado_documento = models.CharField(max_length=100, null=True, blank=True)
     tipo_operacion = models.CharField(max_length=100, null=True, blank=True)
     tipo_receptor = models.CharField(max_length=100, null=True, blank=True)
-    id_envio = models.BigIntegerField(blank=True, null=True)
+    id_envio = models.BigIntegerField(blank=True, null=True, db_index=True)
     # campos correo
     nombre_cliente = models.CharField(max_length=200)
     correo = models.EmailField(max_length=250, db_index=True)
     asunto = models.CharField(max_length=200, blank=True, null=True)
     html = models.TextField(blank=True, null=True)
+    # campos adicionales
+    opcional1 = models.CharField(max_length=255, null=True, db_index=True)
+    opcional2 = models.CharField(max_length=255, null=True, db_index=True)
+    opcional3 = models.CharField(max_length=255, null=True, db_index=True)
     # adjuntos
     xml = models.FileField(
         upload_to='adjuntos/xml/%Y/%m/%d/{0}'.format(
@@ -249,6 +251,20 @@ class Email(models.Model):
         correo = str(body['email']).decode('utf-8')
         id_envio = str(body['id_envio']).decode('utf-8')
 
+        # parametros opcionales
+        try:
+            opcional1 = str(body['opcional1']).decode('utf-8')
+        except:
+            opcional1 = None
+        try:
+            opcional2 = str(body['opcional2']).decode('utf-8')
+        except:
+            opcional2 = None
+        try:
+            opcional3 = str(body['opcional3']).decode('utf-8')
+        except:
+            opcional3 = None
+
         if id_envio == '' or None:
             id_envio = None
         else:
@@ -271,14 +287,17 @@ class Email(models.Model):
             tipo_receptor=tipo_receptor,
             nombre_cliente=nombre_cliente,
             correo=correo,
-            id_envio=id_envio
+            id_envio=id_envio,
+            opcional1=opcional1,
+            opcional2=opcional2,
+            opcional3=opcional3
         )
         return email
 
     # funcion utilizada desde el webhook api
     @classmethod
-    def get_email(self, correo, numero_folio, tipo_dte, rut_emisor, resolucion_emisor, id_envio):
-
+    def get_email(self, correo, numero_folio, tipo_dte,
+                  rut_emisor, resolucion_emisor, id_envio):
         if isinstance(numero_folio, (str, basestring)):
             numero_folio = int(numero_folio, base=10)
 
@@ -314,8 +333,9 @@ class Email(models.Model):
 
     # MÉTODOS DE CONSULTAS (para no repetir código)
     @classmethod
-    def get_statistics_count_by_dates(self, date_from, date_to, empresa, options='all'):
-        if options == 'all':
+    def get_statistics_count_by_dates(self, date_from, date_to, 
+                                            empresa, tipo_receptor='all'):
+        if tipo_receptor == 'all':
             count_total = Email.objects.filter(
                 input_date__range=(date_from, date_to),
                 empresa=empresa).count()
@@ -342,32 +362,32 @@ class Email(models.Model):
         else:
             count_total = Email.objects.filter(
                 input_date__range=(date_from, date_to),
-                tipo_receptor=options,
+                tipo_receptor=tipo_receptor,
                 empresa=empresa).count()
             count_processed = Email.objects.filter(
                 input_date__range=(date_from, date_to),
                 processed_event='processed',
-                tipo_receptor=options,
+                tipo_receptor=tipo_receptor,
                 empresa=empresa).count()
             count_delivered = Email.objects.filter(
                 input_date__range=(date_from, date_to),
                 delivered_event='delivered',
-                tipo_receptor=options,
+                tipo_receptor=tipo_receptor,
                 empresa=empresa).count()
             count_opened = Email.objects.filter(
                 input_date__range=(date_from, date_to),
                 opened_event='open',
-                tipo_receptor=options,
+                tipo_receptor=tipo_receptor,
                 empresa=empresa).count()
             count_dropped = Email.objects.filter(
                 input_date__range=(date_from, date_to),
                 dropped_event='dropped',
-                tipo_receptor=options,
+                tipo_receptor=tipo_receptor,
                 empresa=empresa).count()
             count_bounce = Email.objects.filter(
                 input_date__range=(date_from, date_to),
                 bounce_event='bounce',
-                tipo_receptor=options,
+                tipo_receptor=tipo_receptor,
                 empresa=empresa).count()
         return {
             'total': count_total,
@@ -379,22 +399,33 @@ class Email(models.Model):
         }
 
     @classmethod
-    def get_statistics_range_by_dates(self, date_from, date_to, empresa, options='all'):
-        if options == 'all':
-            emails = Email.objects.filter(input_date__range=(
-                date_from, date_to), empresa=empresa).values('input_date').annotate(
-                total=Count('input_date'), processed=Count('processed_event'),
-                delivered=Count('delivered_event'), opened=Count('opened_event'),
-                dropped=Count('dropped_event'), bounced=Count('bounce_event')
+    def get_statistics_range_by_dates(self, date_from,
+                                      date_to, empresa, tipo_receptor='all'):
+        if tipo_receptor == 'all':
+            emails = Email.objects.filter(
+                input_date__range=(date_from, date_to), empresa=empresa
+            ).values('input_date').annotate(
+                total=Count('input_date'), 
+                processed=Count('processed_event'),
+                delivered=Count('delivered_event'), 
+                opened=Count('opened_event'),
+                dropped=Count('dropped_event'), 
+                bounced=Count('bounce_event')
             ).order_by('input_date')
         else:
-            emails = Email.objects.filter(input_date__range=(
-                date_from, date_to), tipo_receptor=options, empresa=empresa).values('input_date').annotate(
-                total=Count('input_date'), processed=Count('processed_event'),
-                delivered=Count('delivered_event'), opened=Count('opened_event'),
-                dropped=Count('dropped_event'), bounced=Count('bounce_event')
+            emails = Email.objects.filter(
+                input_date__range=(date_from, date_to), 
+                tipo_receptor=tipo_receptor, empresa=empresa
+            ).values('input_date').annotate(
+                total=Count('input_date'), 
+                processed=Count('processed_event'),
+                delivered=Count('delivered_event'), 
+                opened=Count('opened_event'),
+                dropped=Count('dropped_event'), 
+                bounced=Count('bounce_event')
             ).order_by('input_date')
-        data = []
+
+        data = list()
         for email in emails:
             email = json.dumps(email, cls=DjangoJSONEncoder)
             data.append(json.loads(email))
@@ -403,7 +434,7 @@ class Email(models.Model):
     @classmethod
     def delete_old_emails_by_date(self, date_to_delete, empresa):
         try:
-            emails = Email.objects.filter(
+            Email.objects.filter(
                 input_date__lt=date_to_delete,
                 empresa=empresa,
             ).delete()
@@ -413,17 +444,13 @@ class Email(models.Model):
     @classmethod
     def get_emails_by_dynamic_query(self, date_from, date_to, empresa, correo,
                                     folio, rut, mount_from, mount_to, fallidos,
+                                    opcional1, opcional2, opcional3,
                                     display_start, display_length):
         if folio is not None:
-            if empresa is None:
-                logging.info("query de folio sin empresa")
-                emails = Email.objects.filter(
-                    numero_folio=folio).order_by('-input_date')
-            else:
-                logging.info("query de folio con empresa")
-                emails = Email.objects.filter(
-                    empresa=empresa, numero_folio=folio
-                ).order_by('-input_date')
+            logging.info("query de folio con empresa")
+            emails = Email.objects.filter(
+                empresa=empresa, numero_folio=folio
+            ).order_by('-input_date')
         elif fallidos is True:
             logging.info("query de fallidos")
             emails = Email.objects.filter(
@@ -431,13 +458,10 @@ class Email(models.Model):
                 Q(bounce_event='bounce') | Q(dropped_event='dropped')
             ).order_by('-input_date')
         else:
-            params = {}
+            params = dict()
             logging.info("query dinamica")
-            if date_from and date_to:
-                params['input_date__range'] = (date_from, date_to)
-            if empresa is not None:
-                logging.info("con empresa")
-                params['empresa'] = empresa
+            params['input_date__range'] = (date_from, date_to)
+            params['empresa'] = empresa
             if correo is not None:
                 logging.info("con correo")
                 params['correo'] = correo
@@ -445,15 +469,27 @@ class Email(models.Model):
                 logging.info("con rut receptor")
                 params['rut_receptor'] = rut
             if mount_from is not None and mount_to is not None:
-                logging.info("con montos")
+                logging.info("con rango montos")
                 params['monto__range'] = (mount_from, mount_to)
+            if opcional1 is not None:
+                logging.info("con campo opcional1")
+                params['opcional1'] = opcional1
+            if opcional2 is not None:
+                logging.info("con campo opcional2")
+                params['opcional2'] = opcional2
+            if opcional3 is not None:
+                logging.info("con campo opcional3")
+                params['opcional3'] = opcional3
             emails = Email.objects.filter(**params).order_by('-input_date')
+        
         # imprimir consulta
         logging.info("query")
         logging.info(emails.query)
+        
         # despues de consultar paginar y preparar retorno de emails
         query_total = emails.count()
         logging.info(query_total)
+
         if display_start is 0:
             emails = emails[display_start:display_length]
         else:
@@ -462,37 +498,25 @@ class Email(models.Model):
             query_length = emails.count()
         else:
             query_length = 0
-        emails = serializers.serialize('json', emails)
-        emails = json.loads(emails)
-        data = []
-        for e in emails:
-            email = e['fields']
-            email['pk'] = e['pk']
-            data.append(email)
         return {
             'query_total': query_total,
             'query_length': query_length,
-            'data': data,
+            'data': emails,
         }
-        display_start
-        display_length
 
     @classmethod
-    def get_emails_by_dynamic_query_async(self, date_from, date_to, empresa, correo,
-                                        folio, rut, mount_from, mount_to, fallidos):
+    def get_emails_by_dynamic_query_async(self, date_from, date_to, empresa,
+                        correo, folio, rut, mount_from, mount_to, fallidos,
+                                          opcional1, opcional2, opcional3):
 
         date_from = timestamp_to_date(date_from)
         date_to = timestamp_to_date(date_to)
+
         if folio is not None:
-            if empresa is None:
-                logging.info("query de folio sin empresa")
-                emails = Email.objects.filter(
-                    numero_folio=folio).order_by('-input_date')
-            else:
-                logging.info("query de folio con empresa")
-                emails = Email.objects.filter(
-                    empresa=empresa, numero_folio=folio
-                ).order_by('-input_date')
+            logging.info("query de folio con empresa")
+            emails = Email.objects.filter(
+                empresa=empresa, numero_folio=folio
+            ).order_by('-input_date')
         elif fallidos is True:
             logging.info("query de fallidos")
             emails = Email.objects.filter(
@@ -500,7 +524,7 @@ class Email(models.Model):
                 Q(bounce_event='bounce') | Q(dropped_event='dropped')
             ).order_by('-input_date')
         else:
-            params = {}
+            params = dict()
             logging.info("query dinamica")
             if date_from and date_to:
                 params['input_date__range'] = (date_from, date_to)
@@ -516,13 +540,25 @@ class Email(models.Model):
             if mount_from is not None and mount_to is not None:
                 logging.info("con montos")
                 params['monto__range'] = (mount_from, mount_to)
+            if opcional1 is not None:
+                logging.info("con campo opcional1")
+                params['opcional1'] = opcional1
+            if opcional2 is not None:
+                logging.info("con campo opcional2")
+                params['opcional2'] = opcional2
+            if opcional3 is not None:
+                logging.info("con campo opcional3")
+                params['opcional3'] = opcional3
             emails = Email.objects.filter(**params).order_by('-input_date')
+        
         # imprimir consulta
         logging.info("query")
         logging.info(emails.query)
+        
         # despues de consultar paginar y preparar retorno de emails
         query_total = emails.count()
         logging.info(query_total)
+        
         # retornar emails
         if emails:
             return emails
@@ -545,8 +581,9 @@ class Email(models.Model):
     def get_delayed_emails_only_processed(self):
         emails = Email.objects.filter(
             Q(processed_event__isnull=False) & Q(delivered_event__isnull=True) &
-            Q(opened_event__isnull=True ) & Q(dropped_event__isnull=True) &
-            Q(bounce_event__isnull=True)).order_by('input_date')
+            Q(opened_event__isnull=True) & Q(dropped_event__isnull=True) &
+            Q(bounce_event__isnull=True)
+        ).order_by('input_date')
         if emails:
             logging.info("se encontraron la siguente cantidad de emails pendientes")
             logging.info(emails.count())
@@ -555,50 +592,19 @@ class Email(models.Model):
             return None
 
     @classmethod
-    def get_emails_by_correo(self, date_from, date_to, correo, **kwargs):
-        emails = Email.objects.filter(
-            input_date__range=(date_from, date_to),
-            correo=correo
-        ).order_by('-input_date')
-        query_total = emails.count()
-        if kwargs['display_start'] is 0:
-            emails = emails[kwargs['display_start']:kwargs['display_length']]
-        else:
-            emails = emails[kwargs['display_start']:kwargs['display_length']+kwargs['display_start']]
-        if emails:
-            query_length = emails.count()
-        else:
-            query_length = 0
-        emails = serializers.serialize('json', emails)
-        emails = json.loads(emails)
-        data = []
-        for e in emails:
-            data.append(e['fields'])
-        return {
-            'query_total': query_total,
-            'query_length': query_length,
-            'data': data,
-        }
+    def get_emails_by_dates_async(self, date_from, date_to, 
+                                                empresa, tipo_receptor='all'):
 
-    @classmethod
-    def get_emails_by_correo_async(self, date_from, date_to, correo, **kwargs):
-        emails = Email.objects.filter(
-            input_date__range=(date_from, date_to),
-            correo=correo).order_by('-input_date')[:self.get_max_query_length(empresa)]
-        if emails:
-            return emails
-        else:
-            return None
-
-    @classmethod
-    def get_emails_by_dates_async(self, date_from, date_to, empresa, options='all'):
-        params = {}
+        params = dict()
         params['input_date__range'] = (date_from, date_to)
         if empresa != 'all':
             params['empresa'] = empresa
-        if options != 'all':
-            params['tipo_receptor'] = options
-        emails = Email.objects.filter(**params).order_by('input_date')[:self.get_max_query_length(empresa)]
+        if tipo_receptor != 'all':
+            params['tipo_receptor'] = tipo_receptor
+        
+        emails = Email.objects.filter(
+            **params
+        ).order_by('input_date')[:self.get_max_query_length(empresa)]
         if emails:
             return emails
         else:
@@ -609,6 +615,7 @@ class Email(models.Model):
         params = dict()
         params['input_date__range'] = (date_from, date_to)
         params['empresa'] = empresa
+        
         emails = Email.objects.filter(**params).order_by('input_date')
         print emails.query
         print emails.count()
@@ -618,174 +625,44 @@ class Email(models.Model):
             return None
 
     @classmethod
-    def get_sended_emails_by_dates_async(self, date_from, date_to, empresa, options='all'):
-        params = {}
+    def get_sended_emails_by_dates_async(self, date_from, date_to, 
+                                                    empresa, tipo_receptor='all'):
+        params = dict()
         params['input_date__range'] = (date_from, date_to)
         params['delivered_event'] = 'delivered'
         if empresa != 'all':
             params['empresa'] = empresa
-        if options != 'all':
-            params['tipo_receptor'] = options
-        emails = Email.objects.filter(**params).order_by('input_date')[:self.get_max_query_length(empresa)]
+        if tipo_receptor != 'all':
+            params['tipo_receptor'] = tipo_receptor
+        
+        emails = Email.objects.filter(
+            **params
+        ).order_by('input_date')[:self.get_max_query_length(empresa)]
         if emails:
             return emails
         else:
             return None
 
     @classmethod
-    def get_emails_by_folio(self, folio, **kwargs):
-        if folio:
-            emails = Email.objects.filter(
-                numero_folio=folio
-            ).order_by('-input_date')
-            query_total = emails.count()
-            if kwargs['display_start'] is 0:
-                emails = emails[kwargs['display_start']:kwargs['display_length']]
-            else:
-                emails = emails[kwargs['display_start']:kwargs['display_length']+kwargs['display_start']]
-            if emails:
-                query_length = emails.count()
-            else:
-                query_length = 0
-            emails = serializers.serialize('json', emails)
-            emails = json.loads(emails)
-            data = []
-            for e in emails:
-                data.append(e['fields'])
-            return {
-                'query_total': query_total,
-                'query_length': query_length,
-                'data': data,
-            }
-
-    @classmethod
-    def get_emails_by_folio_async(self, folio, **kwargs):
-        if folio:
-            emails = Email.objects.filter(
-                numero_folio=folio).order_by('-input_date')[:self.get_max_query_length(empresa)]
-            if emails:
-                return emails
-            else:
-                return None
-
-    @classmethod
-    def get_emails_by_rut_receptor(self, date_from, date_to, rut, **kwargs):
-        if date_from and date_to and rut:
-            emails = Email.objects.filter(
-                input_date__range=(date_from, date_to),
-                rut_receptor=rut
-            ).order_by('-input_date')
-            query_total = emails.count()
-            if kwargs['display_start'] is 0:
-                emails = emails[kwargs['display_start']:kwargs['display_length']]
-            else:
-                emails = emails[kwargs['display_start']:kwargs['display_length']+kwargs['display_start']]
-            if emails:
-                query_length = emails.count()
-            else:
-                query_length = 0
-            emails = serializers.serialize('json', emails)
-            emails = json.loads(emails)
-            data = []
-            for e in emails:
-                data.append(e['fields'])
-            return {
-                'query_total': query_total,
-                'query_length': query_length,
-                'data': data,
-            }
-
-    @classmethod
-    def get_emails_by_rut_receptor_async(self, date_from, date_to, rut, **kwargs):
-        if date_from and date_to and rut:
-            emails = Email.objects.filter(
-                input_date__range=(date_from, date_to),
-                rut_receptor=rut).order_by('-input_date')[:self.get_max_query_length(empresa)]
-            if emails:
-                return emails
-            else:
-                return None
-
-    @classmethod
-    def get_failure_emails_by_dates(self, date_from, date_to, **kwargs):
-        emails = Email.objects.filter(
-            Q(input_date__range=(date_from, date_to)),
-            Q(bounce_event='bounce') | Q(dropped_event='dropped')
-        ).order_by('-input_date')
-        query_total = emails.count()
-        if kwargs['display_start'] is 0:
-            emails = emails[kwargs['display_start']:kwargs['display_length']]
-        else:
-            emails = emails[kwargs['display_start']:kwargs['display_length']+kwargs['display_start']]
-        if emails:
-            query_length = emails.count()
-        else:
-            query_length = 0
-        emails = serializers.serialize('json', emails)
-        emails = json.loads(emails)
-        data = []
-        for e in emails:
-            data.append(e['fields'])
-        return {
-            'query_total': query_total,
-            'query_length': query_length,
-            'data': data,
-        }
-
-    @classmethod
-    def get_failure_emails_by_dates_async(self, date_from, date_to, empresa, options):
-        if options == 'all':
+    def get_failure_emails_by_dates_async(self, date_from, date_to, empresa, tipo_receptor):
+        if tipo_receptor == 'all':
+            logging.info('Todos los tipos de receptores')
             emails = Email.objects.filter(
                 Q(input_date__range=(date_from, date_to)),
                 Q(empresa=empresa),
                 Q(bounce_event='bounce') | Q(dropped_event='dropped')
             )
         else:
+            logging.info('Sólo el tipo de receptor ' + tipo_receptor)
             emails = Email.objects.filter(
                 Q(input_date__range=(date_from, date_to)),
-                Q(tipo_receptor=options), Q(empresa=empresa),
+                Q(tipo_receptor=tipo_receptor), Q(empresa=empresa),
                 Q(bounce_event='bounce') | Q(dropped_event='dropped')
             )
         emails = emails.order_by('input_date')[:self.get_max_query_length(empresa)]
         logging.info(emails.query)
-        if emails:
-            return emails
-        else:
-            return None
-
-    @classmethod
-    def get_emails_by_mount_and_dates(self, date_from, date_to, mount_from, mount_to, **kwargs):
-        logging.info(kwargs)
-        emails = Email.objects.filter(
-            input_date__range=(date_from, date_to),
-            monto__range=(mount_from, mount_to),
-        ).order_by('-input_date')
-        query_total = emails.count()
-        if kwargs['display_start'] is 0:
-            emails = emails[kwargs['display_start']:kwargs['display_length']]
-        else:
-            emails = emails[kwargs['display_start']:kwargs['display_length']+kwargs['display_start']]
-        if emails:
-            query_length = emails.count()
-        else:
-            query_length = 0
-        emails = serializers.serialize('json', emails)
-        emails = json.loads(emails)
-        data = []
-        for e in emails:
-            data.append(e['fields'])
-        return {
-            'query_total': query_total,
-            'query_length': query_length,
-            'data': data,
-        }
-
-    @classmethod
-    def get_emails_by_mount_and_dates_async(self, date_from, date_to, mount_from, mount_to, **kwargs):
-        emails = Email.objects.filter(
-            input_date__range=(date_from, date_to),
-            monto__range=(mount_from, mount_to)).order_by('-input_date')[:self.get_max_query_length(empresa)]
-        if emails:
+        logging.info(emails.count())
+        if emails.count() > 0:
             return emails
         else:
             return None

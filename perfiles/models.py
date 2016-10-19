@@ -3,27 +3,23 @@
 
 from __future__ import unicode_literals
 
-
-import logging
-
-
-from django.db import models
 from django.contrib.auth.models import User
-
+from django.db import models
 
 from empresas.models import Empresa
 
 
 class Perfil(models.Model):
-	usuario = models.ForeignKey(User)
-	empresas = models.ManyToManyField(Empresa)
+    usuario = models.OneToOneField(User)
+    empresas = models.ManyToManyField(Empresa)
+    enable_report = models.BooleanField(default=True)
 
-	def __unicode__(self):
-		return u'{0}'.format(self.empresas, self.usuario)
+    def __unicode__(self):
+        return u'{0}: {1}'.format(self.usuario, self.enable_report)
 
-	@classmethod
-	def get_perfil(self, user):
-		try:
-			return Perfil.objects.get(usuario=user)
-		except Exception, e:
-			logging.error(e)
+    @classmethod
+    def get_perfil(self, user):
+        try:
+            return Perfil.objects.get(usuario=user)
+        except Perfil.DoesNotExist:
+            return None

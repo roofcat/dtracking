@@ -32,7 +32,7 @@
 						<div align="right" style="margin-top:-50px;">
 							<button type="button" class="btn btn-sm btn-material-teal" id="btnGeneralExport"
 							rel="popover" data-animation="true" data-trigger="hover" data-html="true"
-							data-placement="top" data-container="body" data-toggle="popover"
+							data-placement="top" data-container="body" data-toggle="popover" disabled="true"
 							data-content="<p>Generar Reporte y enviármelo como correo electrónico adjunto.
 								<b>Nota:</b> máximo de 35 mil celdas.</p>">Generar Reporte</button>
 						</div>
@@ -57,7 +57,7 @@
 						<div align="right" style="margin-top:-50px;">
 							<button type="button" class="btn btn-sm btn-material-teal" id="btnSendedExport"
 							rel="popover" data-animation="true" data-trigger="hover" data-html="true"
-							data-placement="top" data-container="body" data-toggle="popover"
+							data-placement="top" data-container="body" data-toggle="popover" disabled="true"
 							data-content="<p>Generar Reporte y enviármelo como correo electrónico adjunto.
 								<b>Nota:</b> máximo de 35 mil celdas.</p>">Generar Reporte</button>
 						</div>
@@ -74,7 +74,7 @@
 								data-html="true" data-trigger="hover" data-placement="bottom"
 								data-container="body" class="mdi-alert-error" style="color:#7FBF10;"
 								data-content="<p>Este gráfico indica del universo de correos fallidos:<br>
-								<b>Correos Rechazados:</b> Son aquellos que podrían ser detectados como spam, cliente sesuscrito,
+								<b>Correos Rechazados:</b> Son aquellos que podrían ser detectados como spam, cliente desuscrito,
 								dominio inexistente.
 								<b>Correos Rebotados:</b> Son aquellos que podrían ser detectados como cuenta inexistente, cuenta sobre el límite.
 								</p>">
@@ -85,7 +85,7 @@
 						<div align="right" style="margin-top:-50px;">
 							<button class="btn btn-sm btn-material-teal" id="btnFailedExport"
 							rel="popover" data-animation="true" data-trigger="hover" data-html="true"
-							data-placement="top" data-container="body" data-toggle="popover"
+							data-placement="top" data-container="body" data-toggle="popover" disabled="true"
 							data-content="<p>Generar Reporte y enviármelo como correo electrónico adjunto.
 								<b>Nota:</b> máximo de 35 mil celdas.</p>">Generar Reporte</button>
 						</div>
@@ -140,15 +140,15 @@
 					<div class="form-group form-group-material-green">
 						<label class="control-label">Empresa</label>
 						<select name="empresas" id="empresas" class="form-control">
-							{% for empresa in empresas %}
+							{% for empresa in perfil.empresas.all %}
 								<option value="{{ empresa.rut }}">{{ empresa.empresa }}</option>
 							{% endfor %}
 						</select>
 					</div>
 					<div class="form-group form-group-material-green">
-						<label class="control-label">Opciones</label>
-						<select name="options" id="options" class="form-control">
-							<option value="all">Todo</option>
+						<label class="control-label">Tipo receptor</label>
+						<select name="tipo_receptor" id="tipo_receptor" class="form-control">
+							<option value="all">Todos</option>
 							<option value="electronico">Electrónico</option>
 							<option value="manual">Manual</option>
 							<option value="ambos">Ambos</option>

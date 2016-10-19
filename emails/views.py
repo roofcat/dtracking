@@ -20,6 +20,7 @@ from rest_framework.views import APIView
 
 from .models import Email
 from .serializers import EmailDteInputSerializer, EmailTrackDTESerializer
+from .serializers import EmailTrackRelatedSerializer
 from configuraciones.models import EliminacionHistorico
 from empresas.models import Empresa
 from utils.queues import input_queue
@@ -27,18 +28,16 @@ from utils.sendgrid_client import EmailClient
 
 
 class EmailDteInputView(APIView):
-    """
-    Vista encargada de recibir los request vía post para crear nuevos email
-    y enviarlos por correo utilizando SendGrid
+    """ Vista encargada de recibir los request vía post para crear nuevos email
+        y enviarlos por correo utilizando SendGrid
     """
     #authentication_classes = (authentication.TokenAuthentication, )
     serializer_class = EmailDteInputSerializer
     permission_classes = (permissions.AllowAny, )
 
     def get(self, request, *args, **kwargs):
-        """
-        Método que permite consultar el estado de un correo.
-        """
+        # Método que permite consultar el estado de un correo.
+
         logging.info(request.query_params)
         query_params = request.query_params
         params = dict()
@@ -65,15 +64,14 @@ class EmailDteInputView(APIView):
                 return Response(response.data)
             else:
                 logging.info("es vacio")
-                return Response([], status=status.HTTP_204_NO_CONTENT)
+                return Response(status=status.HTTP_204_NO_CONTENT)
 
         except Exception, e:
             return Response({"mensaje": "Error en parametros enviados."})
 
     def post(self, request, format=None):
-        """
-        Método que permite el input de un correo para ser
-        gestionado por el Track.
+        """ Método que permite el input de un correo para ser
+            gestionado por el Track.
         """
         email = EmailDteInputSerializer(data=request.data)
 
@@ -88,9 +86,9 @@ class EmailDteInputView(APIView):
 
 
 class QueueSendEmailView(TemplateView):
-    ''' Vista encargada de recibir la cola de solicitudes de envío de
+    """ Vista encargada de recibir la cola de solicitudes de envío de
         correos y envía los correo con sus adjuntos
-    '''
+    """
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args, **kwargs):
@@ -113,10 +111,9 @@ class QueueSendEmailView(TemplateView):
 
 
 class CronCleanEmailsHistoryView(TemplateView):
-    """
-    Método que si tiene habilitada la opción de eliminar correos antiguos
-    antiguos (parametrizado en app configuraciones) lista los correos
-    desde el numero de meses máximo a retener en la DB.
+    """ Método que si tiene habilitada la opción de eliminar correos antiguos
+        antiguos (parametrizado en app configuraciones) lista los correos
+        desde el numero de meses máximo a retener en la DB.
     """
 
     @method_decorator(csrf_exempt)
@@ -148,10 +145,9 @@ class CronCleanEmailsHistoryView(TemplateView):
 
 
 class CronSendDelayedEmailView(TemplateView):
-    """
-    Evalúa los correos que no se han podido enviar,
-    los correos que caen en este proceso son aquellos que son
-    ingresados vía json post en el servicio rest publicado
+    """ Evalúa los correos que no se han podido enviar,
+        los correos que caen en este proceso son aquellos que son
+        ingresados vía json post en el servicio rest publicado
     """
 
     @method_decorator(csrf_exempt)
@@ -169,10 +165,9 @@ class CronSendDelayedEmailView(TemplateView):
 
 
 class CronSendDelayedProcessedEmailView(TemplateView):
-    """
-    Esta es la vista que reintenta envíos de correos
-    cuando se utiliza la api de tracking para enviar
-    correos de los DTEs
+    """ Esta es la vista que reintenta envíos de correos
+        cuando se utiliza la api de tracking para enviar
+        correos de los DTEs
     """
 
     @method_decorator(csrf_exempt)
@@ -190,9 +185,8 @@ class CronSendDelayedProcessedEmailView(TemplateView):
 
 
 class DeleteEmailFileView(TemplateView):
-    """
-    Vista que se encarga de encolar los registros
-    que contentan archivos para ser eliminados
+    """ Vista que se encarga de encolar los registros
+        que contentan archivos para ser eliminados
     """
 
     @method_decorator(csrf_exempt)

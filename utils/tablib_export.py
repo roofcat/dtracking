@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 
 
-from datetime import datetime
-import logging
-import pytz
 import tablib
 
 
 from .generics import timestamp_to_date
+from empresas.models import CamposOpcionalesEmail
 
 
 """ Esta función genera excel en tiempo real de ejecución 
@@ -15,19 +13,33 @@ from .generics import timestamp_to_date
 """
 
 
-def create_tablib(data):
+def optional_name(optionals, field):
+    if optionals is not None:
+        return optionals[field]
+    else:
+        return ''
+
+
+def create_tablib(data, rut_empresa):
+    # lista los campos opcionales que puedan estar configurados
+    optionals = CamposOpcionalesEmail.get_fields_to_dict(rut_empresa)
+    # preparación del DataSet
     my_tab = tablib.Dataset(title="Correos registrados")
     my_tab.headers = (
-        'fecha', 'empresa', 'rut_receptor', 'rut_emisor', 'tipo_envio', 'tipo_dte',
-        'numero_folio', 'resolucion_receptor', 'resolucion_emisor', 'monto', 'fecha_emision',
-        'fecha_recepcion', 'estado_documento', 'tipo_operacion', 'tipo_receptor',
-        'nombre_cliente', 'correo', 'asunto', 'id_envio', 'fecha_procesado', 'procesado', 'fecha_envio',
-        'enviado', 'respuesta_envio', 'fecha_primera_lectura', 'fecha_ultima_lectura',
-        'abierto', 'ip_lector', 'navegador_lectura', 'cantidad_lectura', 'fecha_drop',
-        'razon_drop', 'drop', 'fecha_rebote', 'rebote', 'motivo_rebote', 'estado_Rebote',
-        'tipo_rebote', 'fecha_unsubscribe', 'unsubscribe_purchase', 'unsubscribe_id',
-        'unsubscribe', 'click_ip', 'click_purchase', 'click_navegador', 'click_event',
-        'click_email', 'fecha_click', 'click_url'
+        'fecha', 'empresa', 'rut_receptor', 'rut_emisor', 'tipo_envio',
+        'tipo_dte', 'numero_folio', 'resolucion_receptor', 'resolucion_emisor',
+        'monto', 'fecha_emision', 'fecha_recepcion', 'estado_documento',
+        'tipo_operacion', 'tipo_receptor', 'nombre_cliente', 'correo', 'asunto',
+        'id_envio', 'fecha_procesado', 'procesado', 'fecha_envio', 'enviado',
+        'respuesta_envio', 'fecha_primera_lectura', 'fecha_ultima_lectura',
+        'abierto', 'ip_lector', 'navegador_lectura', 'cantidad_lectura',
+        'fecha_drop', 'razon_drop', 'drop', 'fecha_rebote', 'rebote',
+        'motivo_rebote', 'estado_Rebote', 'tipo_rebote', 'click_ip',
+        'click_purchase', 'click_navegador', 'click_event', 'click_email',
+        'fecha_click', 'click_url',
+        optional_name(optionals, 'opcional1'),
+        optional_name(optionals, 'opcional2'),
+        optional_name(optionals, 'opcional3')
     )
     if data:
         for row in data:
@@ -69,11 +81,11 @@ def create_tablib(data):
             else:
                 monto = ''
             if row.fecha_emision is not None:
-                fecha_emision = timestamp_to_date(row.fecha_emision)
+                fecha_emision = timestamp_to_date(row.fecha_emision).strftime('%d-%m-%Y')
             else:
                 fecha_emision = ''
             if row.fecha_recepcion is not None:
-                fecha_recepcion = timestamp_to_date(row.fecha_recepcion)
+                fecha_recepcion = timestamp_to_date(row.fecha_recepcion).strftime('%d-%m-%Y')
             else:
                 fecha_recepcion = ''
             if row.estado_documento:
@@ -180,22 +192,6 @@ def create_tablib(data):
                 bounce_type = unicode(row.bounce_type).encode('utf-8')
             else:
                 bounce_type = ''
-            if row.unsubscribe_date is not None:
-                unsubscribe_date = timestamp_to_date(row.unsubscribe_date)
-            else:
-                unsubscribe_date = ''
-            if row.unsubscribe_purchase:
-                unsubscribe_purchase = unicode(row.unsubscribe_purchase).encode('utf-8')
-            else:
-                unsubscribe_purchase = ''
-            if row.unsubscribe_id:
-                unsubscribe_id = unicode(row.unsubscribe_id).encode('utf-8')
-            else:
-                unsubscribe_id = ''
-            if row.unsubscribe_event:
-                unsubscribe_event = unicode(row.unsubscribe_event).encode('utf-8')
-            else:
-                unsubscribe_event = ''
             if row.click_ip:
                 click_ip = unicode(row.click_ip).encode('utf-8')
             else:
@@ -224,6 +220,19 @@ def create_tablib(data):
                 click_url = unicode(row.click_url).encode('utf-8')
             else:
                 click_url = ''
+            # campos opcionales
+            if row.opcional1:
+                opcional1 = row.opcional1
+            else:
+                opcional1 = ''
+            if row.opcional2:
+                opcional2 = row.opcional2
+            else:
+                opcional2 = ''
+            if row.opcional3:
+                opcional3 = row.opcional3
+            else:
+                opcional3 = ''
             xlsx_row = (
                 input_date, empresa, rut_receptor, rut_emisor, tipo_envio, tipo_dte,
                 numero_folio, resolucion_receptor, resolucion_emisor, monto, 
@@ -233,9 +242,9 @@ def create_tablib(data):
                 opened_first_date, opened_last_date, opened_event, opened_ip, 
                 opened_user_agent, opened_count, dropped_date, dropped_reason, 
                 dropped_event, bounce_date, bounce_event, bounce_reason, 
-                bounce_status, bounce_type, unsubscribe_date, unsubscribe_purchase, 
-                unsubscribe_id, unsubscribe_event, click_ip, click_purchase,
-                click_useragent, click_event, click_email, click_date, click_url
+                bounce_status, bounce_type, click_ip, click_purchase,
+                click_useragent, click_event, click_email, click_date, click_url,
+                opcional1, opcional2, opcional3
             )
             my_tab.append(xlsx_row)
         return my_tab

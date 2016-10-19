@@ -6,10 +6,8 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.static import serve
 
-
 from rest_framework import routers
 from rest_framework.authtoken.views import obtain_auth_token
-
 
 from autenticacion.views import log_in, log_out, home_to_dashboard, ProfileTemplateView
 from emails.views import EmailDteInputView
@@ -18,15 +16,13 @@ from emails.views import CronSendDelayedEmailView
 from emails.views import CronSendDelayedProcessedEmailView
 from emails.views import CronCleanEmailsHistoryView
 from emails.views import DeleteEmailFileView
-from empresas.views import EmpresaViewSet
 from webhooks.views import SendGridRestWebhookView, SendGridApiWebhookView
-
 
 # sección de registro de apis rest con django-rest-framework
 router = routers.DefaultRouter()
 
-
 urlpatterns = [
+
     # rutas de api rest
     url(r'^api/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
@@ -45,10 +41,16 @@ urlpatterns = [
     url(r'^emails/cron/send-delayed-processed/', CronSendDelayedProcessedEmailView.as_view()),
     url(r'^emails/cron/clean-history/', CronCleanEmailsHistoryView.as_view()),
 
+    # rutas modulo empresas
+    url(r'^empresas/', include('empresas.urls', namespace='empresas')),
+
+    # rutas modulo perfiles
+    url(r'^perfiles/', include('perfiles.urls', namespace='perfiles')),
+    
     # colas de tareas
     url(r'^emails/queue/delete-file/', DeleteEmailFileView.as_view()),
 
-	# rutas de las paginas html del tracking
+    # rutas de las paginas html del tracking
     url(r'^dashboard/', include('dashboard.urls', namespace='dashboard')),
     url(r'^customsearch/', include('customsearch.urls', namespace='customsearch')),
     url(r'^webhook-api/', SendGridApiWebhookView.as_view(), name='webhook_api'),
@@ -58,7 +60,7 @@ urlpatterns = [
 
     # url que recibe webhooks de sendgrid
     url(r'^webhook/', SendGridRestWebhookView.as_view(), name='webhook_rest'),
-    url(r'^resumen/',include('resumen.urls', namespace="resumen")),
+    url(r'^resumen/', include('resumen.urls', namespace="resumen")),
 
     # url de manejo de reenvio de eventos a WS de clientes
     url(r'^webservices/', include('webservices.urls', namespace='webservices')),
@@ -74,4 +76,5 @@ urlpatterns = [
 
     # rutas estaticas
     url(r'^static/(?P<path>.*)$', serve, {'document_root': settings.STATIC_ROOT}),
+
 ]

@@ -5,7 +5,8 @@
 {% block stylesheets %}
 	<link rel="stylesheet" href="https://cdn.datatables.net/r/bs/jqc-1.11.3,dt-1.10.9/datatables.min.css"/>
 	<link rel="stylesheet" href="{% static "/static/css/bootstrap-material-datetimepicker.css" %}">
-	<link rel="stylesheet" href="{% static "/static/css/dataTables.bootstrap.min.css" %}">
+    <link rel="stylesheet" href="{% static "/static/css/dataTables.bootstrap.min.css" %}">
+	<link rel="stylesheet" href="{% static "/static/css/font-awesome.min.css" %}">
 {% endblock %}
 
 {% block title %}Información detallada{% endblock %}
@@ -23,7 +24,7 @@
 		<th>Rut receptor</th>
 		<th>Nombre cliente</th>
 		<th>Rut emisor</th>
-		<th>Tipo envío</th>
+		<th>Tipo receptor</th>
 		<th>Tipo DTE</th>
 		<th>Monto</th>
 	</thead>
@@ -61,7 +62,7 @@
             <div class="modal-body">
             	<br>
             	<div class="row">
-            		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+            		<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
 		            	<div class="form-horizontal">
 		                	<div class="form-group form-group-material-green has-feedback">
 								<label class="control-label">Desde</label>
@@ -70,7 +71,7 @@
 							</div>
 		            	</div>
             		</div>
-            		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+            		<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
 		            	<div class="form-horizontal">
 							<div class="form-group form-group-material-green has-feedback">
 								<label class="control-label">Hasta</label>
@@ -79,43 +80,43 @@
 							</div>
 		            	</div>
             		</div>
-            		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                        <div class="form-horizontal">
+                            <div class="form-group form-group-material-green has-feedback">
+                                <label class="control-label">Nº de folio</label>
+                                <input class="form-control" type="number" id="numeroFolio">
+                            </div>
+                        </div>
+                    </div>
+            		<div class="col-xs-12 col-sm-12 col-md-5 col-lg-5">
             			<div class="form-horizontal">
             				<div class="form-group form-group-material-green has-feedback">
 								<label class="control-label">Empresa</label>
 								<select name="empresas" id="empresas" class="form-control">
-									{% for empresa in empresas %}
+									{% for empresa in perfil.empresas.all %}
 										<option value="{{ empresa.rut }}">{{ empresa.empresa }}</option>
 									{% endfor %}
 								</select>
 							</div>
             			</div>
             		</div>
-            		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-		                <div class="form-horizontal">
-		                	<div class="form-group form-group-material-green has-feedback">
-								<label class="control-label">Nº de folio</label>
-								<input class="form-control" type="number" id="numeroFolio">
-							</div>
-		                </div>
-            		</div>
-            		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-	            		<div class="form-horizontal">
-		                	<div class="form-group form-group-material-green has-feedback">
-								<label class="control-label">Correo</label>
-								<input class="form-control" type="email" id="correoDestinatario">
-							</div>
-		                </div>
-            		</div>
-            		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-            			<div class="form-horizontal">
-							<div class="form-group form-group-material-green has-feedback">
-								<label class="control-label">Rut receptor</label>
-								<input class="form-control" type="text" id="rutReceptor">
-							</div>
-		                </div>
-            		</div>
-            		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+                    <div class="col-xs-12 col-sm-12 col-md-7 col-lg-7">
+                        <div class="form-horizontal">
+                            <div class="form-group form-group-material-green has-feedback">
+                                <label class="control-label">Correo</label>
+                                <input class="form-control" type="email" id="correoDestinatario">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
+                        <div class="form-horizontal">
+                            <div class="form-group form-group-material-green has-feedback">
+                                <label class="control-label">Rut receptor</label>
+                                <input class="form-control" type="text" id="rutReceptor">
+                            </div>
+                        </div>
+                    </div>
+            		<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
             			<div class="form-horizontal">
 		                	<div class="form-group form-group-material-green has-feedback">
 								<label class="control-label">Monto desde</label>
@@ -123,7 +124,7 @@
 							</div>
 		                </div>
             		</div>
-            		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
+            		<div class="col-xs-12 col-sm-12 col-md-4 col-lg-4">
             			<div class="form-horizontal">
 							<div class="form-group form-group-material-green has-feedback">
 								<label class="control-label">Monto hasta</label>
@@ -131,23 +132,49 @@
 							</div>
 		                </div>
             		</div>
-            		<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6">
-            			<div class="form-group form-group-material-green">
-            				<div class="checkbox checkbox-material-green">
-		            			<label>
-		            				<input type="checkbox" id="checkFallidos"> Sólo fallidos
-		        				</label>
-            				</div>
-            			</div>
-            		</div>
+                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4" id="divOpcional1" style="display: none;">
+                        <div class="form-horizontal">
+                            <div class="form-group form-group-material-green has-feedback">
+                                <label class="control-label" id="labelOpcional1">Opcional1</label>
+                                <input class="form-control" type="text" id="opcional1" min="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4" id="divOpcional2" style="display: none;">
+                        <div class="form-horizontal">
+                            <div class="form-group form-group-material-green has-feedback">
+                                <label class="control-label" id="labelOpcional2">Opcional2</label>
+                                <input class="form-control" type="text" id="opcional2" min="0">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-sm-12 col-md-4 col-lg-4" id="divOpcional3" style="display: none;">
+                        <div class="form-horizontal">
+                            <div class="form-group form-group-material-green has-feedback">
+                                <label class="control-label" id="labelOpcional3">Opcional3</label>
+                                <input class="form-control" type="text" id="opcional3" min="0">
+                            </div>
+                        </div>
+                    </div>
             	</div>
             </div>
 
             <div class="modal-footer">
-            	<div class="form-group" align="right" style="margin-right:20px;">
-            		<button class="btn btn-flat" data-dismiss="modal">Cancelar</button>
-					<button class="btn btn-material-green" id="run_search">Buscar</button>
-				</div>
+                <div class="col-xs-4 col-sm-4 col-md-4 col-lg-4">
+                    <div class="form-group form-group-material-green">
+                        <div class="checkbox checkbox-material-green" align="left">
+                            <label>
+                                <input type="checkbox" id="checkFallidos"> Sólo fallidos
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xs-8 col-sm-8 col-md-8 col-lg-8">
+                	<div class="form-group" align="right">
+                		<button class="btn btn-flat" data-dismiss="modal">Cancelar</button>
+    					<button class="btn btn-material-green" id="run_search">Buscar</button>
+    				</div>
+                </div>
             </div>
 
         </div>

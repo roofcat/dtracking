@@ -22,6 +22,7 @@ class LoginRequiredMixin(object):
 
 	@classmethod
 	def as_view(self, **kwargs):
+		# type: (object) -> object
 		view = super(LoginRequiredMixin, self).as_view(**kwargs)
 		return login_required(view, login_url='/login/')
 

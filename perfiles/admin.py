@@ -3,13 +3,13 @@
 
 from django.contrib import admin
 
-
 from .models import Perfil
 
 
 class PerfilAdmin(admin.ModelAdmin):
-	list_display = ('usuario',)
-	list_filter = ('empresas', 'usuario',)
+    list_display = ('usuario', 'enable_report',)
+    list_filter = ('empresas', 'usuario',)
+    ordering = ('usuario',)
 
 
 admin.site.register(Perfil, PerfilAdmin)

@@ -3,42 +3,78 @@
 google.load('visualization', '1.0', {'packages': ['corechart','line','table'], 'language': 'es'});
 
 var baseUrl = document.location.href;
+
+var perfilUrl = 'perfiles/';
+var UserProfile = null;
+
 var urlPath = 'statistics/';
+
 var urlGeneralExport = 'reports/general/';
 var urlSendedExport = 'reports/sended/';
 var urlFailureExport = 'reports/failure/';
+
 var jsonData;
+
 var linkGeneral = '';
 var linkSended = '';
 var linkFailure = '';
 
+
 $( document ).ready( function () {
+
 	baseUrl = baseUrl.split('/');
-	delete baseUrl[4];
-	delete baseUrl[3];
-	baseUrl = baseUrl.join('/')
-	baseUrl = baseUrl.substring( 0, baseUrl.length - 1 );
+    delete baseUrl[4];
+    delete baseUrl[3];
+    baseUrl = baseUrl.join('/')
+    baseUrl = baseUrl.substring( 0, baseUrl.length - 1 );
 
 	// Seteo de fecha actual
 	setDefaultDates();
-	putDownloadLink();
 
-	setDateTimePicker( '#date_from' );
-    setDateTimePicker( '#date_to' );
-	// realizar carga por defecto
-	$( "#run_search" ).click();
+    // obtener el perfil de usuario
+    $.ajax({
+        url: baseUrl + perfilUrl,
+        type: 'GET',
+        dataType: 'json',
+        success: function ( data ) {
+            UserProfile = data;
+            inicializar();
+        },
+        error: function ( jqXHR, textStatus, errorThrown ) {
+            console.log( errorThrown );
+            inicializar();
+        },
+    });
+
 });
 
+function inicializar () {
+
+	setupPageByUserProfile();
+	putDownloadLink();
+	setDateTimePicker( '#date_from' );
+    setDateTimePicker( '#date_to' );
+    // realizar carga por defecto
+	//$( "#run_search" ).click();
+	$( '#showMenu' ).click();
+
+};
+
 $( window ).on( 'resize', function () {
+	
 	drawJsonData();
+
 });
 
 $( '#showMenu' ).on( 'click', function () {
+	
 	$( '#menuModal' ).modal( 'show', true );
+
 });
 
 // Validar los campos de fecha
 $( 'input:text' ).on( 'change', function () {
+	
 	var date_from = $( '#date_from' ).val();
 	var date_to = $( '#date_to' ).val();
 
@@ -49,30 +85,61 @@ $( 'input:text' ).on( 'change', function () {
 		setDefaultDates();
 	};
 	putDownloadLink();
+
+});
+
+$( 'select' ).on( 'change', function () {
+	
+	putDownloadLink();
+
 });
 
 $( 'div' ).on( 'mouseover', '#spanTooltip', function () {
+	
 	$( this ).popover( 'show' );
+
 });
 
 $( 'div' ).on( 'mouseout', '#spanTooltip', function () {
+	
 	$( this ).popover( 'hide' );
+
 });
 
 function putDownloadLink () {
+	
 	var date_from = $( '#date_from' ).val();
 	var date_to = $( '#date_to' ).val();
 	var empresas = $( '#empresas' ).val();
-	var options = $( '#options' ).val();
+	var tipo_receptor = $( '#tipo_receptor' ).val();
 	date_from = getDateAsTimestamp( date_from );
 	date_to = getDateAsTimestamp( date_to );
 	
-	linkGeneral = baseUrl + urlGeneralExport + date_from + '/' + date_to + '/' + empresas + '/' + options + '/';
-	linkSended = baseUrl + urlSendedExport + date_from + '/' + date_to + '/' + empresas + '/' + options + '/';
-	linkFailure = baseUrl + urlFailureExport + date_from + '/' + date_to + '/' + empresas + '/' + options + '/';
+	if ( UserProfile.enable_report === true ) {
+		
+		linkGeneral = baseUrl + urlGeneralExport + date_from + '/';
+		linkGeneral += date_to + '/' + empresas + '/' + tipo_receptor + '/';
+
+		linkSended = baseUrl + urlSendedExport + date_from + '/';
+		linkSended += date_to + '/' + empresas + '/' + tipo_receptor + '/';
+
+		linkFailure = baseUrl + urlFailureExport + date_from + '/';
+		linkFailure += date_to + '/' + empresas + '/' + tipo_receptor + '/';
+
+	} else {
+
+		linkGeneral = '';
+		linkSended = '';
+		linkFailure = '';
+
+	};
+
+	setupPageByUserProfile();
+
 };
 
 $( 'button' ).on( 'click', function () {
+
 	var btn = $( this );
 	var btnId = $( this ).attr( 'id' );
 
@@ -105,37 +172,69 @@ $( 'button' ).on( 'click', function () {
 				notificationModal ( title, body );
 				break;
 		};
+
 	} else {
 		return;
 	};
+
 });
 
 function notificationModal ( t, b ) {
+
 	var title = $( '#notificationTitle' );
 	var body = $( '#notificationBody' );
 	title.empty().append( t );
 	body.empty().append( b );
 	$( '#notificationModal' ).modal( 'show', true );
+
+};
+
+function setupPageByUserProfile() {
+
+    var btnGeneralExport = $( '#btnGeneralExport' );
+    var btnSendedExport = $( '#btnSendedExport' );
+    var btnFailedExport = $( '#btnFailedExport' );
+
+    if ( UserProfile.enable_report === true ) {
+
+        btnGeneralExport.attr( 'disabled', false );
+        btnSendedExport.attr( 'disabled', false );
+        btnFailedExport.attr( 'disabled', false );
+
+    } else {
+        
+        btnGeneralExport.attr( 'disabled', true );
+        btnSendedExport.attr( 'disabled', true );
+        btnFailedExport.attr( 'disabled', true );
+
+    };
+
 };
 
 function sendUrlToReportQueue ( link, btn ) {
-	$.ajax({
-		url: link,
-		type: 'GET',
-		dataType: 'json',
-		success: function ( data ) {
-			btn.empty()
-			btn.html( 'Generar Excel' );
-			btn.attr( 'disabled', false );
-			console.log( data );
-		},
-		error: function ( jqXHR, textStatus, errorThrown ) {
-			btn.empty()
-			btn.html( 'Generar Excel' );
-			btn.attr( 'disabled', false );
-			console.log( errorThrown );
-		},
-	});
+
+	if ( link != '' || link != null ) {
+
+		$.ajax({
+			url: link,
+			type: 'GET',
+			dataType: 'json',
+			success: function ( data ) {
+				btn.empty()
+				btn.html( 'Generar Excel' );
+				btn.attr( 'disabled', false );
+				console.log( data );
+			},
+			error: function ( jqXHR, textStatus, errorThrown ) {
+				btn.empty()
+				btn.html( 'Generar Excel' );
+				btn.attr( 'disabled', false );
+				console.log( errorThrown );
+			},
+		});
+
+	};
+
 };
 
 $( '#run_search' ).on( 'click', function () {
@@ -145,9 +244,11 @@ $( '#run_search' ).on( 'click', function () {
 	var date_from = $( '#date_from' ).val();
 	var date_to = $( '#date_to' ).val();
 	var empresas = $( '#empresas' ).val();
-	var options = $( '#options' ).val();
+	var tipo_receptor = $( '#tipo_receptor' ).val();
 	date_from = getDateAsTimestamp( date_from );
 	date_to = getDateAsTimestamp( date_to );
+
+	putDownloadLink();
 	
 	$( '#loadingModal' ).modal( 'show', true );
 	$.ajax({
@@ -158,7 +259,7 @@ $( '#run_search' ).on( 'click', function () {
 			'date_from': date_from,
 			'date_to': date_to,
 			'empresas': empresas,
-			'options': options,
+			'tipo_receptor': tipo_receptor,
 		},
 		success: function ( data ) {
 			jsonData = data;
@@ -170,22 +271,30 @@ $( '#run_search' ).on( 'click', function () {
 			console.log( errorThrown );
 		},
 	});
+
 });
 
 function drawJsonData () {
+
 	if ( jsonData.statistic ) {
+		
 		setLegends( jsonData.statistic );
 		drawGeneralStatusPieGraph( jsonData.statistic );
 		drawSendedStatusPieChart( jsonData.statistic );
 		drawFailureStatusPieChart( jsonData.statistic );
+
 	};
 
 	if ( jsonData.results ) {
+		
 		drawLineGraph( jsonData.results );
+
 	};
+
 };
 
 function setLegends ( data ) {
+
 	var divResumeGeneral = $( '#divResumeGeneral' );
 	var divResumeOpened = $( '#divResumeOpened' );
 	var divResumeFailure = $( '#divResumeFailure' );
@@ -234,26 +343,33 @@ function setLegends ( data ) {
 		divResumeFailure.empty().append( htmlFailure );
 
 	} else {
+
 		divResumeGeneral.empty().append( '<label>Sin datos en este período</label>' );
 		divResumeOpened.empty().append( '<label>Sin datos en este período</label>' );
 		divResumeFailure.empty().append( '<label>Sin datos en este período</label>' );
+
 	};
+
 };
 
 function getPercentage2( val1, val2 ) {
+	
 	if ( val1 === 0 && val2 === 0 ) {
 		return 0;
 	} else {
 		return parseFloat( ( val1 * 100 ) / ( val1 + val2 ) ).toFixed( 1 );
 	};
+
 };
 
 function getPercentage3( val1, val2, val3 ) {
+	
 	if ( va1 === 0 && val2 === 0 && val3 === 0 ) {
 		return 0;
 	} else {
 		return parseFloat( ( val1 * 100 ) / ( val1 + val2 + val3 ) ).toFixed( 1 );
 	};
+
 };
 
 function drawLineGraph ( results ) {
@@ -322,6 +438,7 @@ function drawLineGraph ( results ) {
 };
 
 function drawGeneralStatusPieGraph ( data ) {
+	
 	var data = google.visualization.arrayToDataTable([
 		[ 'Estadísticas', 'Correos' ],
 		[ 'Enviados', data.delivered ],
@@ -344,11 +461,13 @@ function drawGeneralStatusPieGraph ( data ) {
 		'legend': { 'position': 'none', },
 	};
 
-	var chart = new google.visualization.PieChart(document.getElementById( 'divGeneralStatusPieChart' ));
+	var chart = new google.visualization.PieChart( document.getElementById( 'divGeneralStatusPieChart' ) );
 	chart.draw( data, options );
+
 };
 
 function drawSendedStatusPieChart ( data ) {
+	
 	var data = google.visualization.arrayToDataTable([
 		[ 'Estadísticas', 'Correos' ],
 		[ 'Leídos', data.opened ],
@@ -371,11 +490,13 @@ function drawSendedStatusPieChart ( data ) {
 		'legend': { 'position': 'none', },
 	};
 
-	var chart = new google.visualization.PieChart(document.getElementById( 'divSendedStatusPieChart' ));
+	var chart = new google.visualization.PieChart( document.getElementById( 'divSendedStatusPieChart' ) );
 	chart.draw( data, options );
+
 };
 
 function drawFailureStatusPieChart ( data ) {
+
 	var data = google.visualization.arrayToDataTable([
 		[ 'Estadísticas', 'Correos' ],
 		[ 'Rechazados', data.dropped ],
@@ -398,23 +519,32 @@ function drawFailureStatusPieChart ( data ) {
 		'legend': { 'position': 'none', },
 	};
 
-	var chart = new google.visualization.PieChart(document.getElementById( 'divFailureStatusPieChart' ));
+	var chart = new google.visualization.PieChart( document.getElementById( 'divFailureStatusPieChart' ) );
 	chart.draw( data, options );
+
 };
 
 function getDateAsTimestamp ( date ) {
+	
 	return moment( date, 'DD/MM/YYYY' ).unix();
+
 };
 
 function setDefaultDates () {
+	
 	var date_from = $( '#date_from' ).val( moment().subtract( 7, 'days' ).format( 'DD/MM/YYYY' ) );
 	var date_to = $( '#date_to' ).val( moment().format( 'DD/MM/YYYY' ) );
+
 };
 
 $( 'button' ).on( "mouseover", function () {
+	
 	$( this ).popover( 'show' );
+
 });
 
 $( 'button' ).on( "mouseout", function () {
+	
 	$( this ).popover( 'hide' );
+
 });
