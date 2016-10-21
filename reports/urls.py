@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 
-from django.conf.urls import include, url
+from django.conf.urls import url
 
 
 from .views import DynamicReportTemplateView
@@ -13,7 +13,6 @@ from .views import SendedReportTemplateView
 
 
 urlpatterns = [
-
     # urls para generar reportes
     url(r'^general/(?P<date_from>\d+)/(?P<date_to>\d+)/(?P<empresa>[\S]+)/(?P<tipo_receptor>[\w.%+-]+)/$',
         GeneralReportTemplateView.as_view()),
@@ -34,5 +33,4 @@ urlpatterns = [
 
     # reportes privados para consolidados solo de forma local
     url(r'^consolidados/', ReporteConsolidadoTemplateView.as_view()),
-
 ]

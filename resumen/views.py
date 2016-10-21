@@ -31,7 +31,8 @@ class ResumenIndexView(LoginRequiredMixin, TemplateView):
 class QueryTemplateView(LoginRequiredMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
-    	params = dict()
+
+        params = dict()
 
         date_from = request.GET['date_from']
         date_to = request.GET['date_to']
@@ -45,7 +46,6 @@ class QueryTemplateView(LoginRequiredMixin, TemplateView):
         count = EmailLogEvent.get_count_by_months(**params)
 
         data = {
-        	'total': count,
+            'total': count,
         }
-
         return HttpResponse(json.dumps(data))

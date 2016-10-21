@@ -19,24 +19,25 @@ from utils.generics import timestamp_to_date
 class StatisticsView(LoginRequiredMixin, TemplateView):
 
     def get(self, request, *args, **kwargs):
-        date_from = request.GET['date_from']
-        date_to = request.GET['date_to']
-        empresa = request.GET['empresas']
-        tipo_receptor = request.GET['tipo_receptor']
         try:
-            if date_from and date_to:
-                date_from = int(date_from, base=10)
-                date_to = int(date_to, base=10)
-                date_from = timestamp_to_date(date_from)
-                date_to = timestamp_to_date(date_to)
-                statistic = Email.get_statistics_count_by_dates(date_from, date_to, empresa, tipo_receptor)
-                results = Email.get_statistics_range_by_dates(date_from, date_to, empresa, tipo_receptor)
-                data = {
-                    'date_from': str(date_from),
-                    'date_to': str(date_to),
-                    'statistic': statistic,
-                    'results': results,
-                }
+            date_from = request.GET['date_from']
+            date_to = request.GET['date_to']
+            date_from = int(date_from, base=10)
+            date_to = int(date_to, base=10)
+
+            query_params = dict()
+            query_params['date_from'] = timestamp_to_date(date_from)
+            query_params['date_to'] = timestamp_to_date(date_to)
+            query_params['empresa'] = request.GET['empresas']
+            query_params['tipo_receptor'] = request.GET['tipo_receptor']
+
+            statistic = Email.get_statistics_count_by_dates(**query_params)
+            results = Email.get_statistics_range_by_dates(**query_params)
+
+            data = {
+                'statistic': statistic,
+                'results': results,
+            }
             data = json.dumps(data)
             return HttpResponse(data, content_type='application/json')
         except Exception, e:

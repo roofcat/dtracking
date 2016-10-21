@@ -16,6 +16,7 @@ class HoldingSerializer(ModelSerializer):
 class EmpresaSerializer(ModelSerializer):
 
     holding = HoldingSerializer(many=False, read_only=True)
+
     class Meta:
         model = Empresa
         fields = ('rut', 'empresa', 'holding')

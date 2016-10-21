@@ -399,31 +399,24 @@ class Email(models.Model):
         }
 
     @classmethod
-    def get_statistics_range_by_dates(self, date_from,
-                                      date_to, empresa, tipo_receptor='all'):
-        if tipo_receptor == 'all':
-            emails = Email.objects.filter(
-                input_date__range=(date_from, date_to), empresa=empresa
-            ).values('input_date').annotate(
-                total=Count('input_date'), 
-                processed=Count('processed_event'),
-                delivered=Count('delivered_event'), 
-                opened=Count('opened_event'),
-                dropped=Count('dropped_event'), 
-                bounced=Count('bounce_event')
-            ).order_by('input_date')
-        else:
-            emails = Email.objects.filter(
-                input_date__range=(date_from, date_to), 
-                tipo_receptor=tipo_receptor, empresa=empresa
-            ).values('input_date').annotate(
-                total=Count('input_date'), 
-                processed=Count('processed_event'),
-                delivered=Count('delivered_event'), 
-                opened=Count('opened_event'),
-                dropped=Count('dropped_event'), 
-                bounced=Count('bounce_event')
-            ).order_by('input_date')
+    def get_statistics_range_by_dates(self, date_from, date_to,
+                                      empresa, tipo_receptor='all'):
+        query_params = dict()
+        query_params['input_date__range'] = (date_from, date_to)
+        query_params['empresa'] = empresa
+        if tipo_receptor != 'all':
+            query_params['tipo_receptor'] = tipo_receptor
+
+        emails = Email.objects.filter(
+            **query_params
+        ).values('input_date').annotate(
+            total=Count('input_date'),
+            processed=Count('processed_event'),
+            delivered=Count('delivered_event'),
+            opened=Count('opened_event'),
+            dropped=Count('dropped_event'),
+            bounced=Count('bounce_event')
+        ).order_by('input_date')
 
         data = list()
         for email in emails:
@@ -593,8 +586,7 @@ class Email(models.Model):
 
     @classmethod
     def get_emails_by_dates_async(self, date_from, date_to, 
-                                                empresa, tipo_receptor='all'):
-
+                                        empresa, tipo_receptor='all'):
         params = dict()
         params['input_date__range'] = (date_from, date_to)
         if empresa != 'all':
@@ -626,7 +618,7 @@ class Email(models.Model):
 
     @classmethod
     def get_sended_emails_by_dates_async(self, date_from, date_to, 
-                                                    empresa, tipo_receptor='all'):
+                                        empresa, tipo_receptor='all'):
         params = dict()
         params['input_date__range'] = (date_from, date_to)
         params['delivered_event'] = 'delivered'
@@ -644,7 +636,8 @@ class Email(models.Model):
             return None
 
     @classmethod
-    def get_failure_emails_by_dates_async(self, date_from, date_to, empresa, tipo_receptor):
+    def get_failure_emails_by_dates_async(self, date_from, date_to,
+                                          empresa, tipo_receptor):
         if tipo_receptor == 'all':
             logging.info('Todos los tipos de receptores')
             emails = Email.objects.filter(

@@ -3,9 +3,7 @@
 
 from django.db import models
 
-
 from empresas.models import Holding, Empresa
-
 
 REPORT_FILE_FORMAT = (
     ('xlsx', 'xlsx'),
@@ -78,6 +76,7 @@ class EliminacionHistorico(models.Model):
     holding = models.ForeignKey(Holding, null=True)
     activo = models.BooleanField(default=False)
     dias_a_eliminar = models.IntegerField(null=True, blank=True)
+
     # indicará que sera configuración a nivel de holding
 
     def __unicode__(self):
@@ -105,10 +104,10 @@ class SoapWebService(models.Model):
     solo_default = models.BooleanField(default=False)
     metodo_default = models.CharField(max_length=200, null=True, blank=True)
     parametros_default = models.CharField(max_length=255, blank=True,
-                                          help_text='Lista de parametros ordenados \
-                                          por posición en el metodo del Web Service \
-                                          separado por ; sin espacios ejemplo: \
-										  "rut_emisor;numero_folio;input_date"')
+                                            help_text='Lista de parametros ordenados \
+                                            por posición en el metodo del Web Service \
+                                            separado por ; sin espacios ejemplo: \
+                                            "rut_emisor;numero_folio;input_date"')
     campos_default = models.CharField(max_length=255, null=True, blank=True)
     # procesados
     con_procesado = models.BooleanField(default=False, blank=True)

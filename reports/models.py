@@ -13,7 +13,7 @@ class Report(models.Model):
     name = models.CharField(max_length=120)
     report = models.FileField(
         upload_to='reportes/%Y/%m/%d/{0}'.format(
-        	calendar.timegm(datetime.utcnow().utctimetuple())))
+            calendar.timegm(datetime.utcnow().utctimetuple())))
 
     def __unicode__(self):
-    	return self.name
+        return self.name

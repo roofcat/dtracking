@@ -3,7 +3,6 @@
 
 from datetime import date, timedelta
 import cloudstorage
-import json
 import logging
 
 
@@ -20,7 +19,6 @@ from rest_framework.views import APIView
 
 from .models import Email
 from .serializers import EmailDteInputSerializer, EmailTrackDTESerializer
-from .serializers import EmailTrackRelatedSerializer
 from configuraciones.models import EliminacionHistorico
 from empresas.models import Empresa
 from utils.queues import input_queue
@@ -31,9 +29,9 @@ class EmailDteInputView(APIView):
     """ Vista encargada de recibir los request vía post para crear nuevos email
         y enviarlos por correo utilizando SendGrid
     """
-    #authentication_classes = (authentication.TokenAuthentication, )
+    #authentication_classes = (authentication.TokenAuthentication,)
     serializer_class = EmailDteInputSerializer
-    permission_classes = (permissions.AllowAny, )
+    permission_classes = (permissions.AllowAny,)
 
     def get(self, request, *args, **kwargs):
         # Método que permite consultar el estado de un correo.
