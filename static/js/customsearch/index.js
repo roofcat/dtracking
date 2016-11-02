@@ -848,6 +848,16 @@ function drawEmailDetailModal ( data ) {
 
 	htmlBody += "<label>Nombre cliente</label> " + data.nombre_cliente + "<br>";
 
+	if ( data.opcional1 ) {
+		htmlBody +=  "<label>" + CamposOpcionales.opcional1 + "</label>" + " " + data.opcional1 + "<br>";
+	};
+	if ( data.opcional2 ) {
+		htmlBody += "<label>" + CamposOpcionales.opcional2 + "</label>" + " " + data.opcional2 + "<br>";
+	};
+	if ( data.opcional3 ) {
+		htmlBody += "<label>" + CamposOpcionales.opcional3 + "</label>" + " " + data.opcional3 + "<br>";
+	};
+
 	htmlBody += "<label>Track del correo:</label><br>";
 	if ( data.processed_event ) {
 		htmlBody += "<label class=\"label label-default\">Procesado</label> ";
